@@ -150,18 +150,19 @@ herald_app_req() {   # 已配对前端有请求且认证通过:搬进 $W,返回 
   done
   PAIR_SCOPES=$_ps; CH=app; return 0
 }
-herald_reply() {   # 把 $W/resp.tmp 原子地交给发请求的通道(rename 不跟随符号链接)
+herald_reply() {   # 把 $resp(默认 $W/resp.tmp)原子地交给发请求的通道(rename 不跟随符号链接)
+  : "${resp:=$W/resp.tmp}"   # 异步分支会把 resp 指向独立临时文件;内联路径仍是 $W/resp.tmp,行为不变
   if [ "$CH" = sh ]; then
-    chmod 0666 "$W/resp.tmp" 2>/dev/null; mv -f "$W/resp.tmp" "$SHDIR/resp${RID:+.$RID}" 2>/dev/null
+    chmod 0666 "$resp" 2>/dev/null; mv -f "$resp" "$SHDIR/resp${RID:+.$RID}" 2>/dev/null
   else
     # App 的 files 目录归 App 所有:先删临时文件,再用 set -C(O_EXCL)写。App 若在空档塞符号链接,
     # O_EXCL 会让这次写直接失败而不是让 root 写到链接目标——只丢这一条回包,不会被劫持。最后 rename 是原子的。
     rm -f "$APPFILES/herald_resp.tmp" 2>/dev/null
-    if ( set -C; cat "$W/resp.tmp" > "$APPFILES/herald_resp.tmp" ) 2>/dev/null; then
+    if ( set -C; cat "$resp" > "$APPFILES/herald_resp.tmp" ) 2>/dev/null; then
       chmod 0644 "$APPFILES/herald_resp.tmp" 2>/dev/null
       mv -f "$APPFILES/herald_resp.tmp" "$APPFILES/herald_resp" 2>/dev/null
     fi
-    rm -f "$W/resp.tmp"
+    rm -f "$resp"
   fi
 }
 herald_pair() {   # $1 = "<包名> [--allow rexec]" 或 "--rotate"(只从命令行通道调用)
@@ -230,11 +231,14 @@ herald_int_in() {   # $1 值 $2 最小 $3 最大
 #     heraldp_cmdf_<命令>()   同上,但回包由函数自己写进 "$resp"(要追加、要 cp 文件的用这个)
 #     HERALDP_START           追加函数名:加载完所有插件后各调一次(起守护、做一次性初始化)
 #     HERALDP_IDLE            追加函数名:主循环空闲时每 5 秒调一次
+#     HERALDP_ASYNC           追加命令名(空格分隔):这些 heraldp_cmd_/heraldp_cmdf_ 命令后台执行,不阻塞主循环
+#                             (慢命令用)。回包照常经 resp.<id> 交付,heraldctl 无感。约束:处理函数必须可并发、
+#                             自备所需数据(不能依赖主循环复用的 $W/req 和 attach 文件)。默认空 = 全部内联,行为不变
 #     HERALDP_ATTACH          追加 "<命令>:<文件名>:<raw|b64>":这个命令的请求第 2 行起是附带数据,
 #                          命令行通道搬进 $W/<文件名>(b64 = 去掉换行);前端 App 通道从自己 files/<文件名> 取
 #     HERALDP_SELFTEST        追加函数名:selftest 时各调一次,标准输出并进 selftest 回包
 #     HERALDP_DIAG            追加函数名:diag 时各调一次,标准输出并进 diag 回包
-HERALDP_START=""; HERALDP_IDLE=""; HERALDP_ATTACH=""; HERALDP_SELFTEST=""; HERALDP_DIAG=""; HERALD_PLUGINS=""
+HERALDP_START=""; HERALDP_IDLE=""; HERALDP_ATTACH=""; HERALDP_SELFTEST=""; HERALDP_DIAG=""; HERALDP_ASYNC=""; HERALD_PLUGINS=""
 for _pl in "$PAYDIR"/plugins/*.sh; do [ -f "$_pl" ] && { . "$_pl"; HERALD_PLUGINS="$HERALD_PLUGINS ${_pl##*/}"; }; done
 for _f in $HERALDP_START; do "$_f"; done
 herald_prep
@@ -247,7 +251,8 @@ _hot=0; _idlet=0; _cleant=0     # _hot>0 = 刚处理过请求的热身期(0.1s �
       if [ $_hot -gt 0 ]; then _hot=$((_hot - 1)); _dt=1; else _dt=10; fi
       _idlet=$((_idlet + _dt)); _cleant=$((_cleant + _dt))
       [ $_idlet -ge 50 ] && { for _f in $HERALDP_IDLE; do "$_f"; done; _idlet=0; }                                      # ~每 5 秒
-      [ $_cleant -ge 6000 ] && { find "$SHDIR" -maxdepth 1 -name 'resp.*' -mmin +10 -delete 2>/dev/null; _cleant=0; }   # 被打断的回包 10 分钟后清
+      [ $_cleant -ge 6000 ] && { find "$SHDIR" -maxdepth 1 -name 'resp.*' -mmin +10 -delete 2>/dev/null
+                                 find "$W" -maxdepth 1 -name 'resp.*.async' -mmin +10 -delete 2>/dev/null; _cleant=0; }   # 被打断/交付失败的回包 10 分钟后清
       [ $_dt = 1 ] && sleep 0.1 || sleep 1
       continue
     fi
@@ -297,6 +302,18 @@ _hot=0; _idlet=0; _cleant=0     # _hot>0 = 刚处理过请求的热身期(0.1s �
               continue ;;   # 已手动落地+跳过下面统一的 mv(reboot 分支自己处理过)
       *)      # 插件命令(命令名只允许小写字母/数字/下划线)
               case "$cmd" in *[!a-z0-9_]*|"") _pf=; _pg= ;; *) _pf=heraldp_cmd_$cmd; _pg=heraldp_cmdf_$cmd ;; esac
+              # opt-in 异步:命令在 HERALDP_ASYNC 里就后台跑,不阻塞主循环;默认空集 → 永远走下面的内联路径
+              _async=0
+              if [ -n "$_pf" ]; then case " $HERALDP_ASYNC " in *" $cmd "*) _async=1 ;; esac; fi
+              if [ "$_async" = 1 ] && { type "$_pf" >/dev/null 2>&1 || type "$_pg" >/dev/null 2>&1; }; then
+                # fire-and-forget:外层子 shell 立即退出,内层后台任务被 init 收养,broker 不留僵尸。
+                # 独立的 resp.<id>.async,不碰主循环下一轮复用的 $W/resp.tmp;CH/RID/arg 子 shell 各留一份副本。
+                ( resp=$W/resp.${RID:-app}.async
+                  ( if type "$_pf" >/dev/null 2>&1; then "$_pf" "$arg" > "$resp" 2>&1
+                    else "$_pg" "$arg"; fi
+                    herald_reply ) & )
+                _hot=30; continue
+              fi
               if [ -n "$_pf" ] && type "$_pf" >/dev/null 2>&1; then "$_pf" "$arg" > "$resp" 2>&1
               elif [ -n "$_pg" ] && type "$_pg" >/dev/null 2>&1; then "$_pg" "$arg"
               else echo "err unknown-cmd:$cmd" > "$resp"; fi ;;

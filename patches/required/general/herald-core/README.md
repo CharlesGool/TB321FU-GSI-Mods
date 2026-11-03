@@ -31,6 +31,7 @@ broker 启动时按**文件名顺序**把它们 `source` 进自己的 shell(同�
 | `heraldp_cmdf_<命令>()` | 同上,但回包由函数自己写进 `"$resp"`(要追加、要 `cp` 文件、要先写后改的用这个) |
 | `HERALDP_START` | 追加函数名:所有插件加载完后各调一次(起守护、做一次性初始化) |
 | `HERALDP_IDLE` | 追加函数名:主循环空闲时每 5 秒调一次 |
+| `HERALDP_ASYNC` | 追加命令名(空格分隔):这些 `heraldp_cmd_` / `heraldp_cmdf_` 命令后台执行,不阻塞主循环(慢命令用)。回包照常经 `resp.<id>` 交付,heraldctl 无感。处理函数须可并发、自备数据(不依赖主循环复用的 `$W/req` 和 attach 文件);默认空 = 全部内联 |
 | `HERALDP_ATTACH` | 追加 `"<命令>:<文件名>:<raw\|b64>"`:这条命令的请求第 2 行起是附带数据。命令行通道搬进 `$W/<文件名>`(`b64` = 去掉换行);前端 App 通道从自己 `files/<文件名>` 取 |
 | `HERALDP_SELFTEST` / `HERALDP_DIAG` | 追加函数名:`selftest` / `diag` 时各调一次,标准输出并进回包 |
 
@@ -54,6 +55,7 @@ heraldctl 启动时 `source`。可以用 `send "<broker 命令行>" [附带数�
 - broker(`herald-start.sh`):boot_completed 后在 herald 域起,轮询请求文件,按白名单代执行命令。命令行通道 `/data/local/tmp/herald`(shell 可写,**只放 req/resp**,按 id 区分);App 通道要先 `heraldctl pair <包名>` 配对(设备随机密钥 + uid 校验)。回包先写临时文件再 rename,避免读到半截。
 - broker 日志放 root 私有的 `$STATE=/data/adb/herald/broker.log`(不放 shell 可写的通道目录,免被符号链接劫持 root 写入),由 `heraldctl log` 经 broker 读回。工作目录 `$W=/data/local/tmp/herald/.work` 仍留在通道区(root 0700,shell 进不去):回包 resp 在这里生成、带 `shell_data_file` 标签,rename 给 heraldctl(shell 域)才读得到——放到 `/data/adb` 会因 SELinux 标签不对让回包读不出来(V1.2 真机实测)。
 - 自适应轮询:刚处理过请求后约 3 秒内每 0.1 秒看一次(连续操作几乎不等),空闲回落到每 1 秒;`HERALDP_IDLE` 钩子按墙上时间约每 5 秒触发,与轮询快慢无关。
+- 单线程顺序处理;插件把慢命令名加进 `HERALDP_ASYNC`,broker 就 fire-and-forget 到后台跑(内层任务被 init 收养,不留僵尸),用独立的 `resp.<id>.async` 交付,不阻塞后续请求。默认不声明则全部内联,行为与以前逐字节一致。
 - cmd/dumpsys 的输出必须落文件,不能走管道(binder 传 fd 时接收方 system_server 要对 herald 的 fd 做检查,V62 加了 `herald:fd use` 放行)。
 - sepolicy:herald 域 permissive(等价设备上 KSU 的 blanket);herald 域归入 `netdomain`(V33:否则任何网络 socket 都报 EMSGSIZE)。keystore 域侧的放行不在这里,属于 attestation-fix。
 
