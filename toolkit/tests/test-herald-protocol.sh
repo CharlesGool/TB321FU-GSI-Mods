@@ -27,6 +27,18 @@ run_one() {  # run_one <标签> <herald-start.sh> <heraldctl> <navbar 插件目�
     local L=$1 SC=$2 CT=$3 PLUG=$4 NLMODE=$5 OUTF=$6 F=$T/$1 BP
     mkdir -p "$F"/{bin,payload/bin,payload/seed,payload/plugins,payload/heraldctl.d,data/local/tmp,data/misc/keystore,data/adb,data/data}
     cp "$HERALD_PAYLOAD"/seed/* "$F/payload/seed/" 2>/dev/null || true
+    # 无私有 payload(CI)时自给一个最小、非敏感的 config.toml,好让读写 config.toml 的断言(spoof patch all)也能跑。
+    # 有真种子就用真的,不覆盖。
+    [ -f "$F/payload/seed/config.toml" ] || cat > "$F/payload/seed/config.toml" <<'TOML'
+[trust]
+security_patch = "2024-09-05"
+os_patchlevel = "2024-09-05"
+vendor_patchlevel = "2024-09-05"
+boot_patchlevel = "2024-09-05"
+os_version = "15"
+device_locked = true
+verified_boot_state = true
+TOML
     if [[ $PLUG != - ]]; then sed -e "s#/system/bin/#$F/bin/#g" -e "s#/data/#$F/data/#g" "$PLUG/navbar.sh" > "$F/payload/plugins/navbar.sh"; cp "$PLUG/heraldctl-navbar.sh" "$F/payload/heraldctl.d/navbar.sh"; fi
     local JSON='{"enabled":true,"model":"Pixel Tablet","product":"tangorpro_beta","fingerprint":"google\/tangorpro_beta\/x:CANARY\/1\/2:user\/release-keys","security_patch":"2026-10-05"}'
     { echo '#!/bin/sh'; echo 'case "$1" in'
