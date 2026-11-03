@@ -2,7 +2,11 @@
 
 English · [Español](../es/README.md) · [简体中文](../../README.md)
 
-Everything needed to run a Pixel GSI on the Lenovo Legion Y700 Gen 3 (TB321FU). **One small patch per folder.** Each patch has its own identity file, rationale document, and apply script, and they do not depend on each other. Dependencies are declared and handled automatically at build time. Pick whichever patches you want.
+[![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](../../LICENSE)
+
+Docs: [Design](DESIGN.md) · [Patch spec](../MODULE-SPEC.md) · [Changelog](CHANGELOG.md) · [Maintenance log](LOG.md) · [History](HISTORY.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+
+All the changes needed to run a Pixel GSI on the Lenovo Legion Y700 Gen 3 (TB321FU). **One small patch per folder.** Each patch has its own identity file, rationale document, and apply script, and patches do not depend on each other. Dependencies are declared and handled automatically at build time. Pick whichever patches you want.
 
 This repo lives inside the GSI project folder `tb321fu_pixelos_15_tangorpro_ap3a.241005.015/` (much of what is in that project was made specifically for this base build). It is a reorganized version of the manual V1–V66 workflow: the same changes, but rebuilt from the original materials with a single command instead of editing the previous version's file tree each time. For how the project folder is laid out, see the `README.md` one level up.
 
@@ -17,25 +21,25 @@ Stock 9008 package ────────────────────�
 ```
 
 ```bash
-make list                           # List all patches and which ones this build will include
-make build                          # Build the system image + vbmeta_system + boot set into out/tb321fu-a15/
-make 9008 NOTE="版本备注"           # All three steps: system + boot set + 9008 package, output in out/tb321fu-a15/
+make list                           # list all patches and which ones this build will include
+make build                          # build the system image + vbmeta_system + boot set into out/tb321fu-a15/
+make 9008 NOTE="version note"       # all three steps: system + boot set + 9008 package, output in out/tb321fu-a15/
 ```
 
-`make build` is `toolkit/build.sh`. It puts the GSI base and stock firmware into the same workspace, applies patches in order from one list (system changes edit the tree, boot changes produce boot.img, and changes that touch both are done in one pass), then packages everything together. `make 9008` is `toolkit/build-9008.sh`: it runs build and then `toolkit/flash9008/make_9008_patch.sh`. For details on the 9008 package, see [docs/FLASH-9008.md](../../docs/FLASH-9008.md). For AVB re-signing, see [docs/AVB-RESIGN.md](../../docs/AVB-RESIGN.md).
+`make build` is `toolkit/build.sh`. It puts the GSI base and stock firmware into the same workspace, applies patches in order from one list (system changes edit the tree, boot changes produce boot.img, and changes that touch both are done in one pass), then packages everything together. `make 9008` is `toolkit/build-9008.sh`: it runs build and then `toolkit/flash9008/make_9008_patch.sh`. For details on the 9008 package, see [docs/FLASH-9008.md](../FLASH-9008.md). For AVB re-signing, see [docs/AVB-RESIGN.md](../AVB-RESIGN.md).
 
 ## Selecting patches
 
 You do not need to edit `device.conf`. Selection rules are passed at build time, and the system, boot set, and 9008 package steps all use the same selection:
 
 ```bash
-make 9008 WITHOUT=tango NOTE="不带 32 位"                     # drop an entire category
-make build WITHOUT=refresh-control,hotspot-6ghz-unlock                   # drop a few
-make build WITH=optional/refresh-auto-switch                  # add ones that are off by default
-make 9008 WITH=app-backup,custom-font NOTE="…"               # add advanced features that are off by default
-make 9008 PROFILE=no-tango NOTE="…"                            # use a preset
-make menu SAVE=my-build                                        # open the checkbox menu and save the selection as preset my-build
-make info P=battery                                            # show what a patch depends on and what depends on it
+make 9008 WITHOUT=tango NOTE="no 32-bit"                              # drop an entire category
+make build WITHOUT=refresh-control,hotspot-6ghz-unlock                # drop a few
+make build WITH=optional/refresh-auto-switch                          # add ones that are off by default
+make 9008 WITH=app-backup,custom-font NOTE="…"                        # add advanced features that are off by default
+make 9008 PROFILE=no-tango NOTE="…"                                   # use a preset
+make menu SAVE=my-build                                               # open the checkbox menu and save the selection as preset my-build
+make info P=battery                                                   # show what a patch depends on and what depends on it
 ```
 
 Rule syntax: patch name (`battery`, `brightness/hbm-unlimited`), category folder (`slim`, `brightness`), wildcard (`hotspot-*`, `spoof/*`), or `all`.
@@ -65,18 +69,18 @@ patches/required/general/hardware-fix/bluetooth-fix/                 combined pa
   parts/003.sco-call-fix/
 ```
 
-`patch.conf` says what a patch is and how it relates to others. The README explains how it is implemented. For the format and rules, see [docs/MODULE-SPEC.md](../../docs/MODULE-SPEC.md).
+`patch.conf` says what a patch is and how it relates to others. The README explains how it is implemented. For the format and rules, see [docs/MODULE-SPEC.md](../MODULE-SPEC.md).
 
 ## Patch overview
 
-All 47 patches (31 applied by default, including 1 pulled in automatically) are listed in **[patches/README.md](../../patches/README.md)**. The list is split into tables by `required/general` (required, general fixes), `required/tangorpro` and similar (required, specific to one base build; the folder name is the base build ID prefix and the patch only runs when it matches), `optional`, and `debug`. The tables are generated by `toolkit/gen-index.sh` from each `patch.conf`, with numbers and names. By purpose (★ = off by default):
+All 47 patches (31 applied by default, including 1 pulled in automatically) are listed in **[patches/README.md](../../patches/README.md)**. The list is split into tables by `required/general` (required, general fixes), `required/tangorpro` and similar (required, specific to one base build; the folder name is the base build ID prefix and the patch only runs when it matches), `optional`, and `debug`. The tables are generated by `toolkit/gen-index.sh` from each `patch.conf`, with numbers and Chinese names. By purpose (★ = off by default):
 
 | Purpose | Patches |
 |---|---|
 | Slimming (removal only) | `slim/pixel-leftovers`, `slim/old-vndk`, `slim/pixel-hardware` (Pixel Tablet only), `slim/google-slim` (tiered slimming of Google apps) (a generic script plus each patch's own lists/), `slim/gsi-traces` (leftovers from Mystic/phh) |
 | Restoring device identity / removing traces | `identity`, `debug-off`, `gsi-hide`, `rw-system-tmpfs`, `kernel-builder-string` (modifies boot) |
 | SELinux | `selinux/fix` (SELinux fix, changes system and boot together), `selinux/shell-logcat` |
-| Fixing GSI problems / restoring stock behavior | `auto-brightness-fix`, `rotation-fix`, `bluetooth-fix`, `hotspot-ui-fix`, `build-consistency-dialog-fix`, `macro-camera-fix` |
+| Fixing GSI problems / restoring stock behavior | `auto-brightness-fix` (auto-brightness fix), `rotation-fix`, `bluetooth-fix`, `hotspot-ui-fix`, `build-consistency-dialog-fix`, `macro-camera-fix` |
 | Stock features | `zuicamera` (Lenovo camera), `faceunlock` (face unlock), `battery` (battery protection, charge limit, bypass), `6ghz-fix` (country code + 6GHz band fix, required), `hotspot-control` (custom hotspot + commands, optional), `wifi-apex-assemble` (APEX packaging), `hotspot-6ghz-unlock` |
 | Root-free core and spoofing | `herald-core` (core: command channel, pairing, plugin interface), `attestation-fix` (key attestation: keymint engine + default identity, hooked into the core), ★`spoof/global-pif`, ★`spoof/app-spoof`, ★`herald-readonly-shell` |
 | System features | `navbar-hide`, `adaptive-refresh-fix` (adaptive refresh rate fix), `refresh-control` (refresh rate control), ★`refresh-auto-switch` (switches per app / by battery level), `tango` (32-bit APKs) |
@@ -135,3 +139,24 @@ The parent of this repo is the GSI project folder (`device.conf` picks up `OLD` 
 | `releases/` | Release builds: images and reports, 9008 patch packages |
 | `legacy/` | Build scripts and sources for the manual V1–V66 workflow (`gsi/`, `overlay/`, `faceunlock/`…). `gsi/strong/herald-payload` is herald's private payload. `faceunlock/incoming/tools` (dex2jar/r8/apktool) is still used by the build |
 | `doc/` | Backend API doc (`herald-backend-api.md`) and research notes. `doc/history/` holds old READMEs, FIXES, TEST, and release notes |
+
+## Requirements
+
+- Build host: Linux, with `sudo`, Python 3, Android build-tools 35, and the external tools listed in the "Inputs" column of each patch's README (apktool, xdelta3, etc.; bring your own).
+- Flashing: a Qualcomm 9008 (EDL) tool, on Windows or Linux.
+
+## Installation
+
+This repository produces flash packages; it is not software you install directly. The 9008 package made by `make 9008` is flashed with `flash.bat` (wipes data) or `flash_keep_data.bat` (keeps data), which are inside the package.
+
+## Uninstall
+
+Flash back the stock 9008 base firmware.
+
+## Acknowledgements
+
+AVB signing uses AOSP's `avbtool`. Full third-party credits and licenses are in [docs/THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## License
+
+This repository itself is released under GNU GPL v3.0 or later (`GPL-3.0-or-later`); the full text is in [LICENSE](../../LICENSE). `toolkit/avb/avbtool.py`, distributed with this repo, comes from AOSP and is under the `MIT` license (its copyright and license notice are in the file header). See [docs/THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.

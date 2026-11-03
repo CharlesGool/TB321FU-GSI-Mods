@@ -2,6 +2,10 @@
 
 [English](docs/en/README.md) · [Español](docs/es/README.md) · 简体中文
 
+[![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
+
+文档:[设计](docs/DESIGN.md) · [补丁规范](docs/MODULE-SPEC.md) · [变更](docs/CHANGELOG.md) · [维护日志](docs/LOG.md) · [历史](docs/HISTORY.md) · [第三方声明](docs/THIRD_PARTY_NOTICES.md)
+
 联想拯救者 Y700 三代(TB321FU)上跑 Pixel GSI 的全部改动。**一个小补丁一个文件夹**,每个补丁自带身份文件、原理文档和应用脚本,互不依赖(依赖都写明了,构建时自动处理),想要哪个打哪个。
 
 本仓库放在 GSI 工程 `tb321fu_pixelos_15_tangorpro_ap3a.241005.015/` 里面(工程里很多东西是专为这个底包做的)。它是 V1–V66 那套手工流程的重整版:同样的改动,但从"每版直接改上一版的文件树"改成**从原始材料一条命令重新构建**。工程目录怎么分见上一级的 `README.md`。
@@ -135,3 +139,24 @@ toolkit/tests/test-modules.sh devices/tb321fu-a15/device.conf --leave-out   # �
 | `releases/` | 各版本成品:镜像和报告、9008 补丁包 |
 | `legacy/` | V1–V66 手工流程的构建脚本和源码(`gsi/`、`overlay/`、`faceunlock/`…)。`gsi/strong/herald-payload` 是 herald 的私有 payload,`faceunlock/incoming/tools` 是 dex2jar/r8/apktool,构建仍在用 |
 | `doc/` | 后端接口文档(`herald-backend-api.md`)、研究笔记,`doc/history/` 是旧的 README、FIXES、TEST 和发布说明 |
+
+## 要求
+
+- 构建主机:Linux,`sudo`、Python 3、Android build-tools 35,以及各补丁 README「输入」列明的外部工具(apktool、xdelta3 等,自备)。
+- 刷机:高通 9008(EDL)工具,Windows 或 Linux。
+
+## 安装
+
+本仓库产出刷机包,不是直接安装的软件。`make 9008` 出的 9008 包按包内 `flash.bat`(清数据)或 `flash_keep_data.bat`(保数据)刷入设备。
+
+## 卸载
+
+刷回原厂 9008 底包即可。
+
+## 致谢
+
+AVB 签名用到 AOSP 的 `avbtool`。完整第三方署名与许可见 [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。
+
+## 许可证
+
+本仓库自身以 GNU GPL v3.0 或更新(`GPL-3.0-or-later`)发布,全文见 [LICENSE](LICENSE)。随仓库分发的 `toolkit/avb/avbtool.py` 来自 AOSP,按 `MIT` 许可(版权与许可声明在其文件头)。详见 [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。

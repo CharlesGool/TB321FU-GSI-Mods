@@ -2,7 +2,11 @@
 
 [English](../en/README.md) · Español · [简体中文](../../README.md)
 
-Todas las modificaciones para ejecutar Pixel GSI en la Lenovo Legion Y700 (3.ª generación, TB321FU). **Una carpeta por cada parche pequeño**; cada parche incluye su propio archivo de identidad, su documento de principios y su script de aplicación. Los parches no dependen unos de otros (las dependencias están indicadas y se resuelven automáticamente al compilar), así que puede elegir los que quiera.
+[![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](../../LICENSE)
+
+Documentación: [Diseño](DESIGN.md) · [Especificación de parches](../MODULE-SPEC.md) · [Cambios](CHANGELOG.md) · [Registro de mantenimiento](LOG.md) · [Historial](HISTORY.md) · [Avisos de terceros](THIRD_PARTY_NOTICES.md)
+
+Todas las modificaciones para ejecutar Pixel GSI en la Lenovo Legion Y700 Gen 3 (TB321FU). **Una carpeta por cada parche pequeño**; cada parche incluye su propio archivo de identidad, su documento de principios y su script de aplicación. Los parches no dependen unos de otros (las dependencias están indicadas y se resuelven automáticamente al compilar), así que puede elegir los que quiera.
 
 Este repositorio está dentro de la carpeta del proyecto GSI `tb321fu_pixelos_15_tangorpro_ap3a.241005.015/` (muchas cosas del proyecto están hechas específicamente para esta imagen base). Es la versión reorganizada del flujo manual de V1–V66: los mismos cambios, pero en lugar de "modificar directamente el árbol de archivos de la versión anterior", ahora todo se reconstruye desde los materiales originales con un solo comando. La organización de la carpeta del proyecto se explica en el `README.md` del directorio superior.
 
@@ -22,7 +26,7 @@ make build                          # genera la imagen system + vbmeta_system + 
 make 9008 NOTE="nota de versión"    # los tres pasos juntos: system + conjunto de boot + paquete 9008; salida en out/tb321fu-a15/
 ```
 
-`make build` equivale a `toolkit/build.sh`: la imagen base GSI y el firmware original se colocan en el mismo espacio de trabajo y los parches se aplican uno por uno según una lista (los que modifican system cambian el árbol de archivos, los que modifican boot generan boot.img, y los que modifican ambos se hacen de una sola vez); al final se empaqueta todo. `make 9008` equivale a `toolkit/build-9008.sh`: tras el build, ejecuta `toolkit/flash9008/make_9008_patch.sh`. Los detalles del paquete 9008 están en [docs/FLASH-9008.md](../../docs/FLASH-9008.md), y el re-firmado AVB en [docs/AVB-RESIGN.md](../../docs/AVB-RESIGN.md).
+`make build` equivale a `toolkit/build.sh`: la imagen base GSI y el firmware original se colocan en el mismo espacio de trabajo y los parches se aplican uno por uno según una lista (los que modifican system cambian el árbol de archivos, los que modifican boot generan boot.img, y los que modifican ambos se hacen de una sola vez); al final se empaqueta todo. `make 9008` equivale a `toolkit/build-9008.sh`: tras el build, ejecuta `toolkit/flash9008/make_9008_patch.sh`. Los detalles del paquete 9008 están en [docs/FLASH-9008.md](../FLASH-9008.md), y el re-firmado AVB en [docs/AVB-RESIGN.md](../AVB-RESIGN.md).
 
 ## Seleccionar parches
 
@@ -65,7 +69,7 @@ patches/required/general/hardware-fix/bluetooth-fix/                 parche comb
   parts/003.sco-call-fix/
 ```
 
-`patch.conf` indica "qué es y qué relación tiene con otros", y el README indica "cómo está implementado". El formato y las reglas están en [docs/MODULE-SPEC.md](../../docs/MODULE-SPEC.md).
+`patch.conf` indica "qué es y qué relación tiene con otros", y el README indica "cómo está implementado". El formato y las reglas están en [docs/MODULE-SPEC.md](../MODULE-SPEC.md).
 
 ## Resumen de parches
 
@@ -135,3 +139,24 @@ El directorio superior del repositorio es el proyecto GSI (`OLD` en `device.conf
 | `releases/` | Versiones publicadas: imágenes e informes, paquetes 9008 |
 | `legacy/` | Scripts de build y código fuente del flujo manual V1–V66 (`gsi/`, `overlay/`, `faceunlock/`…). `gsi/strong/herald-payload` es el payload privado de herald, y `faceunlock/incoming/tools` contiene dex2jar/r8/apktool; el build todavía los usa |
 | `doc/` | Documentación de la API del backend (`herald-backend-api.md`) y notas de investigación; `doc/history/` contiene los README, FIXES, TEST y notas de publicación antiguos |
+
+## Requisitos
+
+- Equipo de build: Linux, `sudo`, Python 3, Android build-tools 35, y las herramientas externas indicadas en la sección "Entradas" del README de cada parche (apktool, xdelta3, etc.), que debe proporcionar usted mismo.
+- Flasheo: herramienta Qualcomm 9008 (EDL), en Windows o Linux.
+
+## Instalación
+
+Este repositorio genera paquetes de flasheo; no es un programa que se instale directamente. El paquete 9008 que genera `make 9008` se flashea en el dispositivo con `flash.bat` (borra los datos) o `flash_keep_data.bat` (conserva los datos), según cuál venga incluido en el paquete.
+
+## Desinstalación
+
+Basta con volver a flashear el paquete 9008 original de fábrica.
+
+## Agradecimientos
+
+La firma AVB usa `avbtool` de AOSP. Las atribuciones y licencias completas de terceros están en [docs/THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Licencia
+
+Este repositorio se publica bajo GNU GPL v3.0 o posterior (`GPL-3.0-or-later`); el texto completo está en [LICENSE](../../LICENSE). El archivo `toolkit/avb/avbtool.py` incluido en el repositorio proviene de AOSP y se distribuye bajo licencia `MIT` (el copyright y el aviso de licencia están en su cabecera). Más detalles en [docs/THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
