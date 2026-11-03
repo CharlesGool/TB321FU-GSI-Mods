@@ -15,8 +15,9 @@
 # 不加 --apply 一律只预演(打印会删什么),不动任何文件。
 set -u
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-REL=$(cd "$HERE/../.." && pwd)/releases
-[[ -d $REL ]] || { echo "找不到 releases 目录: $REL" >&2; exit 1; }
+# releases 在数据工程目录下(本仓库独立成项目后与它平级);TB321FU_DATA 可覆盖,同 device.conf。
+REL=${TB321FU_DATA:-$(cd "$HERE/../.." && pwd)/tb321fu_pixelos_15_tangorpro_ap3a.241005.015}/releases
+[[ -d $REL ]] || { echo "找不到 releases 目录: $REL(设 TB321FU_DATA 指定数据工程目录)" >&2; exit 1; }
 
 APPLY=0; MODE=; NAMES=()
 for a in "$@"; do
