@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lenovo.tb321fu.overlay.systemui">
+    <application android:extractNativeLibs="false" android:hasCode="false"/>
+    <!-- 快捷设置里显示热点磁贴(SystemUITitan 的自动生成 RRO 把它关了); 优先级高于 tangorpro 自带的 overlay(10 / 1) -->
+    <overlay android:isStatic="true" android:priority="20" android:requiredSystemPropertyName="ro.product.vendor.device" android:requiredSystemPropertyValue="TB321FU" android:targetPackage="com.android.systemui"/>
+</manifest>

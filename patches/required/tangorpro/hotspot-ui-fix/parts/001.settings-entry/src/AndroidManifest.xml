@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lenovo.tb321fu.overlay.settings">
+    <application android:extractNativeLibs="false" android:hasCode="false"/>
+    <!-- 设置里显示 WLAN 热点(tangorpro 的 SettingsGoogleTangorproOverlay 把它关了); 优先级高于 tangorpro 自带的 overlay(10 / 1) -->
+    <overlay android:isStatic="true" android:priority="20" android:requiredSystemPropertyName="ro.product.vendor.device" android:requiredSystemPropertyValue="TB321FU" android:targetPackage="com.android.settings"/>
+</manifest>

@@ -1,0 +1,56 @@
+--- a/mods/herald/core/files/herald-start.sh	2026-10-31 13:42:33.868545526 +0700
++++ b/mods/herald/core/files/herald-start.sh	2026-10-31 13:48:29.335804875 +0700
+@@ -474,6 +474,25 @@
+     echo "os/vendor/boot_patchlevel 也已改为 $1(重启生效;用更高补丁级别生成的现有密钥可能不能再用,需要重新生成)"
+   else rm -f "$W/herald_cf"; echo "err patch all: config.toml 的 [trust] 里 os/vendor/boot_patchlevel 没改成"; return 1; fi
+ }
++# herald/app-spoof:按 App 伪装模式(模块装了且 spoof_mode 不是 global)。这个模式下系统属性一律保持真机值:
++#   config.toml [trust] 的 security_patch 固定为真机日期(keymint 启动时按它同步全局 security_patch 属性,
++#   所以属性 = 真机 = /system/build.prop,Hunter 不报不一致);os/vendor/boot_patchlevel(TEE 认证里的补丁级别)
++#   照常跟 profile 日期走;名单里的 App 由 framework 钩子看到 profile 的 Build.VERSION.SECURITY_PATCH。
++herald_app_spoof_on() {
++  [ -f /system/etc/herald_payload/app-spoof/targets.default ] && [ "$(cat "$CFG/data/spoof_mode" 2>/dev/null)" != global ]
++}
++herald_cfg_secpatch() {   # config.toml [trust] 的 security_patch 改成 $1
++  _cf=$CFG/config.toml
++  [ -f "$_cf" ] || return 1
++  sed '/^\[trust\]/,/^\[/ s/^security_patch = "[^"]*"/security_patch = "'"$1"'"/' "$_cf" > "$W/herald_cf2" 2>/dev/null
++  grep -q "^security_patch = \"$1\"" "$W/herald_cf2" 2>/dev/null || { rm -f "$W/herald_cf2"; return 1; }
++  cat "$W/herald_cf2" > "$_cf"; rm -f "$W/herald_cf2"
++}
++herald_spoof_patch_sync() {   # 切换模式后(伪装开着)按新模式重排四个补丁级别,app-spoof 插件的 spoof_mode 调用
++  _sd=$(sed -n 's/.*"security_patch":"\([^"]*\)".*/\1/p' "$DATA_PIF" 2>/dev/null | head -1)
++  [ -n "$_sd" ] || { echo "err 当前 profile 里没有 security_patch"; return 1; }
++  herald_patch "$_sd all"
++}
+ herald_real_patch() {   # 真机的安全补丁日期:原厂 vendor 的 build.prop 文件(不受 resetprop 影响)
+   sed -n 's/^ro\.vendor\.build\.security_patch=//p' /vendor/build.prop 2>/dev/null | head -1 | tr -d '\r'
+ }
+@@ -497,6 +516,18 @@
+   if [ "$(echo "$_pd" | tr -d -)" -gt "$(echo "$_today" | tr -d -)" ]; then
+     echo "err patch 日期不能晚于今天($_today): $_pd"; return 1
+   fi
++  if herald_app_spoof_on; then
++    # 按 App 伪装:profile 记新日期(名单里的 App 看到它);全局 security_patch 保持真机,不调 keymint 的同步(它会 resetprop 全局属性)
++    _rp=$(herald_real_patch)
++    [ -n "$_rp" ] && herald_cfg_secpatch "$_rp"
++    if [ -f "$DATA_PIF" ]; then
++      sed 's/"security_patch":"[^"]*"/"security_patch":"'"$_pd"'"/' "$DATA_PIF" > "$W/herald_cf" && cat "$W/herald_cf" > "$DATA_PIF"
++      rm -f "$W/herald_cf"
++    fi
++    echo "ok patch $_pd via=app-spoof reboot-required"
++    echo "按 App 伪装模式:名单里的 App 看到 $_pd;全局 security_patch 属性保持真机 ${_rp:-?}(config.toml 的 security_patch 也是它);带 all 时 TEE 的 os/vendor/boot_patchlevel 改成 $_pd"
++    return 0
++  fi
+   if "$RBIN/keymint" --webui-sync-security-patch "$1" > "$W/herald_t5" 2>&1 </dev/null; then
+     echo "ok patch $_pd via=keymint reboot-required"; cat "$W/herald_t5"; rm -f "$W/herald_t5"; return 0
+   fi
+@@ -783,6 +814,8 @@
+                   echo "$_k=$(getprop $_k 2>/dev/null)"; done
+                 echo "== 全局伪装"
+                 [ -f "$CFG/data/global_pif_enabled" ] && echo "flag=on" || echo "flag=off"
++                herald_app_spoof_on && echo "mode=app" || echo "mode=global"
++                ls -lZ /data/system/imitation.conf 2>&1
+                 ls -l "$CFG/data/pif_fingerprint.json" 2>&1
+                 grep -E '^(security_patch|os_patchlevel|vendor_patchlevel|boot_patchlevel)' "$CFG/config.toml" 2>&1
+                 for _f in logs/global-pif.log logs/keymint.log; do

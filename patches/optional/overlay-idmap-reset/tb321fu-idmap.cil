@@ -1,0 +1,3 @@
+; init 在 post-fs-data 里 rm /data/resource-cache 下我们 overlay 的旧 idmap(overlay-idmap-reset)
+(allow init resourcecache_data_file (dir (search getattr write remove_name)))
+(allow init resourcecache_data_file (file (getattr unlink)))

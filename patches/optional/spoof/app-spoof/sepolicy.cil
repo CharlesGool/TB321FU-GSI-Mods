@@ -1,0 +1,8 @@
+; spoof/app-spoof:伪装配置文件 /data/system/imitation.conf 的标签。
+; post-fs-data 的伪装脚本(herald 域,permissive)写它并 chcon 成这个类型;只给 zygote 读(fork App 之前读一次)。
+; 普通 App 没有任何规则能碰它,也进不去 /data/system。
+(type imitation_conf_file)
+(roletype object_r imitation_conf_file)
+(typeattributeset file_type (imitation_conf_file))
+(allow zygote imitation_conf_file (file (read open getattr)))
+(allow zygote system_data_file (dir (search)))

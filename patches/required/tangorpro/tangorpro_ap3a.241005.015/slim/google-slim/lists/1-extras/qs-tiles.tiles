@@ -1,0 +1,4 @@
+# 磁贴 依赖的路径(相对 system/)。路径不在了(被精简掉)就从下拉栏默认列表里去掉这个磁贴;还在的不动。一行一个,# 注释。
+# 磁贴名和 SystemUI 的 quick_settings_tiles_default 一致,custom(…) 要整段写。
+controls product/priv-app/GoogleHomePrebuilt   # 设备控制:提供者是 Google Home,精简后磁贴只剩"没有可用控制器"
+wallet product/priv-app/GoogleWallet   # 钱包:点开要 Google 钱包应用,这版底包只有 AOSP 的 QuickAccessWallet 服务、没有钱包应用,磁贴没用,所以总是去掉

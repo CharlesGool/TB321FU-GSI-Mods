@@ -1,0 +1,2 @@
+# 不带 32 位 APK 支持(Tango 五个补丁)
+-tango

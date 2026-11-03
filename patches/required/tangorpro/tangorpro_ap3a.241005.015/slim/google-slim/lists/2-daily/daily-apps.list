@@ -1,0 +1,15 @@
+# 日常会用的 Google 应用(计算器、日历、通讯录、拨号、短信、Drive、Keep、地图、相册、Gmail、时钟、TTS、录音机、天气)。路径相对 system/。
+product/app/CalculatorGooglePrebuilt_*
+product/app/CalendarGooglePrebuilt
+product/app/GoogleContacts
+product/priv-app/GoogleDialer
+product/priv-app/PrebuiltBugle
+product/app/Drive
+product/app/GoogleKeepPrebuilt
+product/app/Maps
+product/app/Photos
+product/app/PrebuiltGmail
+product/app/PrebuiltDeskClockGoogle_*
+product/app/GoogleTTS
+product/priv-app/RecorderPrebuilt_*
+product/priv-app/WeatherPixelPrebuilt

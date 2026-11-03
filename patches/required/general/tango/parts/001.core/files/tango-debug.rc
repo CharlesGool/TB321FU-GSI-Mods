@@ -1,0 +1,8 @@
+# Tango 日志目录(tango.debug 不是 off 时翻译器往 tango.log_dir 写日志)。
+# 放 /metadata/tango_log 而不是 /data/tango/log:/data 要到 post-fs-data 才可用,而且开机循环/卡第一屏时 /data 里的日志也读不到;
+# /metadata 在 first-stage 就挂载,重启后保留,卡住时进 recovery/fastbootd 或用 adb(能起 adb 的话)都能取。
+# 目录标签 tango_log_file(见 tango/sepolicy),翻译进程的各个域都能写。
+on early-init
+    mkdir /metadata/tango_log 0777 system system
+on post-fs
+    mkdir /metadata/tango_log 0777 system system

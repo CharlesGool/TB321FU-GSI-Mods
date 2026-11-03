@@ -1,0 +1,88 @@
+#!/system/bin/sh
+# heraldctl —— 免 root 核心的命令行入口(V62 起烤在 /system/bin/heraldctl,adb shell 里直接用)
+# 本身没有任何特权:只把请求写进 /data/local/tmp/herald/req,由 root broker(herald-start.sh)按白名单执行,
+# 结果从 /data/local/tmp/herald/resp 读回。前端 App(经 heraldctl pair 配对后)走同一个 broker、同一套命令。
+D=/data/local/tmp/herald
+TMO=${HERALD_TIMEOUT:-120}
+TMPF=/data/local/tmp/heraldctl.$$
+
+usage() {
+  cat <<'EOF'
+用法: heraldctl <命令> [参数]
+
+后端
+  selftest                      后端自检(身份/SELinux/读写设置/dumpsys/cmd wifi/配对)
+  pair <包名> [--allow rexec]   把一个前端 App 配对为唯一可用的前端(先打开一次该 App); --allow rexec = 授权它在 rexec 窗口期间调 rexec
+  pair --rotate                 给已配对的 App 换新密钥(授权范围不变)
+  pair                          查看配对状态
+  unpair                        取消配对(之后只有命令行能用)
+  log                           后端日志(收到的命令、被拒绝的请求)
+  diag                          只读诊断:后端和各插件(如 attestation 引擎的关键属性、keymint 日志末尾)
+  raw <broker命令> [参数]       直接发一条 broker 命令(调试用)
+  reboot                        重启
+
+EOF
+  # 插件(别的模块装进 /system/etc/heraldctl.d/ 的命令)的帮助
+  for _h in $HERALDCTL_HELP; do echo; "$_h"; done
+  cat <<'EOF'
+
+环境变量 HERALD_TIMEOUT=秒 改等待上限(默认 120)。
+失败时第一行以 err 开头, 退出码 1; 用法错误退出码 2。
+EOF
+}
+
+die() { echo "$*" >&2; rm -f "$TMPF"; exit 2; }
+
+# send <broker 命令行> [附带数据文件]
+send() {
+  [ -d "$D" ] || die "err 后端通道 $D 不存在: 系统里没有 V62 以上的 broker, 或开机后 broker 还没起来"
+  # V64: 每次请求用自己的编号, 回包只会是这条请求的(多个 heraldctl 同时跑或上一条被打断都不会串)
+  id=$$.$RANDOM
+  { printf '%s\n' "$1"; if [ -n "$2" ]; then cat "$2"; fi; } > "$D/new.$id" || die "err 写不进 $D"
+  chmod 0666 "$D/new.$id" 2>/dev/null
+  mv -f "$D/new.$id" "$D/req.$id" || die "err 提交请求失败"
+  # 自适应等待:前 3 秒每 0.05s 看一次回包(快命令几乎瞬间返回),之后每 0.5s;总等待上限仍是 TMO 秒。
+  _waited=0; _limit=$((TMO * 100))     # 单位:百分之一秒
+  while [ ! -f "$D/resp.$id" ]; do
+    if [ $_waited -ge $_limit ]; then
+      # broker 取走请求时会把 req.<id> 搬走:还在 = 没被取走(broker 没在跑或前面排着长命令), 不在 = 命令还在执行
+      if [ -f "$D/req.$id" ]; then
+        rm -f "$D/req.$id"
+        die "err ${TMO}s 内请求没被取走: broker 没在跑, 或前面有别的命令在执行(ps -A | grep herald-start; heraldctl log)"
+      fi
+      die "err ${TMO}s 内没等到结果: 命令已在执行, 只是还没跑完(结果会被丢弃; 慢命令可设 HERALD_TIMEOUT=秒 调大等待)"
+    fi
+    if [ $_waited -lt 300 ]; then sleep 0.05; _waited=$((_waited + 5)); else sleep 0.5; _waited=$((_waited + 50)); fi
+  done
+  # V75:回包直接从文件输出,不放进变量再 printf。Android 的 sh(mksh)没有内建 printf,
+  #   会把整个回包当一个参数交给 /system/bin/printf,回包一大(如 rexec dmesg)就 "Argument list too long"。
+  #   输出和以前一样:去掉末尾多余的空行,保证以一个换行结尾。
+  f=$D/resp.$id
+  sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$f"
+  [ -n "$(tail -c 1 "$f")" ] && echo      # 回包末尾没有换行时补一个
+  _rc=0
+  { [ "$(head -c 3 "$f")" = err ] || grep -q '^err wifi' "$f"; } && _rc=1
+  rm -f "$f" "$TMPF"
+  return $_rc
+}
+
+c=$1; [ $# -gt 0 ] && shift
+# V67 插件:别的模块往 /system/etc/heraldctl.d/ 放 <名字>.sh,定义 heraldctl_cmd_<命令>() 和帮助函数(追加进 HERALDCTL_HELP)
+HERALDCTL_HELP=""
+for _pl in /system/etc/heraldctl.d/*.sh; do [ -f "$_pl" ] && . "$_pl"; done
+
+case "$c" in
+  ""|-h|--help|help) usage ;;
+  selftest) send selftest ;;
+  pair)     if [ -n "$1" ]; then send "pair $*"; else send pair_status; fi ;;
+  unpair)   send unpair ;;
+  log)      send log ;;    # broker.log 已移到 root 私有目录,经 broker 读(不再直接 cat)
+  diag)     send diag ;;
+  reboot)   send reboot ;;
+  raw)      [ $# -ge 1 ] || die "用法: heraldctl raw <broker命令> [参数]"; send "$*" ;;
+
+
+  *) case "$c" in *[!a-z0-9_]*) _pf= ;; *) _pf=heraldctl_cmd_$c ;; esac
+     if [ -n "$_pf" ] && type "$_pf" >/dev/null 2>&1; then "$_pf" "$@"
+     else echo "未知命令: $c" >&2; usage >&2; exit 2; fi ;;
+esac

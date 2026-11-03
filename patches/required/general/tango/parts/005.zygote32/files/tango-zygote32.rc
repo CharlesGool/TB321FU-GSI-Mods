@@ -1,0 +1,30 @@
+# 32 位 zygote,照小米 14 Ultra(同 SM8650,官方集成 Tango)的做法:**不改 ro.zygote**(保持 vendor 的 zygote64),
+# 自己定义 zygote_secondary,只在开机保险放行(tango.zygote32=1,见 tango-guard.sh)时启动。
+# 好处:init 不再 import init.zygote64_32.rc / init.boringssl.zygote64_32.rc,system 的两个 32 位 BoringSSL 自检根本不会被触发,
+#       也不用去改原版 rc 文件;vendor 那个 32 位自检仍由 tango-boringssl32.rc 接管(它只看 abilist32)。
+# 服务定义抄原版 init.zygote64_32.rc,改三处:
+#   - ★服务名改成 tango_zygote32(V881 真机:原版 init.rc 的 on zygote-start 里有无条件的 `start zygote_secondary`,disabled 挡不住显式 start,
+#     回退纯 64 位时它照样被拉起、因 abilist32 为空反复 abort,触发 init 的 updatable_crashing 整机重启)。改名后那条 start 变成空操作。
+#   - 去掉 onrestart restart zygote:32 位 zygote 死了不连带重启 64 位 zygote / system_server(Tango 出问题时不卡开机动画)
+#   - 加 disabled:class_start main 不会自动起它,由下面的 on zygote-start 决定
+# socket 名必须仍是 zygote_secondary:system_server 的 ZygoteProcess 按 socket 名连 32 位 zygote,不看服务名。
+service tango_zygote32 /system/bin/app_process32 -Xzygote /system/bin --zygote --socket-name=zygote_secondary --enable-lazy-preload
+    class main
+    disabled
+    priority -20
+    user root
+    group root readproc reserved_disk
+    socket zygote_secondary stream 660 root system
+    socket usap_pool_secondary stream 660 root system
+    task_profiles ProcessCapacityHigh MaxPerformance
+
+# 本文件在 init.rc 之后解析,同一个 zygote-start 事件里排在 init.rc 的 start zygote 后面。
+# tango.zygote32 由 tango-guard.sh 在 post-fs-data(exec_start,早于 zygote-start)里置 1;回退时不置,32 位 zygote 就不起。
+on zygote-start && property:tango.zygote32=1
+    start tango_zygote32
+
+# 手动隔离测试(heraldctl tango zygote32 start|stop,见 tango-ctl.sh):开机完成后再起 32 位 zygote,看整机重启是否只和它有关
+on property:tango.zygote32.manual=start
+    start tango_zygote32
+on property:tango.zygote32.manual=stop
+    stop tango_zygote32

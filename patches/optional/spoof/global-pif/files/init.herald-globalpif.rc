@@ -1,0 +1,19 @@
+# ★V29 全局 PIF:post-fs-data(zygote 之前)用 resetprop 按 profile 全局覆写 build 属性 + boot-state。
+# 必须 early —— 赶在框架缓存 Build.* 前,gms.unstable(DroidGuard)native 读即得 panther(绕开 V28 死结)。
+# ★V46:触发方式从 `start`(异步,init 发完命令立刻走下一条 trigger,不等脚本跑完)改成
+#   `exec_start`(同步阻塞,init 必须等这个 oneshot 服务整个退出才会继续)。hw/init.rc 里
+#   trigger post-fs-data 和 trigger zygote-start 之间还隔着几个 trigger,原来 start 不卡这几步,
+#   属性可能还没写完 zygote 就先启动了——这才是 V37 要用"重启 zygote"补救的那场竞速的真正成因。
+#   换成 exec_start 后 init physically 不会在本脚本退出前走到 zygote-start,不再需要任何重启
+#   (zygote 重启的副作用是 Duck/春秋都会抓到的 selinuxfs sequence/policyload 不匹配误报,见
+#   herald-global-pif.sh 结尾的详细说明)。
+service herald_globalpif /system/bin/sh /system/etc/herald_payload/herald-global-pif.sh
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH SYS_NICE SYS_ADMIN
+    oneshot
+    disabled
+
+on post-fs-data
+    exec_start herald_globalpif

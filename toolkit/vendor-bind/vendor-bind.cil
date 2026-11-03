@@ -1,0 +1,7 @@
+; vendor-bind.sh 以 update_engine 域运行(脚本标签 update_engine_exec,init exec 靠 typetransition 进这个域)。
+; AOSP 策略里没有任何域能对 vendor_file / vendor_configs_file 的文件做 mounton,也没给 update_engine 读 vendor_file 的权限,
+; 所以 Enforcing 下 bind 不上、sha256sum 目标文件也读不出来(dmesg 里是 FAIL 或 "sha256 of ... is , not the stock file")。
+; Mystic 底包在 post-fs 阶段还是 Permissive,所以老版本(tb321fu.rc 那套)没暴露;selinux/fix 让内核从头 Enforcing 之后就失效了。
+; neverallow 不在开机重编时检查(init 用 secilc -N),下面的放行不会让策略编不过。
+(allow update_engine vendor_file (file (getattr read open mounton)))
+(allow update_engine vendor_configs_file (file (mounton)))

@@ -1,0 +1,22 @@
+# tango/zygote32 的开机保险,见 /system/etc/tango/tango-guard.sh 文件头。
+# exec_start:init 等它跑完才往下走,保证 ABI 属性和 tango.zygote32 在 zygote 起来之前就定了。
+service tango_guard /system/bin/sh /system/etc/tango/tango-guard.sh
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    oneshot
+    disabled
+
+on post-fs-data
+    exec_start tango_guard
+
+# 开机完成 120 秒还活着 = 带 32 位开机稳定,删掉 booting 标记,并把日志再导出一份到 /data/local/tmp/tango_log(adb pull 能直接取)
+service tango_stable /system/bin/sh /system/etc/tango/tango-stable.sh
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    oneshot
+    disabled
+
+on property:sys.boot_completed=1
+    start tango_stable

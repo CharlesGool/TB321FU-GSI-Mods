@@ -1,0 +1,4 @@
+# 零售演示。路径相对 system/,底包里没有的自动跳过。
+
+product/priv-app/RetailCorePrebuilt
+product/priv-app/RetailDemoGooglePrebuilt

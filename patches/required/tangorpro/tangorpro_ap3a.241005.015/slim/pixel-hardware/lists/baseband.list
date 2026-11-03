@@ -1,0 +1,4 @@
+# Pixel 基带(TB321FU 是纯 WiFi 版): Google RIL 扩展服务(常驻)和基带温控。路径相对 system/,底包里没有的自动跳过。
+
+system_ext/priv-app/grilservice
+system_ext/priv-app/ConnectivityThermalPowerManager

@@ -1,0 +1,6 @@
+# Google 应用(Velvet)和它的语音唤醒词录入、资源。路径相对 system/,底包里没有的自动跳过。
+
+product/priv-app/Velvet
+product/app/NgaResources
+product/priv-app/HotwordEnrollmentOKGoogleFUSIONPro
+product/priv-app/HotwordEnrollmentXGoogleFUSIONPro

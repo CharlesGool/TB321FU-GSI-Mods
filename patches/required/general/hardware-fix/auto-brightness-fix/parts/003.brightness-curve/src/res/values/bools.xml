@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 曲线需要自动亮度可用才有意义;更重要的是:只含 array 资源的 overlay 在 TB321FU 上 idmap 生成失败(STATE_NO_IDMAP,V69 实测),
+         整包必须带至少一个标量资源。这一条和 screen/auto-brightness 的值相同,同值重复无害。 -->
+    <bool name="config_automatic_brightness_available">true</bool>
+</resources>

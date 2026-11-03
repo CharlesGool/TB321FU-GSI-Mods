@@ -1,0 +1,12 @@
+# rootless Zygisk 阶段 1 的真机测量探针。exec_start(同步,照抄 tango-guard.rc 已经真机验证过的模式):
+# init 等它跑完才往下走,这一刻的 uptime 就是 post-fs-data 这个阶段开始的时刻;
+# 跟事后用 adb 读到的 zygote 自己的 starttime 一比,就是我们留给注入监控服务的时间窗口。
+service zygisk_timing_probe /system/bin/sh /system/etc/herald_payload/zygisk-timing-probe.sh
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    oneshot
+    disabled
+
+on post-fs-data
+    exec_start zygisk_timing_probe

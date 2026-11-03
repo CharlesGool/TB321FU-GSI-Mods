@@ -1,0 +1,15 @@
+--- a/smali/com/android/server/wifi/SoftApManager$SoftApStateMachine$IdleState.smali
++++ b/smali/com/android/server/wifi/SoftApManager$SoftApStateMachine$IdleState.smali
+@@ -319,10 +319,12 @@
+ 
+     check-cast v2, Landroid/os/WorkSource;
+ 
+     invoke-static {v1, v2}, Lcom/android/server/wifi/SoftApManager;->-$$Nest$fputmRequestorWs(Lcom/android/server/wifi/SoftApManager;Landroid/os/WorkSource;)V
+ 
++    invoke-static {v1}, Lcom/android/server/wifi/SoftApManager;->heraldApplyApOverrides(Lcom/android/server/wifi/SoftApManager;)V
++
+     .line 1177
+     iget-object v1, v0, Lcom/android/server/wifi/SoftApManager$SoftApStateMachine$IdleState;->this$1:Lcom/android/server/wifi/SoftApManager$SoftApStateMachine;
+ 
+     iget-object v1, v1, Lcom/android/server/wifi/SoftApManager$SoftApStateMachine;->this$0:Lcom/android/server/wifi/SoftApManager;
+ 

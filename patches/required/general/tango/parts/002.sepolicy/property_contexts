@@ -1,0 +1,4 @@
+tango.enabled u:object_r:tango_prop:s0
+tango.debug u:object_r:tango_prop:s0
+tango.log_dir u:object_r:tango_prop:s0
+tango.jit_dump_dir u:object_r:tango_prop:s0

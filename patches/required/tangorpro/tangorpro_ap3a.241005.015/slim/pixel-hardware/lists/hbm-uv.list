@@ -1,0 +1,6 @@
+# Pixel 屏幕专用: 强光模式(HBM, 常驻)和屏幕 UV 老化统计。路径相对 system/,底包里没有的自动跳过。
+
+system_ext/priv-app/HbmSVManager
+system_ext/lib/libhbmsvmanager_jni.so
+system_ext/lib64/libhbmsvmanager_jni.so
+system_ext/priv-app/UvExposureReporter

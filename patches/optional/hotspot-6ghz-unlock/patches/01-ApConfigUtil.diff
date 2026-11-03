@@ -1,0 +1,517 @@
+--- a/smali/com/android/server/wifi/util/ApConfigUtil.smali
++++ b/smali/com/android/server/wifi/util/ApConfigUtil.smali
+@@ -1888,11 +1888,494 @@
+ .end method
+ 
+ .method public static getAvailableChannelFreqsForBand(ILcom/android/server/wifi/WifiNative;Landroid/content/res/Resources;Z)Ljava/util/List;
+     .locals 4
+ 
++    const/4 v0, 0x4
++
++    if-ne p0, v0, :herald_cond_0
++
++    new-instance v0, Ljava/util/ArrayList;
++
++    invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
++
++    const/16 v1, 0x1743
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1757
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x176b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x177f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1793
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x17a7
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x17bb
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x17cf
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x17e3
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x17f7
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x180b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x181f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1833
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1847
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x185b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x186f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1883
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1897
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x18ab
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x18bf
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x18d3
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x18e7
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x18fb
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x190f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1923
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1937
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x194b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x195f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1973
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1987
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x199b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x19af
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x19c3
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x19d7
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x19eb
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x19ff
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a13
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a27
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a3b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a4f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a63
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a77
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a8b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1a9f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1ab3
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1ac7
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1adb
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1aef
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b03
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b17
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b2b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b3f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b53
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b67
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b7b
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1b8f
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1ba3
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1bb7
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    const/16 v1, 0x1bcb
++
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++
++    move-result-object v1
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    return-object v0
++
+     .line 470
++    :herald_cond_0
+     invoke-static {p0}, Lcom/android/server/wifi/util/ApConfigUtil;->isBandValid(I)Z
+ 
+     move-result v0
+ 
+     const/4 v1, 0x0
+@@ -3424,10 +3907,19 @@
+ .end method
+ 
+ .method public static isSoftApBandSupported(Landroid/content/Context;I)Z
+     .locals 3
+ 
++    const/4 v0, 0x4
++
++    if-ne p1, v0, :herald_cond_0
++
++    const/4 v0, 0x1
++
++    return v0
++
++    :herald_cond_0
+     const/4 v0, 0x0
+ 
+     const/4 v1, 0x1
+ 
+     if-eq p1, v1, :cond_6

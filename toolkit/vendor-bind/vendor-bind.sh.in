@@ -1,0 +1,50 @@
+#!/system/bin/sh
+# 开机把 /system 里的补丁文件 bind 到 /vendor 对应文件上(toolkit/vendor-bind/ 生成,由 vendor_bind_add 首次调用时装进树里)。
+# 在 post-fs 由 init exec,必须赶在用到这些文件的 HAL 启动之前。
+#
+# 描述符目录 /system/etc/vendor-bind/*.bind,每个文件三行 key=value:
+#   target=/vendor/...        要盖住的 vendor 文件
+#   patch=/system/...         补丁文件
+#   sha256=<64 位十六进制>      vendor 里 target 的原文件应有的 sha256(构建时打补丁用的那个)
+# 只有 target 存在、sha256 对得上才 bind;对不上说明 vendor 换了版本,补丁不能盖上去,跳过。
+# 结果写 dmesg,用 `dmesg | grep vendor-bind` 查看。
+
+DESC_DIR=/system/etc/vendor-bind
+VENDOR_ROOT=/vendor
+SYSTEM_ROOT=/system
+KMSG=/dev/kmsg
+
+[ "$(getprop ro.product.vendor.device)" = "@DEVICE@" ] || exit 0
+
+log() { echo "vendor-bind: $*" > "$KMSG"; }
+
+for f in "$DESC_DIR"/*.bind; do
+    [ -f "$f" ] || continue
+    name=${f##*/}; name=${name%.bind}
+    target=; patch=; want=
+    while IFS== read -r k v || [ -n "$k" ]; do
+        case $k in
+            target) target=$v ;;
+            patch)  patch=$v ;;
+            sha256) want=$v ;;
+        esac
+    done < "$f"
+
+    case $target in "$VENDOR_ROOT"/*) ;; *) log "skip $name: target '$target' is not under $VENDOR_ROOT/"; continue ;; esac
+    case $patch  in "$SYSTEM_ROOT"/*) ;; *) log "skip $name: patch '$patch' is not under $SYSTEM_ROOT/"; continue ;; esac
+    if [ -z "$want" ]; then log "skip $name: no sha256 in descriptor"; continue; fi
+    if [ ! -f "$patch" ]; then log "skip $name: patch file $patch missing"; continue; fi
+    if [ ! -f "$target" ]; then log "skip $name: target $target missing"; continue; fi
+
+    have=$(sha256sum "$target" 2>/dev/null | cut -d' ' -f1)
+    if [ "$have" != "$want" ]; then
+        log "skip $name: sha256 of $target is $have, not the stock file this build was made from ($want)"
+        continue
+    fi
+    if mount -o bind "$patch" "$target"; then
+        log "ok $name: $target"
+    else
+        log "FAIL $name: mount -o bind $patch $target"
+    fi
+done
+exit 0

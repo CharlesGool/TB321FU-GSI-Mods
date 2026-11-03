@@ -1,0 +1,8 @@
+; devopts-hide/hook:隐藏规则配置文件 /data/system/settings_compat.conf 的标签。
+; devopts-hide/control 在 post-fs-data 和每次改规则时写它并 chcon 成这个类型;只给 zygote 读(fork App 之前读一次)。
+; 普通 App 没有任何规则能碰它,也进不去 /data/system。
+(type settings_compat_file)
+(roletype object_r settings_compat_file)
+(typeattributeset file_type (settings_compat_file))
+(allow zygote settings_compat_file (file (read open getattr)))
+(allow zygote system_data_file (dir (search)))

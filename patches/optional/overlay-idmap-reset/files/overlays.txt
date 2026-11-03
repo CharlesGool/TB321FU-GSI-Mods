@@ -1,0 +1,13 @@
+# 我们放进 /product/overlay 的 overlay(含历史文件名),每行一个,不带 .apk。
+# idmap-reset 开机时删掉它们在 /data/resource-cache 里的 idmap,让系统重新生成。新增/改名 overlay 时记得加一行。
+tb321fu-auto-brightness
+tb321fu-min-brightness
+tb321fu-auto-brightness-curve
+tb321fu-brightness-curve
+tb321fu-brightness-debounce
+tb321fu-rotation-reverse-fix
+tb321fu-dock-rotation-fix
+tb321fu-screen-rotation
+treble-overlay-lenovo-tb321fu
+treble-overlay-lenovo-tb321fu-settings
+treble-overlay-lenovo-tb321fu-systemui

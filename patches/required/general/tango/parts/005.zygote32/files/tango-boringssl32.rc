@@ -1,0 +1,37 @@
+# 32 位 BoringSSL 自检改跑 64 位的那一份。
+# 现在 ro.zygote 保持 zygote64(见 tango-zygote32.rc),system 的 init.boringssl.zygote64.rc 只跑 64 位自检,下面 system 的两条 override 只是兜底;
+# 真正必须接管的是 vendor 那条:联想 vendor 的 boringssl_self_test.rc 不看 ro.zygote,只要 ro.product.cpu.abilist32 非空就在 early-init 跑它。
+# (小米 vendor 的同名 rc 是 import boringssl_self_test.${ro.zygote}.rc,所以小米不用接管;联想的写法不同。)
+# 一旦 ro.product.cpu.abilist32 非空,可能被触发的三个 32 位自检:
+#
+#   boringssl_self_test32_vendor  vendor/etc/init/boringssl_self_test.rc,on early-init,/vendor/bin/boringssl_self_test32,
+#                                 带 reboot_on_failure reboot,boringssl-self-check-failed。联想 vendor 只有 64 位,
+#                                 **这个文件根本不存在** → 起不来 → 重启。V68 卡第一屏就是它(和 Tango 无关,Tango 再好也救不了)。
+#   boringssl_self_test32         init.rc,on init,/system/bin/boringssl_self_test32(靠 Tango 翻译)。A15 的定义里没有
+#   boringssl_self_test_apex32    reboot_on_failure,失败不重启;但 exec_start 会等它退出,翻译器一旦卡住 init 就停在这里。
+#
+# 统一换成同名的 64 位程序:可执行文件标签不变(boringssl_self_test_exec / vendor_boringssl_self_test_exec),
+# 域转换照旧,不需要新策略;64 位自检多跑一次无害。vendor 那份去掉了 reboot_on_failure。
+#
+# 生效方式:
+# - system 的两个在 init.rc 里定义,先于本文件解析 → 用 override 顶掉。
+# - vendor 的在 /vendor/etc/init 里定义,后于本文件解析(/system/etc/init 先于 /vendor/etc/init)。init 的规则是
+#   "先到先得,后来的不带 override 就丢弃"(ignored duplicate definition),所以这里先定义,vendor 那份被丢弃。
+#   这里不能写 override:不是在覆盖谁;vendor 的 `on early-init ... exec_start boringssl_self_test32_vendor` 照样会触发,跑的是这一份。
+
+service boringssl_self_test32 /system/bin/boringssl_self_test64
+    override
+    stdio_to_kmsg
+    capabilities
+    user nobody
+
+service boringssl_self_test_apex32 /apex/com.android.conscrypt/bin/boringssl_self_test64
+    override
+    stdio_to_kmsg
+    capabilities
+    user nobody
+
+service boringssl_self_test32_vendor /vendor/bin/boringssl_self_test64
+    setenv BORINGSSL_SELF_TEST_CREATE_FLAG true
+    stdio_to_kmsg
+    user root

@@ -1,0 +1,3 @@
+# phh 的远程 adb 隧道(persist.sys.phh.remote=true 才启动,dropbear 连 android-remote.phh.me)。路径相对 system/。
+bin/phh-remotectl.sh
+etc/init/phh-remotectl.rc

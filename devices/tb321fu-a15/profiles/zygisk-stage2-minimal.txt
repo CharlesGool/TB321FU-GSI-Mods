@@ -1,0 +1,8 @@
+# 临时测试预设:只打 herald-core + 观察探针,排除 wifi-apex-assemble(它 ASSEMBLES wifi-service-jar,
+# -all 不会把它带掉,要显式点名)。规则按行顺序处理,所以 -all 必须写在最前面。
+# 用法: make 9008 PROFILE=zygisk-stage2-minimal NOTE="..."
+# 测完可以删这个文件。
+-all
++herald-core
++herald-zygisk-fork-observer
+-wifi-apex-assemble

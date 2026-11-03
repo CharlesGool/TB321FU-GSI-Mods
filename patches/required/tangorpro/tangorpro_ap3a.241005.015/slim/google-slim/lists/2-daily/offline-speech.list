@@ -1,0 +1,2 @@
+# 离线语音识别模型(en-US 和若干语言包)。默认不启用,见 README。路径相对 system/。
+product/usr/srec

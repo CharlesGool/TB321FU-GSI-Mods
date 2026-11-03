@@ -1,0 +1,4 @@
+# 只打 required/ 下的补丁,不带 optional 和 debug。
+# 用法: make 9008 PROFILE=required-only NOTE="..."
+-all
++required

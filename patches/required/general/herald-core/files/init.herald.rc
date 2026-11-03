@@ -1,0 +1,18 @@
+# herald-core 的 init 配置。boot_completed 后在 u:r:herald 域起 broker(herald-start.sh)。
+# broker 本身常驻(命令轮询循环在后台跑,脚本末尾 wait 阻塞;未设 oneshot,崩了 init 自动重起);keymint/inject 不是核心起的,
+# 由 attestation-fix 插件在 HERALDP_START 里拉起,作为 broker 的子进程继承下面的用户、组和 capabilities。
+# 核心自己要的:root + system 组,KILL/SETUID/SETGID/SYS_NICE 等(代执行命令、管理插件守护)。
+# 给插件用的:SYS_PTRACE(attestation-fix 的 inject 注入 keystore2);keystore 组和 DAC_OVERRIDE/CHOWN/FOWNER
+# (attestation-fix 的 keymint 写 /data/misc/keystore/herald、bind rpc.sock、连 keystore binder、spawn app_process 跑 RKP bridge);
+# inet/net_raw 和 NET_ADMIN/NET_RAW/NET_BIND_SERVICE(keymint 联网、热点等网络类插件)。
+
+service herald_main /system/bin/sh /system/etc/herald_payload/herald-start.sh
+    class late_start
+    user root
+    group root system keystore inet net_raw
+    seclabel u:r:herald:s0
+    capabilities SYS_PTRACE DAC_OVERRIDE DAC_READ_SEARCH CHOWN FOWNER FSETID KILL SETUID SETGID SYS_NICE NET_ADMIN NET_RAW NET_BIND_SERVICE
+    disabled
+
+on property:sys.boot_completed=1
+    start herald_main

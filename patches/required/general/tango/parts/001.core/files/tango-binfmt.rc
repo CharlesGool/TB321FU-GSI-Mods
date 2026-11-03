@@ -1,0 +1,11 @@
+# 注册 binfmt_misc:所有 32 位 ARM ELF(含 32 位 zygote)都交给 /system_ext/bin/tango_translator。
+# 魔数/掩码/标志(POCF)照 Tango 官方集成包 tango-binfmt.rc,没改。开关属性 tango.enabled。
+on early-init
+    mount binfmt_misc none /proc/sys/fs/binfmt_misc
+    write /proc/sys/fs/binfmt_misc/register ":tango_translator:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\xfe\xff\xff\xff:/system_ext/bin/tango_translator:POCF"
+
+on property:tango.enabled=1
+    write /proc/sys/fs/binfmt_misc/tango_translator 1
+
+on property:tango.enabled=0
+    write /proc/sys/fs/binfmt_misc/tango_translator 0

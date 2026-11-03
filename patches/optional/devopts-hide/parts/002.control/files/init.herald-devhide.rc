@@ -1,0 +1,12 @@
+# devopts-hide/control:开机时(zygote 之前)把隐藏规则写成 zygote 读的配置文件。
+#   herald_devhide_boot  post-fs-data 同步跑一次(exec_start)。运行时改规则由 broker 直接调同一个脚本,不用服务。
+service herald_devhide_boot /system/bin/sh /system/etc/herald_payload/herald-devopts-hide.sh boot
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH CHOWN FOWNER
+    oneshot
+    disabled
+
+on post-fs-data
+    exec_start herald_devhide_boot

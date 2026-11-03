@@ -1,0 +1,2 @@
+# Google TTS 的语音数据(GoogleTTS 应用已被 google-apps 清单 删掉,数据成了孤儿)。路径相对 system/。
+product/tts/google

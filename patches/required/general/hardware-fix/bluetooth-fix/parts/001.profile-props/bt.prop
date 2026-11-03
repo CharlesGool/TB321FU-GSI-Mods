@@ -1,0 +1,24 @@
+# TB321FU: A2DP 不走高通 offload, 改用 vendor 的 bluetooth_qti 软件编码
+# (需要 /system/etc/audio_policy_configuration_bluetooth_legacy_hal.xml)
+persist.bluetooth.a2dp_offload.disabled=true
+persist.bluetooth.bluetooth_audio_hal.disabled=false
+# 和原厂 ZUI 一致: 双模耳机默认走经典蓝牙, 不默认连 LE Audio
+ro.bluetooth.leaudio.le_audio_connection_by_default=false
+# 关掉 Pixel 专用、高通 vendor 不支持的特性
+persist.bluetooth.opus.enabled=false
+bluetooth.core.le_audio.codec_extension_aidl.enabled=false
+bluetooth.hfp.swb.supported=false
+# LE Audio 走高通 offload, 在 AOSP 协议栈下不可用(打开后 PAL 报 a2dp handle is not identified),
+# 软件路径 vendor 策略里也没有 BLE 端口. 直接关掉 LE Audio 相关 profile, 双模耳机只走经典蓝牙.
+bluetooth.profile.bap.unicast.client.enabled=false
+bluetooth.profile.bap.unicast.server.enabled=false
+bluetooth.profile.bap.broadcast.assist.enabled=false
+bluetooth.profile.bap.broadcast.source.enabled=false
+bluetooth.profile.csip.set_coordinator.enabled=false
+bluetooth.profile.hap.client.enabled=false
+bluetooth.profile.vcp.controller.enabled=false
+bluetooth.profile.vc.server.enabled=false
+bluetooth.profile.mcp.server.enabled=false
+bluetooth.profile.ccp.server.enabled=false
+bluetooth.profile.tbs.server.enabled=false
+ro.bluetooth.leaudio_switcher.supported=false

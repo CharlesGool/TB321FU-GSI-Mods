@@ -1,0 +1,11 @@
+# diag-boot-camera-log:post-fs-data(/data 可写、相机 HAL 还没起)开始记日志,记 150 秒。
+# 用 herald 域(permissive)跑:读内核日志、写 /data/local/tmp 都不用另加 SELinux 规则。
+service tb321fu_bootcamlog /system/bin/sh /system/etc/tb321fu-bootcamlog.sh
+    user root
+    group root log
+    seclabel u:r:herald:s0
+    oneshot
+    disabled
+
+on post-fs-data
+    start tb321fu_bootcamlog

@@ -1,0 +1,2 @@
+# Mystic 的调试服务:每次开机以 root 跑 logcat -f /data/boot_lc_main.txt。路径相对 system/。
+etc/init/mystic.rc

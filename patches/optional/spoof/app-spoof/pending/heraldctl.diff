@@ -1,0 +1,24 @@
+--- a/mods/herald/core/files/heraldctl	2026-10-31 13:42:33.880546426 +0700
++++ b/mods/herald/core/files/heraldctl	2026-10-31 13:43:33.000032604 +0700
+@@ -27,6 +27,8 @@
+   spoof apply <product> [b p v] 用内建机型预填(不打开全局开关); product 取 spoof list 里的名字, 如 panther_beta
+   spoof set <profile.json>      写入 profile 并打开全局伪装(重启生效)
+   spoof off                     关闭全局伪装(重启生效)
++  spoof mode [app|global]       伪装方式:app = 只给名单里的 App 换 Build.*(默认),global = 全局改属性(重启生效)
++  spoof apps [add|remove <名字>] 按 App 伪装的名单(默认 + 额外,重启生效)
+   spoof patch <YYYY-MM-DD|auto> [all] 同步安全补丁日期(auto = 用当前 profile 里的日期); 不能晚于今天;
+                                 加 all = 连 os/vendor/boot_patchlevel 一起改(默认不动;改低会让用更高级别生成的现有密钥失效)
+ 
+@@ -149,7 +151,11 @@
+       set)   [ -f "$1" ] || die "用法: heraldctl spoof set <profile.json>(文件不存在: $1)"
+              grep -q '"fingerprint"' "$1" || die "err $1 里没有 fingerprint 字段"
+              send set "$1" ;;
+-      *)     die "spoof 子命令: get list apply set off patch" ;;
++      mode)  case "$1" in ""|app|global) ;; *) die "用法: heraldctl spoof mode [app|global]" ;; esac; send "spoof_mode $*" ;;
++      apps)  case "$1" in ""|list) send "spoof_apps list" ;;
++               add|remove) [ -n "$2" ] || die "用法: heraldctl spoof apps add|remove <进程名或包名>"; send "spoof_apps $1 $2" ;;
++               *) die "用法: heraldctl spoof apps [list] | add|remove <进程名或包名>" ;; esac ;;
++      *)     die "spoof 子命令: get list apply set off patch mode apps" ;;
+     esac ;;
+ 
+   keybox)

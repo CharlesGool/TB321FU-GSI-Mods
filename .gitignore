@@ -1,0 +1,31 @@
+# 构建产物和临时
+/out/
+/build/
+*.img
+*.log
+/devices/*/out/
+
+# 私有件(不进仓库,见各模块 README 的"输入")
+/private/
+# herald 引擎二进制和 keybox 是私有的:只收脚本/sepolicy/文档,不收 payload
+/mods/herald-backend/payload/
+
+# 救回来的大文件(临时放着,整理完删)
+/_rescue/
+
+# 编译中间物
+*.class
+*.dex
+__pycache__/
+*.pyc
+.claude/settings.local.json
+
+# 本地文件与机密(all-in-one 规范)
+.local/
+.env
+
+# 含专有 Megvii SDK 的预编译 APK:由 parts/002.app/src + fetch_upstream.sh 重建,不入公开仓库
+patches/optional/faceunlock/parts/002.app/files/FaceUnlock.apk
+# 人脸录入教育页的原厂素材(从 Pixel 设置提取),不随仓库分发;重建 overlay 前自备
+patches/optional/faceunlock/parts/003.settings-entry/src/overlay/res/raw/face_education_lottie.json
+patches/optional/faceunlock/parts/003.settings-entry/src/overlay/res/raw/face_settings.mp4

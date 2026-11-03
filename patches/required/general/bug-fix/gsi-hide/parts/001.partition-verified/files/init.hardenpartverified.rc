@@ -1,0 +1,8 @@
+# TB321FU V7.4+: GSI 下 init 挂载分区时把 partition.{system,vendor,odm}.verified 设为 0.
+# 在 post-fs-data 覆盖掉, 让检测器读到的伪装值和 build.prop 里 product/system_ext 的一致.
+on post-fs-data
+    setprop partition.system.verified 1
+    setprop partition.vendor.verified 1
+    setprop partition.odm.verified 1
+    setprop partition.product.verified 1
+    setprop partition.system_ext.verified 1

@@ -1,0 +1,2 @@
+; Mystic 的 plat_sepolicy 没给 shell 执行 /system/bin/logcat(logd_exec),Permissive 时看不出来,Enforcing 后 adb logcat 被拒。
+(allow shell logd_exec (file (getattr execute read open map execute_no_trans)))

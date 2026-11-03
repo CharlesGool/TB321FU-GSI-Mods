@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 四个方向都允许自动旋转(含竖屏倒过来)。AOSP 默认只在大屏(最小宽度够大)上允许;"显示大小"调大后最小宽度 < 600dp,系统就把本机当手机 -->
+    <bool name="config_allowAllRotations">true</bool>
+</resources>

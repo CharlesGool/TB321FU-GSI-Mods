@@ -1,0 +1,59 @@
+; ============================================================================
+; rootless 核心的 sepolicy(CIL,追加到 plat_sepolicy.cil)
+; ============================================================================
+; 只定义核心自己的东西:herald 域(broker 和所有插件的进程都在这个域里跑)、herald_exec 文件标签、
+; init 启动它的转换、system_server 接收它传来的 fd。
+; 具体功能自己带策略:attestation 引擎要放行 keystore 域,在 attestation-fix 补丁的 sepolicy_attestation.cil 里。
+;
+; 设计依据:
+;   - herald 域 permissive:等价设备上 KSU 的 blanket(无约束)。strong-spike 的"自定义域 permissive 会被
+;     DroidGuard 探测"假设已被 V23e 证伪(干净 enforcing 仍 BASIC → sepolicy 非 gap)。
+;     后若要收 enforcing,按 permissive 期采集的 AVC 逐条补。
+; ============================================================================
+
+; ---- 类型声明 ----
+(type herald)              ; broker 和所有插件的运行域
+(type herald_exec)         ; payload 目录(脚本、插件、二进制)的文件标签
+
+(typeattributeset domain (herald))
+(typeattributeset exec_type (herald_exec))
+(typeattributeset file_type (herald_exec))
+(typeattributeset system_file_type (herald_exec))
+(roletype r herald)
+(typeattributeset mlstrustedsubject (herald))
+
+; ★ herald 域 permissive(等价设备上 ksu blanket;见顶部依据)
+(typepermissive herald)
+
+; ★V33 修 Bug①(herald 域任何网络 socket 操作报 EMSGSIZE,netd 侧 "control message was truncated
+;   when receiving file descriptors"):加 capabilities(NET_ADMIN/NET_RAW)+ 补充组(inet/net_raw)
+;   已证实落地(CapEff/Groups 核对过)但仍不解决——说明不是权限缺失,是 netd FwmarkClient 交互
+;   (SCM_RIGHTS 传 fd 给 netd 打 fwmark/路由)在这个域下传输异常。
+;   关键认识:(typepermissive herald) 只让 SELinux 的 allow/deny 判定变成空操作(照常记 avc、不拦),
+;   **不改变 herald 这个 type 有没有被打上策略属性**。AOSP 的 net_domain() 宏(platform_app/system_app/
+;   shell 等正经网络域都用它)不只是发 allow 规则,还把域加进 netdomain 这个 attribute——某些内核/
+;   策略对 unix_stream_socket 的 ancillary 数据打包方式(是否额外带 SCM_SECURITY 标签)是按"域是否
+;   属于 netdomain"这个属性事实分支的,是行为选择不是访问控制判定,permissive 管不到。herald 域此前
+;   没把自己归进 netdomain,只手写了几条窄 allow——这里补上。
+(typeattributeset netdomain (herald))
+
+; ---- init 以 seclabel u:r:herald:s0 起 herald-start.sh(/system/bin/sh 入口)----
+; init.herald.rc 用 seclabel 直接定域;init(enforcing)需被放行向 herald 转换、herald 需 entrypoint。
+; 入口是 /system/bin/sh(shell_exec);payload 二进制(herald_exec)由 herald 域再 exec。
+(allow init herald (process (transition)))
+(allow herald init (process (sigchld)))
+(allow herald init (fd (use)))
+(allow herald shell_exec (file (entrypoint execute read open getattr map execute_no_trans)))
+(allow herald herald_exec (file (entrypoint execute execute_no_trans read open getattr map)))
+(allow herald herald_exec (dir (search open read getattr)))
+(allow init herald_exec (file (getattr open read execute map)))
+
+; ---- V62:让 herald broker 能调用 system_server 里的服务(settings / cmd wifi / dumpsys wifi)----
+; cmd/dumpsys 把调用方的 stdin/stdout/stderr fd 经 binder 交给服务端。fd 是 herald 域进程打开的,
+; system_server(enforcing)要有 herald:fd use 才收得下,否则内核直接让这次 binder 事务失败,
+; 表现为 V60/V61 实测的 "Failure calling service ...: Failed transaction (2147483646)"。
+; herald 自己是 permissive,只有 system_server 这一侧的判定会拦,所以只需放行 system_server。
+(allow system_server herald (fd (use)))
+(allow system_server herald (fifo_file (read write getattr append)))          ; $(...) 管道输出
+(allow system_server herald (binder (call transfer)))                         ; ResultReceiver/ShellCallback 回调 cmd 进程
+(allow system_server shell_data_file (file (read write getattr append)))   ; 输出重定向到 /data/local/tmp/herald/.work 下的文件

@@ -1,0 +1,5 @@
+# 把 /system/etc/vendor-lib32(小米 32 位 GPU 栈)和原厂 /vendor/lib 叠成一个只读 overlay 盖在 /vendor/lib 上。
+# 原厂 /vendor/lib 里的 rfsa/adsp(DSP 库)和 modules 照样可见;overlay 的 lowerdir 左边优先,这里不重名。
+# 用 init 自己的 mount,不新增 SELinux 域。设备守护:只在 TB321FU 上做。
+on post-fs && property:ro.product.vendor.device=TB321FU
+    mount overlay overlay /vendor/lib ro nosuid nodev lowerdir=/system/etc/vendor-lib32:/vendor/lib

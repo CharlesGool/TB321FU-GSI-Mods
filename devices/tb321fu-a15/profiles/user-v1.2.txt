@@ -1,0 +1,8 @@
+# user-v1.2 正式版:在 user-v1.1 的补丁集基础上修蓝牙(vendor-bind 补 update_engine 的 SELinux 权限)。
+-all
++required
++optional/smooth-display
++optional/navbar-hide
++optional/faceunlock
++optional/free-rotation
++optional/spoof/global-pif

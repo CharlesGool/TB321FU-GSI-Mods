@@ -1,0 +1,16 @@
+# 不是人人都用的 Google 应用(YouTube 全家、Meet、Home、Wellbeing、ARCore 等)。路径相对 system/。
+product/app/MeetPrebuilt_*
+product/priv-app/HealthIntelligencePrebuilt-1762
+product/priv-app/TipsPrebuilt_*
+product/app/LocationHistoryPrebuilt
+product/app/PlayBooksPrebuilt
+product/app/Videos
+product/app/YouTube
+product/app/YouTubeKidsPrebuilt
+product/app/YouTubeMusicPrebuilt
+product/app/arcore-1.42
+product/app/DevicePolicyPrebuilt-*
+product/app/WallpaperEmojiPrebuilt-v470
+product/priv-app/WellbeingPrebuilt
+product/priv-app/GoogleHomePrebuilt
+product/priv-app/PixelLiveWallpaperPrebuilt

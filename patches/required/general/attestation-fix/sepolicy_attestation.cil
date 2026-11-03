@@ -1,0 +1,57 @@
+; ============================================================================
+; attestation 引擎的 sepolicy(CIL,追加到 plat_sepolicy.cil,要在 herald-core 的 sepolicy 之后)
+; ============================================================================
+; 目标:把设备上实测过认证的 oh_my_keymint(keymint + inject,Rust 原生二进制)以 herald 域服务烤入。
+;   - keymint 是原生 Rust ELF,不跑 app_process+dex → 无 ART/idmap/resourcecache 痛点。
+;   - inject 靠 ptrace attach keystore2;keystore 域(enforcing)侧需放行读 herald payload / 被回调 / 执行映射注入体。
+;   - keymint 自带:bind /data/misc/keystore/herald/rpc.sock(keystore 上下文)、注册 binder
+;     IRemotelyProvisionedComponent、spawn app_process 跑 duck.rkp.RkpV1Bridge(本机 RKP)、
+;     resetprop helper(patch 同步)。这些 herald-source 的动作都被 herald 域 permissive 覆盖。
+; ============================================================================
+
+; ---- keystore 域(enforcing)侧:注入与回调放行(herald permissive 盖不到 keystore-source)----
+; inject 把注入体 fd 传进 keystore2 后由 keystore 域 dlopen/map(fd 继承 herald_exec 标签)。
+(allow keystore herald_exec (file (read open getattr execute map execute_no_trans)))
+(allow keystore herald_exec (dir (search open read getattr)))
+(allow keystore herald_exec (lnk_file (read getattr)))
+; keystore2 里的注入体回调 keymint 守护(binder + unix socket rpc.sock)。
+(allow keystore herald (binder (call transfer)))
+(allow keystore herald (unix_stream_socket (connectto read write)))
+(allow keystore herald (fd (use)))
+; herald 守护被注入体/keystore 回连(permissive 已覆盖 herald-source,这里补 keystore→herald 的对端)。
+
+; ---- ★可写运行目录 /data/misc/keystore/herald/bin(herald_exec),解 remote dlopen EACCES ----
+; inject 用 /proc/self/exe 定位自身、把内嵌 payload .so 部署在自身目录再让 keystore2 dlopen。
+; 烤在只读 /system 部署不了、且 keystore 不能 exec /data 的 .so(EACCES)。故 herald-start 把
+; 二进制复制到 /data/misc/keystore/herald/bin;下面 type_transition 让该 "bin" 目录及其中新建文件
+; (复制来的二进制 + inject 部署的 payload .so)自动落 herald_exec —— 免 restorecon(不需 MAC_ADMIN)。
+; keystore 已被放行 read/execute/map herald_exec → fd handoff 成功,namespace 不再相关。
+(typetransition herald keystore_data_file dir "bin" herald_exec)
+(typetransition herald herald_exec file herald_exec)     ; herald_exec 目录内新建文件 → herald_exec
+(typetransition herald herald_exec dir herald_exec)
+; herald 在 keystore 数据目录下建 bin + 读写(permissive 已覆盖,显式写便于日后转 enforcing)
+(allow herald keystore_data_file (dir (search open read getattr add_name remove_name write setattr)))
+(allow herald keystore_data_file (file (create read write open getattr setattr unlink rename map execute)))
+(allow herald herald_exec (dir (create search open read getattr add_name remove_name write setattr)))
+(allow herald herald_exec (file (create read write open getattr setattr unlink rename execute execute_no_trans map entrypoint)))
+; keystore 读 bin 目录(herald_exec)定位 payload(前面已给 herald_exec dir/file 读执行映射)
+
+; ---- GMS 侧:ID attestation(三绿可能需要,gmscore_app 域 enforcing)----
+; keystore2 被注入后以 keystore 标签服务;若 GMS 对注入 key 做 gen_unique_id,放行。
+; (沿用 teesim 域同款;herald 注入 key 仍在 keystore 标签下)
+
+; ---- file_contexts(make_gsi OMK 分支追加到 plat_file_contexts)----
+;   /system/etc/herald_payload(/.*)?        u:object_r:herald_exec:s0     (只读 payload,xattr 已由 put 打)
+;   /data/misc/keystore/herald 基路径归 keystore_data_file(keystore 家目录),herald(permissive)可写。
+;   /data/adb/herald(/.*)?                  —— 让它继承 /data/adb 标签;herald permissive 可写。
+;
+; ---- Goal2(最终版):内置 resetprop boot-state 伪装 ----
+; 用户定稿 boot-state 走内置 resetprop(不 relock)。herald-start.sh 在 BOOTSTATE=1 构建里跑 resetprop,
+; 覆写 ro.boot.verifiedbootstate=green / *.device_state=locked / flash.locked=1 等(复刻 OMK service.sh)。
+; resetprop 直改 /dev/__properties__ 序列化区 + 走 property_service set。当前 herald 域 permissive → 全部放行,
+; 无需显式 CIL。★日后把 herald 收紧成 enforcing 时,须为下列 prop_type 逐条放行 set_prop 与属性区读写
+;   (按 permissive 期 logcat 的 avc: denied 采集精确类型,勿凭名字猜 —— 猜错会使整个 plat_sepolicy 编译失败/开不了机):
+;   verifiedbootstate/device_state → 多为 vbmeta_prop;flash.locked/veritymode → boot_mode_prop 一类;
+;   ro.build.type/tags → exported_default_prop/build_prop;sys.oem_unlock_allowed → ...
+; 参考形: (allow herald <prop_type> (property_service (set)))
+;          (allow herald <prop_type> (file (read write open map getattr)))

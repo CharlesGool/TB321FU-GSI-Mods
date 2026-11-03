@@ -1,0 +1,9 @@
+# user-v1.1 候选(测试通过就转正式版):在 user-v1.0(test-v16 同款补丁集)的基础上,
+# 加回 attestation-fix(密钥认证,+required 自动带上)和 optional/spoof/global-pif(全局机型伪装)。
+-all
++required
++optional/smooth-display
++optional/navbar-hide
++optional/faceunlock
++optional/free-rotation
++optional/spoof/global-pif

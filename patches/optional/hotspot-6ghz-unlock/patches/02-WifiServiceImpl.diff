@@ -1,0 +1,504 @@
+--- a/smali/com/android/server/wifi/WifiServiceImpl.smali
++++ b/smali/com/android/server/wifi/WifiServiceImpl.smali
+@@ -8532,13 +8532,500 @@
+ 
+     return-void
+ .end method
+ 
+ .method private synthetic lambda$getUsableChannels$132(III)Ljava/util/List;
+-    .locals 0
++    .locals 3
++
++    const/16 v0, 0x8
++
++    if-ne p1, v0, :herald_cond_0
++
++    and-int/lit8 v0, p2, 0x2
++
++    if-eqz v0, :herald_cond_0
++
++    new-instance v0, Ljava/util/ArrayList;
++
++    invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1743
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1757
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x176b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x177f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1793
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x17a7
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x17bb
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x17cf
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x17e3
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x17f7
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x180b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x181f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1833
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1847
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x185b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x186f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1883
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1897
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x18ab
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x18bf
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x18d3
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x18e7
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x18fb
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x190f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1923
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1937
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x194b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x195f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1973
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1987
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x199b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x19af
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x19c3
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x19d7
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x19eb
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x19ff
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a13
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a27
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a3b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a4f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a63
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a77
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a8b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1a9f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1ab3
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1ac7
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1adb
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1aef
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b03
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b17
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b2b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b3f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b53
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b67
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b7b
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1b8f
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1ba3
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1bb7
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    new-instance v1, Landroid/net/wifi/WifiAvailableChannel;
++
++    const/16 v2, 0x1bcb
++
++    invoke-direct {v1, v2, p2, p3}, Landroid/net/wifi/WifiAvailableChannel;-><init>(III)V
++
++    invoke-interface {v0, v1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
++
++    return-object v0
+ 
+     .line 7577
++    :herald_cond_0
+     iget-object p0, p0, Lcom/android/server/wifi/WifiServiceImpl;->mWifiNative:Lcom/android/server/wifi/WifiNative;
+ 
+     invoke-virtual {p0, p1, p2, p3}, Lcom/android/server/wifi/WifiNative;->getUsableChannels(III)Ljava/util/List;
+ 
+     move-result-object p0

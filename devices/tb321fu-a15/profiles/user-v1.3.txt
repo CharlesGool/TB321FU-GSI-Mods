@@ -1,0 +1,8 @@
+# user-v1.3 正式版:补丁集同 user-v1.2,herald-core 升到 V1.3(真机实测稳定)并带新认证引擎。
+-all
++required
++optional/smooth-display
++optional/navbar-hide
++optional/faceunlock
++optional/free-rotation
++optional/spoof/global-pif

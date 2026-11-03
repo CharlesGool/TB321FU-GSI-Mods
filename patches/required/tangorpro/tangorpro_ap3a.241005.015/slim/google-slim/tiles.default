@@ -1,0 +1,2 @@
+# 底包 SystemUITitan 里平板的默认磁贴(来自 SystemUITitan__tangorpro__auto_generated_rro_product.apk 的 quick_settings_tiles_default)
+internet,bt,rotation,controls,mictoggle,cameratoggle,dream,night,custom(com.google.android.gms/.nearby.sharing.SharingTileService),custom(com.google.android.permissioncontroller/com.android.permissioncontroller.permission.service.v33.SafetyCenterQsTileService)

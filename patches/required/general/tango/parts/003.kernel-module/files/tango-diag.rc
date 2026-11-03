@@ -1,0 +1,10 @@
+# tango/kernel-module 的诊断,见 /system/etc/tango/tango-diag.sh。开机完成 30 秒后跑一次。
+service tango_diag /system/bin/sh -c "sleep 30; exec /system/bin/sh /system/etc/tango/tango-diag.sh"
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    oneshot
+    disabled
+
+on property:sys.boot_completed=1
+    start tango_diag

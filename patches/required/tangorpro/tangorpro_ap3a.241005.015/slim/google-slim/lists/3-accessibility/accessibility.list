@@ -1,0 +1,7 @@
+# 无障碍应用(都能从 Play 装回来)。路径相对 system/,底包里没有的自动跳过。
+
+product/app/SwitchAccessPrebuilt_*
+product/app/talkback
+product/app/SoundAmplifierPrebuilt_*
+product/app/VoiceAccessPrebuilt
+product/priv-app/ScribePrebuilt_*

@@ -1,0 +1,95 @@
+; Tango 的 SELinux 策略(官方集成包 sepolicy/system/{public,private}/tango.te + te_macros 的 CIL 展开)。
+; neverallow 不在开机重编时检查(init 用 secilc -N),所以下面给 appdomain/zygote 的 execmem 不会让策略编不过;
+; 但它确实放宽了所有 app 的加固,见 README"取舍"。
+
+; ---- 类型 ----
+(type tango_prop)
+(roletype object_r tango_prop)
+(typeattributeset property_type (tango_prop))
+(typeattributeset system_property_type (tango_prop))
+
+(type tango32_device)
+(roletype object_r tango32_device)
+(typeattributeset dev_type (tango32_device))
+(typeattributeset mlstrustedobject (tango32_device))
+
+; ---- init 挂 binfmt_misc 并往里注册 ----
+(allow init proc (dir (mounton)))
+(allow init binfmt_miscfs (file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; ---- init 从 /system 加载 tango32.ko(kernel-module 模块用)----
+(allow init system_file (system (module_load)))
+
+; tango_translated(zygote, zygote_tmpfs)
+(allow zygote self (process (execmem)))
+(allow zygote zygote_tmpfs (file (open read write getattr map)))
+(allow zygote tango_prop (file (read getattr map open)))
+(allow zygote tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; tango_translated(app_zygote, app_zygote_tmpfs)
+(allow app_zygote self (process (execmem)))
+(allow app_zygote app_zygote_tmpfs (file (open read write getattr map)))
+(allow app_zygote tango_prop (file (read getattr map open)))
+(allow app_zygote tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; tango_translated(webview_zygote, webview_zygote_tmpfs)
+(allow webview_zygote self (process (execmem)))
+(allow webview_zygote webview_zygote_tmpfs (file (open read write getattr map)))
+(allow webview_zygote tango_prop (file (read getattr map open)))
+(allow webview_zygote tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; tango_translated(appdomain, appdomain_tmpfs)
+(allow appdomain self (process (execmem)))
+(allow appdomain appdomain_tmpfs (file (open read write getattr map)))
+(allow appdomain tango_prop (file (read getattr map open)))
+(allow appdomain tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; tango_translated(crash_dump, tmpfs)
+(allow crash_dump self (process (execmem)))
+(allow crash_dump tmpfs (file (open read write getattr map)))
+(allow crash_dump tango_prop (file (read getattr map open)))
+(allow crash_dump tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; tango_translated(boringssl_self_test, tmpfs)
+(allow boringssl_self_test self (process (execmem)))
+(allow boringssl_self_test tmpfs (file (open read write getattr map)))
+(allow boringssl_self_test tango_prop (file (read getattr map open)))
+(allow boringssl_self_test tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; tango_translated(vendor_boringssl_self_test, tmpfs)
+(allow vendor_boringssl_self_test self (process (execmem)))
+(allow vendor_boringssl_self_test tmpfs (file (open read write getattr map)))
+(allow vendor_boringssl_self_test tango_prop (file (read getattr map open)))
+(allow vendor_boringssl_self_test tango32_device (chr_file (ioctl read write getattr lock append map open watch watch_reads)))
+
+; 翻译器启动时读 /proc/sys/kernel/randomize_va_space(V79 真机 zygote 域被拒,翻译器只是告警;给上免得每个 32 位进程都刷一条 avc)
+(allow zygote proc_security (file (read open getattr)))
+
+; ---- 日志目录 /metadata/tango_log(tango.log_dir)----
+(type tango_log_file)
+(roletype object_r tango_log_file)
+(typeattributeset file_type (tango_log_file))
+(typeattributeset mlstrustedobject (tango_log_file))
+(allow init tango_log_file (dir (create setattr add_name write getattr search open read)))
+(allow init metadata_file (dir (search getattr write add_name)))
+(allow zygote metadata_file (dir (search getattr)))
+(allow zygote tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow zygote tango_log_file (file (create open read write append getattr setattr)))
+(allow app_zygote metadata_file (dir (search getattr)))
+(allow app_zygote tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow app_zygote tango_log_file (file (create open read write append getattr setattr)))
+(allow webview_zygote metadata_file (dir (search getattr)))
+(allow webview_zygote tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow webview_zygote tango_log_file (file (create open read write append getattr setattr)))
+(allow appdomain metadata_file (dir (search getattr)))
+(allow appdomain tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow appdomain tango_log_file (file (create open read write append getattr setattr)))
+(allow crash_dump metadata_file (dir (search getattr)))
+(allow crash_dump tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow crash_dump tango_log_file (file (create open read write append getattr setattr)))
+(allow boringssl_self_test metadata_file (dir (search getattr)))
+(allow boringssl_self_test tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow boringssl_self_test tango_log_file (file (create open read write append getattr setattr)))
+(allow vendor_boringssl_self_test metadata_file (dir (search getattr)))
+(allow vendor_boringssl_self_test tango_log_file (dir (search getattr open read write add_name remove_name)))
+(allow vendor_boringssl_self_test tango_log_file (file (create open read write append getattr setattr)))

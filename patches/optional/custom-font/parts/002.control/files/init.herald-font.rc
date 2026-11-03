@@ -1,0 +1,24 @@
+# custom-font/control:字体包开机保护。
+#   herald_font_boot  post-fs-data 同步跑(exec_start,system_server 之前):发现上次选了包但开机没走完就撤回。
+#   herald_font_ok    sys.boot_completed=1 后跑:确认这次开机走完了。
+service herald_font_boot /system/bin/sh /system/etc/herald_payload/herald-font.sh boot
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH CHOWN FOWNER
+    oneshot
+    disabled
+
+service herald_font_ok /system/bin/sh /system/etc/herald_payload/herald-font.sh ok
+    user root
+    group root system
+    seclabel u:r:herald:s0
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH CHOWN FOWNER
+    oneshot
+    disabled
+
+on post-fs-data
+    exec_start herald_font_boot
+
+on property:sys.boot_completed=1
+    start herald_font_ok

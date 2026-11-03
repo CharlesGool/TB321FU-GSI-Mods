@@ -1,0 +1,6 @@
+# 侧边指纹(TB321FU 没有指纹): 这三个 overlay 只有指纹录入/验证界面的文字和动画。
+# 路径相对 system/,底包里没有的自动跳过。
+
+product/overlay/SfpsOverlayTablet.apk
+product/overlay/GoogleConfigSideFpsOverlay.apk
+product/overlay/BiometricTangorproOverlay.apk

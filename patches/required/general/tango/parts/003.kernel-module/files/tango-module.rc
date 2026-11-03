@@ -1,0 +1,16 @@
+# 加载 Tango 的 32 位 compat 系统调用内核模块,它注册 /dev/tango32。必须在第一个 32 位进程(zygote-start 的 zygote_secondary)之前。
+# V78–V80 真机:init 自己在 early-init 的 `insmod` 一直没加载上(内核日志里也没有失败原因),
+#   而 post-fs-data 时以 herald 域(root)跑 /system/bin/insmod 每次都成功(退出码 0,/dev/tango32 出现)。
+#   V81 起改成后者:post-fs-data 里 exec_start,init 等它跑完才往下走,zygote-start 之前模块一定已经在了。
+#   (32 位自检已经被 tango/zygote32 换成 64 位版,所以 post-fs-data 之前没有 32 位进程。)
+# V881 真机:这个服务跑完 /proc/modules 里仍没有 tango32,而同样 herald 域的保险/诊断脚本 insmod 都成功。原因没查到(sh -c 一整串?),
+# 改成跑脚本并把结果写到 /metadata/tango_log/insmod.txt。
+service tango_load /system/bin/sh /system/etc/tango/tango-insmod.sh
+    user root
+    group root
+    seclabel u:r:herald:s0
+    oneshot
+    disabled
+
+on post-fs-data
+    exec_start tango_load

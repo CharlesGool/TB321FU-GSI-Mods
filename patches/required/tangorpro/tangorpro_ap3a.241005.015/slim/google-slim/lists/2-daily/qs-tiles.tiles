@@ -1,0 +1,2 @@
+# 磁贴 依赖的路径(相对 system/,可带通配符)。精简到这一级后路径不在了,就从下拉栏默认列表和编辑页总表里去掉这个磁贴。
+alarm product/app/PrebuiltDeskClockGoogle_*   # 闹钟:提供者是 Google 时钟,第 2 级精简掉以后磁贴没有东西可管

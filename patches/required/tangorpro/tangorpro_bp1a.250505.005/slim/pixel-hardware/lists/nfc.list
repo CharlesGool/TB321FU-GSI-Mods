@@ -1,0 +1,4 @@
+# TB321FU 的 vendor 没有 NFC。只删应用和 overlay;NFC 的 apex 带着启动类路径 jar,不能删。路径相对 system/。
+system_ext/priv-app/PixelNfc
+priv-app/TagGoogle
+product/overlay/NfcOverlayCommon.apk

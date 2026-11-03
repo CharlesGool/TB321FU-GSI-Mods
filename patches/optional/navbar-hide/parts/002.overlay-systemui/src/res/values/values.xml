@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 导航栏隐藏(手机模式,高 DPI):SystemUI 画的手势提示线改成全透明 -->
+<resources>
+    <color name="navigation_bar_home_handle_light_color">#00000000</color>
+    <color name="navigation_bar_home_handle_dark_color">#00000000</color>
+</resources>
