@@ -560,6 +560,14 @@ heraldp_cmdf_set() {
                 _pr=""; [ -n "$sp" ] && _pr=$(herald_patch "$sp all" 2>&1 | head -1)
                 : > "$ENABLE_FLAG"; chown 1017:1017 "$ENABLE_FLAG" 2>/dev/null   # 显式打开全局伪装(默认关)
                 _rel=$(sed -n 's/.*"release":"\([^"]*\)".*/\1/p' "$DATA_PIF" 2>/dev/null | head -1)
+                # V105:目录机型(spoof apply)写的 profile 常无独立 "release" 字段——release 在
+                # fingerprint 串里(brand/product/device:RELEASE/id/incr:type/tags)。herald-global-pif.sh
+                # 的 valid_profile 开机时就是这么从 fingerprint 现推的;这里不推就会对 panther_beta 这类
+                # 本来会正常应用的 profile 谎报 WILL_FALLBACK(用户实测被误导)。空就从 fingerprint 推,对齐开机脚本。
+                if [ -z "$_rel" ]; then
+                  _fp=$(sed -n 's/.*"fingerprint":"\([^"]*\)".*/\1/p' "$DATA_PIF" 2>/dev/null | head -1 | sed 's#\\/#/#g')
+                  _rel=$(echo "$_fp" | cut -d: -f2- | cut -d/ -f1)
+                fi
                 # ★用户明确要求允许 CANARY/beta release(2026-10-29:"原来就是那么实现的,说明是可以
                 # 这么做的"——最初验证过能过认证的那套配置[panther_beta]本来就是 CANARY)。跟
                 # herald-global-pif.sh 的 valid_profile() 同步放宽:只要 release 非空就算 WILL_APPLY,
