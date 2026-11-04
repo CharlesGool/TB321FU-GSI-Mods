@@ -303,22 +303,29 @@ fails=0
 #      下次开机已无标志、不再注入,自动恢复干净,不会 bootloop;
 #   ③ 绝不 kill system_server(kill 它=重启);注入失败就保持原样(P2.0 的扩展是纯透传,无副作用)。
 SS_FLAG=/data/local/tmp/herald_ss_inject
+# ★结果标记写到 shell 可读处:免 root 设备上 logcat 被 debug-off 关了、root 日志也读不到,
+#   adb shell 只能靠 cat 这个文件看注入结果(0644)。顺带也能判定开机是否真跑到了这里。
+SS_RESULT=/data/local/tmp/herald_ss_result
 if [ -f "$SS_FLAG" ]; then
     rm -f "$SS_FLAG"
-    ( for _ in 1 2 3 4 5 6; do pidof system_server >/dev/null 2>&1 && break; sleep 2; done
+    ( echo "attempting pid-wait $(date 2>/dev/null)" > "$SS_RESULT" 2>/dev/null; chmod 0644 "$SS_RESULT" 2>/dev/null
+      for _ in 1 2 3 4 5 6; do pidof system_server >/dev/null 2>&1 && break; sleep 2; done
       sspid=$(pidof system_server 2>/dev/null)
       if [ -n "$sspid" ]; then
           sleep 8   # 等 system_server 把系统服务都注册完再注入
+          echo "attempting inject pid=$sspid" > "$SS_RESULT" 2>/dev/null; chmod 0644 "$SS_RESULT" 2>/dev/null
           log "注入 system_server pid=$sspid(inject --target system_server,实验;一次性标志已消费)"
           "$RBIN/inject" --target system_server >> "$LOG/inject.ss.boot.log" 2>&1
           rc=$?
           if [ "$rc" = 0 ] && grep -qi "injection completed" "$LOG/inject.ss.boot.log" 2>/dev/null; then
-              log "✓ system_server 注入返回成功 pid=$sspid(稳定性看真机;透传扩展应不改变任何行为)"
+              res="ok system_server 注入返回成功 pid=$sspid rc=$rc(稳定性看真机;透传扩展应不改变任何行为)"
           else
-              log "✗ system_server 注入未成功(rc=$rc,见 inject.ss.boot.log);system_server 未被 kill、保持原样"
+              res="fail system_server 注入未成功 rc=$rc(system_server 未被 kill、保持原样,见 inject.ss.boot.log)"
           fi
+          log "$res"; echo "$res" > "$SS_RESULT" 2>/dev/null; chmod 0644 "$SS_RESULT" 2>/dev/null
       else
-          log "✗ 没等到 system_server 就绪,跳过本次注入"
+          res="fail 没等到 system_server 就绪,跳过本次注入"
+          log "$res"; echo "$res" > "$SS_RESULT" 2>/dev/null; chmod 0644 "$SS_RESULT" 2>/dev/null
       fi ) &
 fi
 
