@@ -407,6 +407,9 @@ if [ -x "$BOOTSTATE_RESETPROP" ]; then
 fi
 }
 HERALDP_START="$HERALDP_START heraldp_start_attestation"
+# 两个只读的慢 list 命令后台执行,不阻塞主循环(需 herald-core V1.4+ 的 HERALDP_ASYNC;旧 broker 忽略此变量,照常内联)。
+# rkp_list 要联网拉远程配置目录,最慢;list(内建机型)其次。都是只读,可并发。
+HERALDP_ASYNC="$HERALDP_ASYNC list rkp_list"
 
 # V64:跑 keymint --webui-*,退出码非 0 时第一行加 "err <命令> rc=N",后面保留 keymint 自己的报错原文
 #   (V63 只看输出文字,失败也是退出码 0;patch 失败时还把原文丢了,只剩 err patch-failed)
