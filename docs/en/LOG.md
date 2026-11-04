@@ -21,6 +21,9 @@ None at the moment.
 |---|---|---|---|
 | 2026-11-03 | Repo split from the data project directory into a sibling project | Accepted | Easier to maintain and release on its own; the data directory is located via `TB321FU_DATA` or the sibling path |
 | 2026-11-04 | Proprietary components (Megvii SDK, Pixel face assets) are not distributed | Accepted | Proprietary material cannot be redistributed publicly; users supply it themselves, and the docs explain how |
+| 2026-11-04 | `spoof set` prediction derives release from fingerprint | Accepted | Directory-style model profiles have no release field; the old logic falsely reported `WILL_FALLBACK` for panther_beta and similar, inconsistent with the boot script behavior |
+| 2026-11-04 | system_server injection launcher is off by default, with a one-shot flag | Accepted | Injecting into system_server is high risk (bootloop); the one-shot consumed flag prevents persistence, and system_server is never killed |
+| 2026-11-05 | Cut the `user-v1.4` anchor official release and delete test-v1.3.x | Accepted | Set an anchor after SOTER removal; the 6 test builds were deleted with clean-releases, and the three older official releases are kept |
 
 ## Handover
 
