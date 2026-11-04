@@ -296,6 +296,32 @@ fails=0
     fi
   done ) &
 
+# ---- P2.0:system_server 注入(应用列表隐藏,实验,默认不注入)----
+# 注入 system_server 风险远高于 keystore2:出错=开机即崩。所以:
+#   ① 默认关,靠一次性开关触发:adb shell touch /data/local/tmp/herald_ss_inject,然后 reboot;
+#   ② 开机时见到标志就先删掉它(消费),再注入一次——这样即便本次把 system_server 搞崩/重启,
+#      下次开机已无标志、不再注入,自动恢复干净,不会 bootloop;
+#   ③ 绝不 kill system_server(kill 它=重启);注入失败就保持原样(P2.0 的扩展是纯透传,无副作用)。
+SS_FLAG=/data/local/tmp/herald_ss_inject
+if [ -f "$SS_FLAG" ]; then
+    rm -f "$SS_FLAG"
+    ( for _ in 1 2 3 4 5 6; do pidof system_server >/dev/null 2>&1 && break; sleep 2; done
+      sspid=$(pidof system_server 2>/dev/null)
+      if [ -n "$sspid" ]; then
+          sleep 8   # 等 system_server 把系统服务都注册完再注入
+          log "注入 system_server pid=$sspid(inject --target system_server,实验;一次性标志已消费)"
+          "$RBIN/inject" --target system_server >> "$LOG/inject.ss.boot.log" 2>&1
+          rc=$?
+          if [ "$rc" = 0 ] && grep -qi "injection completed" "$LOG/inject.ss.boot.log" 2>/dev/null; then
+              log "✓ system_server 注入返回成功 pid=$sspid(稳定性看真机;透传扩展应不改变任何行为)"
+          else
+              log "✗ system_server 注入未成功(rc=$rc,见 inject.ss.boot.log);system_server 未被 kill、保持原样"
+          fi
+      else
+          log "✗ 没等到 system_server 就绪,跳过本次注入"
+      fi ) &
+fi
+
 # ---- keybox 自愈:只要当前 keybox 不是 valid+未吊销,就想办法换一张能用的(用户要求 2026-11)----
 #   ★真机验证发现:CSR 常被原生工作进程拒绝(v2、v1-native 都拒过,status 还不一样),而且设备上同一时间
 #   还有一张之前成功下发、没过期也没被吊销的 keybox(真机 ec 证书链只约 12 天有效期)——像是已有一张有效
