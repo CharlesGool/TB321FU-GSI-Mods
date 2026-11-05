@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Using: /tmp/claude-1000/-home-gzcheng-Desktop/eb8c19c5-849e-466b-871d-061b17d306f5/scratchpad/face/tools/android-15/aidl --lang=java -I/tmp/claude-1000/-home-gzcheng-Desktop/eb8c19c5-849e-466b-871d-061b17d306f5/scratchpad/face/src/ParanoidSense/interfaces/biometrics/face/aidl/src -o gen /tmp/claude-1000/-home-gzcheng-Desktop/eb8c19c5-849e-466b-871d-061b17d306f5/scratchpad/face/src/ParanoidSense/interfaces/biometrics/face/aidl/src/vendor/aospa/biometrics/face/ISenseServiceReceiver.aidl
+ * Using: aidl --lang=java -I<ParanoidSense>/interfaces/biometrics/face/aidl/src -o gen <ParanoidSense>/interfaces/biometrics/face/aidl/src/vendor/aospa/biometrics/face/ISenseServiceReceiver.aidl
  */
 package vendor.aospa.biometrics.face;
 /** @hide */
