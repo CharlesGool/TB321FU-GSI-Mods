@@ -431,8 +431,12 @@ def cmd_repack(a):
         out = os.path.abspath(a.out)
         if os.path.exists(out):
             os.unlink(out)
+        # --alignment-preserved true:保住 zipalign 的 4096 对齐。apksigner 默认(false)会把所有条目
+        # 重新按 4 字节对齐,抹掉 apex_payload.img 的 4096 页对齐(apexd 要求 payload 4096 对齐),
+        # 产物就卡在后面的 off % 4096 校验(数据偏移 128)。见下方 do_verify 的对齐检查。
         run(['apksigner', 'sign', '--key', a.pk8, '--cert', a.cert,
              '--v1-signing-enabled', 'true', '--v2-signing-enabled', 'true', '--v3-signing-enabled', 'true',
+             '--alignment-preserved', 'true',
              '--out', out, aligned], what='apksigner sign')
         if os.path.exists(out + '.idsig'):
             os.unlink(out + '.idsig')
