@@ -88,7 +88,7 @@ key 都不放进仓库,自己从 AOSP 源码取或自己生成。需要的工具
 
 ## 适用范围和换底包注意
 
-补丁按 Android 15 的 Wi-Fi 模块做(官方 Pixel 原厂 GSI CP3A.250505.005 带的 `com.google.android.wifi`,
+补丁按 Android 15 的 Wi-Fi 模块做(官方 Pixel 原厂 GSI CP3A.260905.009 带的 `com.google.android.wifi`,
 模块版本 350820380,原 CAPEX sha256 前缀 `e1d2fc24`)。换底包时会在这些地方停下:
 
 - 底包里没有这个 APEX → 贡献者的 `need_file` 和这里都会报错。

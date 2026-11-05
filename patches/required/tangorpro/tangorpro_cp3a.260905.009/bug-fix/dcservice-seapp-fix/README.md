@@ -29,7 +29,7 @@ user=_app isPrivApp=true name=com.google.android.apps.pixel.dcservice.ui domain=
 
 ## 适用范围
 
-只针对底包 ID 以 `tangorpro_cp3a.260905.009` 开头的那一版 Pixel Tablet GSI(Android 15,CP3A.250505.005);别的版本的 Tablet GSI 没有这个问题。适用范围由文件夹表达:补丁放在 `required/tangorpro/tangorpro_cp3a.260905.009/` 下,构建时底包 ID 不命中就整个跳过(日志写"跳过 … 不在适用范围")。底包 ID 取自构建开头记下的指纹,见 `toolkit/lib/removelist.sh` 的 `base_id`。
+只针对底包 ID 以 `tangorpro_cp3a.260905.009` 开头的那一版 Pixel Tablet GSI(Android 15,CP3A.260905.009);别的版本的 Tablet GSI 没有这个问题。适用范围由文件夹表达:补丁放在 `required/tangorpro/tangorpro_cp3a.260905.009/` 下,构建时底包 ID 不命中就整个跳过(日志写"跳过 … 不在适用范围")。底包 ID 取自构建开头记下的指纹,见 `toolkit/lib/removelist.sh` 的 `base_id`。
 
 ## 依赖和顺序
 

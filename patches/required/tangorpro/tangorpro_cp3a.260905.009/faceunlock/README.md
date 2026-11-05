@@ -3,7 +3,7 @@
 > **CP3A 专属版本**(底包 ID 门控:`required/tangorpro/tangorpro_cp3a.260905.009/`)。与 ap3a 版
 > `required/tangorpro/tangorpro_ap3a.241005.015/faceunlock` 的区别只在 `parts/001.services-hooks` 的
 > Sense 框架类源码和 `apply_hooks.py` 的 AuthService 注入锚,照
-> 官方 CP3A.250505.005 的 `services.jar` 重新适配(通用版是对 AP3A/Mystic 写的,直接编不过)。依据见 CP3A 工程
+> 官方 CP3A.260905.009 的 `services.jar` 重新适配(通用版是对 AP3A/Mystic 写的,直接编不过)。依据见 CP3A 工程
 > `doc/08-V8-BUILD.md` §5b。改动:
 > - `HalClientMonitor` 子类(FaceUpdateActiveUser/ResetLockout/SetFeature/GetFeature)super 末尾加 `isMandatoryBiometrics=false`;
 > - `FaceRemovalClient` 加 `int reason` 透传给 `RemovalClient`;`FaceInternalCleanupClient.getRemovalClient` 同步加 `reason`;`SenseProvider` 两处 `new FaceRemovalClient` 传 `3`;
