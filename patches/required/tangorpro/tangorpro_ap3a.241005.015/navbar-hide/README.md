@@ -1,24 +1,8 @@
-# navbar — 隐藏导航栏 · BP1A 适配版
-
-> **2026-11-05 决定:新方法不并回通用版。** 通用版 `optional/navbar-hide`(V1.0,0dp)在 ap3a(Mystic 启动器)上是更完美的方案,
-> 保持不动,ap3a 继续用它。本专属版的 1dp 是为保住官方 BP1A 启动器的手势收尾付出的折中(用户细看后认为"还有一点不完美",
-> 具体点待确认),**只在 BP1A 用**。cp3a 若要同样处理,另开它自己的版本门控补丁。
-
-> **BP1A 专属版本**(底包 ID 门控:`required/tangorpro/tangorpro_bp1a.250505.005/`,V1.1)。通用版 `optional/navbar-hide`(V1.0)在 ap3a 上
-> 稳定,但在官方 BP1A 底包上"上滑到多任务**中途**掉头"会卡死:App 点不动、侧滑返回失效(多任务完整结束、或点一下应用就恢复)。
-> 2026-11-05 真机 + `dumpsys` 定位,与通用版的两处差异:
->
-> 1. **启动器 overlay 的收起高度 0dp → 1dp**(`003.overlay-launcher`)。BP1A 官方启动器里 `transient_taskbar_stashed_height` /
->    `taskbar_stashed_size` 不只决定占位,还决定手势收尾的判定区,清成 0 手势就收不了尾。1dp(444 密度约 3px)肉眼不可见,
->    占位等于去掉,手势正常。依据:真机 `adb install -r` 逐个换值,1dp 即不卡。
-> 2. **底部是 Taskbar 时不再强切导航模式**(`004.control` 的 `herald_nav_set`)。官方 BP1A 启动器在手机尺寸的显示大小(sw<600dp)
->    下底部仍是启动器的 `Taskbar` 窗口(`mNavigationBar=Taskbar`,没有 `NavigationBar0`),原逻辑按"sw<600 就是 SystemUI 导航栏"
->    去把导航模式 手势→三键→手势 强切一遍,对 Taskbar 是白折腾(hide 那一秒连跑十次转场)。现在 `bar=taskbar` 只杀启动器。
->
-> 框架高度 overlay(`navigation_bar_height=0`)和 SystemUI 提示线 overlay 保持不变;此底包上底部栏是 Taskbar 时它们不起作用,
-> 隐藏靠启动器 overlay。overlay APK 版本号 200(高于测试时手动装的 101–105,刷入后系统自带版本不会被旧的数据分区更新压住)。
-
 # navbar — 隐藏导航栏
+
+> **ap3a 旧方案(特例)。** 2026-11-05 起通用版 `optional/navbar-hide`(V1.1)换成新方案:启动器收起高度 **1dp**、
+> 底部是 Taskbar 时**不强切导航模式**(官方 BP1A 启动器上 0dp 会让"上滑多任务中途掉头"卡死)。本补丁保留 ap3a 上稳定的
+> **旧方案**:收起高度 0dp(占位真正为 0)、原控制逻辑,V1.0 不变。只在 ap3a 底包上跑(底包 ID 门控);其它底包用通用版。
 
 > 一个补丁(`navbar-hide`),内部 4 个部分在 `parts/NNN.<部分>/`,按编号顺序跑,只能整个打或整个不打。依赖和说明见本目录的 `patch.conf`,每个部分的原理见它自己的 `README.md`。
 
@@ -56,4 +40,4 @@
 
 ## 整组独立发布
 
-可以带 `patches/required/tangorpro/tangorpro_bp1a.250505.005/navbar-hide/` + `toolkit/`。控制部分依赖 herald 控制后端的插件机制;如果不用 herald,三个 overlay 本身是标准 RRO,自己用 `cmd overlay enable --user 0 com.omk.navhide.android` 等命令也能开关(记得 `set-priority highest` 并重启启动器/SystemUI)。
+可以带 `patches/required/tangorpro/tangorpro_ap3a.241005.015/navbar-hide/` + `toolkit/`。控制部分依赖 herald 控制后端的插件机制;如果不用 herald,三个 overlay 本身是标准 RRO,自己用 `cmd overlay enable --user 0 com.omk.navhide.android` 等命令也能开关(记得 `set-priority highest` 并重启启动器/SystemUI)。

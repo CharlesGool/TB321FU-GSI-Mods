@@ -131,7 +131,7 @@
 | `herald-readonly-shell` | `debug/herald-readonly-shell` |
 | `herald-zygisk-fork-observer` | `debug/herald-zygisk-fork-observer` |
 | `herald-zygisk-timing-probe` | `debug/herald-zygisk-timing-probe` |
-| `navbar-hide` | `optional/navbar-hide` |
+| `navbar-hide` | `optional/navbar-hide`(通用,新方案 V1.1:收起高度 1dp);ap3a 底包的旧方案(0dp,V1.0)在 `required/tangorpro/tangorpro_ap3a.241005.015/navbar-hide`(2026-11-05) |
 | `overlay-idmap-reset` | `optional/overlay-idmap-reset` |
 | `perf` | `optional/perf` |
 | `perf-game-boost` | `optional/perf-game-boost` |

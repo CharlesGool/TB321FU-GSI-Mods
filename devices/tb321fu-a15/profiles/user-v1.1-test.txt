@@ -3,6 +3,5 @@
 -all
 +required
 +optional/smooth-display
-+optional/navbar-hide
 +optional/free-rotation
 +optional/spoof/global-pif

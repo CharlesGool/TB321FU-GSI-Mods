@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 导航栏隐藏(平板模式,低 DPI):任务栏收起后报给 App 的高度 = 收起高度,改成 0;收起时的小白条全透明。
+     transient_taskbar_stashed_height = 默认的"自动隐藏任务栏";taskbar_stashed_size = 常驻任务栏/启动器手机模式。
+     手势判定区用的是框架的 navigation_bar_gesture_height,不受影响 -->
+<resources>
+    <dimen name="transient_taskbar_stashed_height">0dp</dimen>
+    <dimen name="taskbar_stashed_size">0dp</dimen>
+    <color name="taskbar_stashed_handle_light_color">#00000000</color>
+    <color name="taskbar_stashed_handle_dark_color">#00000000</color>
+</resources>

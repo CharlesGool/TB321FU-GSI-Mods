@@ -3,7 +3,7 @@
 #
 # 导航栏隐藏(像国产系统那样:不画提示线、App 不给底部让高度,手势照旧)
 #   底部有两种:低 DPI(平板模式)是启动器的任务栏,高 DPI(手机模式)是 SystemUI 的导航栏。
-#   /product/overlay/OmkNavHide{Fw,SysUI,Launcher}/ 三个非静态 RRO 覆盖两种(源码 patches/required/tangorpro/tangorpro_bp1a.250505.005/navbar-hide/overlay-*/)。
+#   /product/overlay/OmkNavHide{Fw,SysUI,Launcher}/ 三个非静态 RRO 覆盖两种(源码 patches/required/tangorpro/tangorpro_ap3a.241005.015/navbar-hide/overlay-*/)。
 #   每个 APK 必须单独一个目录:同一目录里的多个 APK 会被当成一个包的拆分包,包名不同就整目录作废(V65 真机)。
 #     com.omk.navhide.android  框架 navigation_bar_height 等 = 0(手机模式给 App 的占位高度)
 #     com.omk.navhide.systemui SystemUI 手势提示线颜色全透明
@@ -100,11 +100,7 @@ herald_nav_set() {   # $1 = enable | disable;失败的包每个打一行 fail
     _pp=$(pidof com.google.android.apps.nexuslauncher 2>/dev/null); [ -n "$_pp" ] && kill $_pp
     _rs=launcher
   fi
-  # BP1A:底部是启动器的 Taskbar 时(官方 BP1A 启动器在手机尺寸的显示大小下也画 Taskbar,真机 dumpsys 里
-  #   mNavigationBar=Taskbar、没有 NavigationBar0),SystemUI 没有导航栏要重建,只需要杀启动器让 Taskbar 重读资源。
-  #   这时再把导航模式 手势→三键→手势 强切一遍只会让 Taskbar 白折腾一轮(日志里 hide 的那一秒连跑十次转场、Taskbar 窗口被销毁),
-  #   还出现过"应用内导航栏不能用"。所以 bar=taskbar 就跳过轻量重建,和平板模式走同一条路。
-  if [ "$_bar" = navbar ] || { [ "$_bar" != taskbar ] && [ "$_ph" != 1 ]; }; then herald_nav_apply_phone "$1"; fi
+  if [ "$_bar" = navbar ] || [ "$_ph" != 1 ]; then herald_nav_apply_phone "$1"; fi
   # 等 SystemUI / 启动器重建稳定再放行,下一条命令(或守护)不会叠在重建中间
   sleep 2
   rm -f "$NAV_BUSY"
