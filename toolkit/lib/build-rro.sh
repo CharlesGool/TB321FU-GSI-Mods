@@ -11,6 +11,12 @@ SRC=$(realpath "$1"); OUT=$(realpath -m "$2"); VER=${3:-1}
 REPO=$(cd "$(dirname "$0")/../.." && pwd)
 KEYDIR=${RRO_KEY_DIR:-$REPO/private/overlay-key}
 FW=${RRO_FRAMEWORK_RES:-/usr/share/android-framework-res/framework-res.apk}   # 只用来解析清单里的 android: 属性
+if [[ ! -f $FW ]]; then
+    # 没装 Debian 的 android-framework-res 包(android 容器里就没有)时,退到 SDK 自带的 android.jar:
+    # aapt2 link -I 只拿它解析 android: 属性,任何 API 级别的都够用。取最新的一个;RRO_FRAMEWORK_RES 仍然优先。
+    for _j in $(ls -d "${ANDROID_HOME:-/nonexistent}"/platforms/android-*/android.jar /opt/android/sdk/platforms/android-*/android.jar 2>/dev/null | sort -V); do FW=$_j; done
+fi
+[[ -f $FW ]] || { echo "build-rro: 找不到 framework-res / android.jar(装 android-framework-res,或设 RRO_FRAMEWORK_RES)"; exit 1; }
 [[ -f $SRC/AndroidManifest.xml && -d $SRC/res ]] || { echo "build-rro: $SRC 缺 AndroidManifest.xml 或 res/"; exit 1; }
 if [[ ! -f $KEYDIR/overlay.pk8 || ! -f $KEYDIR/overlay.x509.pem ]]; then
     mkdir -p "$KEYDIR"
