@@ -47,6 +47,19 @@ def main():
     out = ["# 由 identity/parts/002.build-fingerprint/gsi_overlay.py 生成(保留 GSI 安卓版本,只换机型身份段),不要手改"]
     for part in ("", "system.", "product.", "vendor.", "odm.", "bootimage.", "system_ext."):
         out.append(f"ro.{part}build.fingerprint={new_fp}")
+
+    # flavor / description:把开头的 "<GSI 机型代号>-user" 换成 "<ID_DEVICE>-user",后面的版本段(17 CP3A...)原样保留。
+    # 三份 build.prop 的机型代号可能不一样(system 常被 MysticGSI 泛化成 generic_system_google,
+    # product/system_ext 仍是 tangorpro),统一用 GSI system/build.prop 的值归一化后 overlay 进全部三份。
+    def retag(v):
+        i = v.find("-user")
+        return device + v[i:] if i != -1 else None  # "<ID_DEVICE>-user[ <版本段>]"
+    for key in ("ro.build.flavor", "ro.build.description"):
+        v = s.get(key)
+        if v:
+            nv = retag(v)
+            if nv:
+                out.append(f"{key}={nv}")
     print("\n".join(out))
 
 

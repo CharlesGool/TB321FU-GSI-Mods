@@ -24,8 +24,8 @@
 
 - **不读原厂镜像**(不需要 `STOCK_SYSTEM_IMG`),改从 **GSI 自带** 的 `system/build.prop` 读指纹。
 - 只重写指纹里的机型身份段:`BRAND/PRODUCT/DEVICE:...` 冒号前那段换成 `ID_BRAND/ID_NAME/ID_DEVICE`(= `Lenovo/TB321FU/TB321FU`),冒号后的版本段 `:<release>/<id>/<incremental>:<type>/<tags>` 原样保留 GSI 的。
-- 产出同样的 7 个指纹变体(值一致),但**不**写 `ro.build.version.*`、`ro.build.id`、`ro.build.version.security_patch`、`ro.build.tags/type/flavor/description` —— 这些全部保留 GSI 自带的 Android 17 值。
-- `ro.build.flavor` / `ro.build.description` 里的机型代号由 `001.product-fields` 把开头的 `tangorpro-user` 换成 `TB321FU-user`(版本串照旧保留 A17),两部分配合得到 "机型是 Lenovo、系统是 Android 17" 的一致身份。
+- 产出 7 个指纹变体(值一致),外加归一化后的 `ro.build.flavor` / `ro.build.description`;**不**写 `ro.build.version.*`、`ro.build.id`、`ro.build.version.security_patch`、`ro.build.tags/type` —— 这些全部保留 GSI 自带的 Android 17 值。
+- `ro.build.flavor` / `ro.build.description`:把开头的 `<GSI 机型代号>-user` 换成 `<ID_DEVICE>-user`、版本串照旧保留 A17,并 overlay 进全部三份 build.prop。新版 MysticGSI 把 system/build.prop 泛化成 `generic_system_google-user`、而 product/system_ext 仍是 `tangorpro-user`;gsi_overlay 以 system 的值统一归一化成 `TB321FU-user 17 CP3A...`,避免 `tangorpro` 作为 GSI 痕迹残留(`001.product-fields` 只改 system 那份,靠这里补齐另两份)。
 
 结果:`ro.build.fingerprint = Lenovo/TB321FU/TB321FU:17/CP3A.260905.009/<incremental>:user/release-keys`,`ro.build.version.release=17`、`sdk=37`、`security_patch` 为 GSI 自带的 2026-09 级别 —— 机型还原但不谎报安卓版本(CP3A 这条线的明确要求)。
 
