@@ -32,7 +32,7 @@
 | 14 | 清过期预编译 | [boot-kernel/stale-boot-image](required/general/boot-kernel/stale-boot-image/) | system | 自动 | 清掉因改 jar 而过期的预编译产物 |  |  |  |  | 删掉 framework 的预编译 boot image 和 services oat,开机时由系统重新生成;抓到过一条 dex2oat 的 execute_no_trans AVC,判断是策略本来如此,没有处理 |
 | 15 | 内核编译者字符串 | [boot-kernel/kernel-builder-string](required/general/boot-kernel/kernel-builder-string/) | boot | 打 | 内核编译者字符串 |  |  | → boot |  |  |
 | 16 | boot 打包重签 | [boot-kernel/boot-assemble](required/general/boot-kernel/boot-assemble/) | boot | 打 | 汇总改动、重签 boot |  |  | 负责 boot |  |  |
-| 17 | 联想相机 | [camera/zuicamera](required/general/camera/zuicamera/) | system | 不打 | 联想原厂相机(ZuiCamera)和它在 GSI 上要的修补:辅助镜头清单、相机编号核对、真实机型、屏蔽不支持的功能(含设置页的水印和 OCR 选项) | 6 个部分:001.app、002.aux-camera-list、003.camera-id-check、004.real-device-id、005.hide-unsupported、006.storage-permission |  |  |  | 联想相机要读真实机型:改全局机型(全局伪装等)会让它无法使用,real-device-id 只能在补丁自己的伪装方式下让它读到真实机型,别的改机型方式不保证;水印等 ZUI 专属处理需要相机 HAL 认出联想相机,这里没有做,所以水印不生效 |
+| 17 | 联想相机 | [camera/zuicamera](required/general/camera/zuicamera/) | system | 不打 | 联想原厂相机(ZuiCamera)和它在 GSI 上要的修补:辅助镜头清单、相机编号核对、真实机型、屏蔽不支持的功能(含设置页的水印和 OCR 选项) | 5 个部分:001.app、002.aux-camera-list、003.camera-id-check、004.real-device-id、005.hide-unsupported |  |  |  | 联想相机要读真实机型:改全局机型(全局伪装等)会让它无法使用,real-device-id 只能在补丁自己的伪装方式下让它读到真实机型,别的改机型方式不保证;水印等 ZUI 专属处理需要相机 HAL 认出联想相机,这里没有做,所以水印不生效 |
 
 ## 必须打 · 特定底包限定(tangorpro)
 
@@ -56,9 +56,10 @@
 | 16 | 人脸解锁(BP1A 适配) | [tangorpro_bp1a.250505.005/faceunlock](required/tangorpro/tangorpro_bp1a.250505.005/faceunlock/) | system | 不在目录 | 人脸解锁(BP1A 专属版):services.jar 的生物识别放行钩子 + FaceUnlock App 和权限 + 设置里的人脸入口。Sense 框架类按 BP1A 官方 services.jar 的构造器签名重编,apply_hooks 的注入点按 BP1A smali 重新定位 | 3 个部分:001.services-hooks、002.app、003.settings-entry |  |  |  | 人脸是 2D 的(PixelOS ParanoidSense,Megvii SDK),只算 WEAK / Class 2 生物识别,没有深度或红外,安全性比指纹低,用照片或视频可能骗过;services.jar 里还加了生物识别放行钩子,不要用来保护支付、银行这类应用 |
 | 17 | 6GHz 修复 | [tangorpro_bp1a.250505.005/hardware-fix/6ghz-fix](required/tangorpro/tangorpro_bp1a.250505.005/hardware-fix/6ghz-fix/) | system | 不在目录 | 6GHz 热点修复:Wi-Fi 国家码(默认 DE,驱动才允许 6GHz 当 AP)+ 设置里选 6GHz 时把热点固定在 6GHz 频段(信道和带宽不固定) | 2 个部分:001.country-code、002.band-fix |  | → wifi-service-jar | Settings 键 herald_wifi_country;可选 herald_6g_channel / herald_6g_bw / herald_6g_be | Wi-Fi 国家码默认固定为 DE 才能开 6GHz 热点,代价是 5GHz 没有 149–169 信道;6GHz 热点的信道交给驱动自动选(没有固定信道),只有在这台设备上实测过设置里选 6GHz 能开出来才算数;平板同时连着 5GHz Wi-Fi 时 6GHz 热点会被压回 5GHz |
 | 18 | Wi-Fi 打包 | [tangorpro_bp1a.250505.005/hardware-fix/wifi-apex-assemble](required/tangorpro/tangorpro_bp1a.250505.005/hardware-fix/wifi-apex-assemble/) | system | 不在目录 | Wi-Fi APEX 打包:把前面各个 Wi-Fi 补丁登记的 smali 补丁一次性应用到 service-wifi.jar,回编、重签 APEX 并换进树里;没有任何登记时跳过 |  |  | 负责 wifi-service-jar |  |  |
-| 19 | 精简 GSI 残留 | [tangorpro_bp1a.250505.005/slim/gsi-traces](required/tangorpro/tangorpro_bp1a.250505.005/slim/gsi-traces/) | system | 不在目录 | 删 GSI 工具留下的东西:Mystic 的 vendor overlay 和开机 root logcat、phh 的按键布局/远程 adb 隧道/属性处理脚本 | 2 个部分:001.mystic-vendor-overlays、002.nested-system-shim |  |  |  | 其中 phh 的三个部分没有在真机上单独试过,理论上无副作用;刷后要查开机、热点、蓝牙、亮度 |
-| 20 | 精简 Pixel 硬件组件 | [tangorpro_bp1a.250505.005/slim/pixel-hardware](required/tangorpro/tangorpro_bp1a.250505.005/slim/pixel-hardware/) | system | 不在目录 | 删本机没有对应硬件的 Pixel 组件:底座、投屏、零售演示、Tensor 服务、侧边指纹、UWB、强光/UV、基带、NFC 应用(只有 Pixel Tablet 的 GSI 才带) |  |  |  |  |  |
-| 21 | 精简 Pixel 专属应用和数据 | [tangorpro_bp1a.250505.005/slim/pixel-leftovers](required/tangorpro/tangorpro_bp1a.250505.005/slim/pixel-leftovers/) | system | 不在目录 | 删 TB321FU 用不上的 Pixel 专属东西:Play 自动安装配置、"正在播放"歌曲库、Pixel 相机、儿童模式 |  |  |  |  |  |
+| 19 | 隐藏导航栏(BP1A 适配) | [tangorpro_bp1a.250505.005/navbar-hide](required/tangorpro/tangorpro_bp1a.250505.005/navbar-hide/) | system | 不在目录 | 隐藏导航栏(BP1A 专属版:启动器 Taskbar 收起高度 1dp 而不是 0,底部是 Taskbar 时不强切导航模式):三个非静态 overlay(手机模式导航栏、手势提示线、平板任务栏)+ heraldctl 开关和导航模式守护 | 4 个部分:001.overlay-framework、002.overlay-systemui、003.overlay-launcher、004.control | required/general/herald-core |  | heraldctl navbar hide\|show\|status |  |
+| 20 | 精简 GSI 残留 | [tangorpro_bp1a.250505.005/slim/gsi-traces](required/tangorpro/tangorpro_bp1a.250505.005/slim/gsi-traces/) | system | 不在目录 | 删 GSI 工具留下的东西:Mystic 的 vendor overlay 和开机 root logcat、phh 的按键布局/远程 adb 隧道/属性处理脚本 | 2 个部分:001.mystic-vendor-overlays、002.nested-system-shim |  |  |  | 其中 phh 的三个部分没有在真机上单独试过,理论上无副作用;刷后要查开机、热点、蓝牙、亮度 |
+| 21 | 精简 Pixel 硬件组件 | [tangorpro_bp1a.250505.005/slim/pixel-hardware](required/tangorpro/tangorpro_bp1a.250505.005/slim/pixel-hardware/) | system | 不在目录 | 删本机没有对应硬件的 Pixel 组件:底座、投屏、零售演示、Tensor 服务、侧边指纹、UWB、强光/UV、基带、NFC 应用(只有 Pixel Tablet 的 GSI 才带) |  |  |  |  |  |
+| 22 | 精简 Pixel 专属应用和数据 | [tangorpro_bp1a.250505.005/slim/pixel-leftovers](required/tangorpro/tangorpro_bp1a.250505.005/slim/pixel-leftovers/) | system | 不在目录 | 删 TB321FU 用不上的 Pixel 专属东西:Play 自动安装配置、"正在播放"歌曲库、Pixel 相机、儿童模式 |  |  |  |  |  |
 
 ## 可选
 
@@ -90,13 +91,12 @@
 
 | 编号 | 中文名 | 补丁 | 改哪里 | 默认 | 做什么 | 包含 | 要先有 | 登记到 / 负责 | 运行时开关 | 可能的问题 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | 机上刷 root 变体 | [root-selfflash](debug/root-selfflash/) | system | 打 | 以 herald broker 的 root 在设备上把 root 变体 init_boot+vbmeta 写进当前槽分区(等价 PC apply_root);严格 sha 校验输入镜像与当前基线、备份、回读校验、出错自动还原。调试用,默认不动。 |  | required/general/herald-core |  | heraldctl raw rootflash status\|apply --confirm\|restore,默认不触发 |  |
-| 2 | adb 可抓日志 | [shell-logcat](debug/shell-logcat/) | system | 不打 | Enforcing 下 adb 能 logcat |  |  |  |  |  |
-| 3 | 开机自动开 ADB | [adb-on-boot](debug/adb-on-boot/) | system | 不打 | 开机自动启用 ADB,并且免授权/免配对(ro.adb.secure=0,连电脑不弹授权框);不管 root(见 herald-rooted-shell);排在 debug-off 后面执行,把它关掉的都加回来。测试用 | 2 个部分:001.on-boot、002.no-auth |  |  |  |  |
-| 4 | adb root | [rooted-adbd](debug/rooted-adbd/) | system | 不打 | 让 adb root 能用:ro.debuggable=1,并把 adbd 和 shell 域设成 permissive;不改开机启用 ADB 和授权(那是 adb-on-boot),也不让 adbd 开机就是 root |  |  |  | adb root(按需,不是开机 root) |  |
-| 5 | root 只读命令 | [herald-readonly-shell](debug/herald-readonly-shell/) | system | 不打 | 以 root 跑只读查看命令 |  | required/general/herald-core |  | heraldctl rexec on\|off,默认关 |  |
-| 6 | root shell | [herald-rooted-shell](debug/herald-rooted-shell/) | system | 不打 | 经 herald broker 以 root 跑任意命令(经 sh -c,支持管道和重定向),默认关、限时打开、只接受命令行;不需要 debug/adb 的免授权和 ro.debuggable |  | required/general/herald-core |  | heraldctl rsh on\|off,默认关 |  |
-| 7 | zygote 时序测量(调研) | [herald-zygisk-timing-probe](debug/herald-zygisk-timing-probe/) | system | 不打 | 测量开机时 post-fs-data 到 zygote 启动的时间窗口(调研用,只读,默认不打) |  | required/general/herald-core |  |  |  |
-| 8 | zygote 注入点验证(调研) | [herald-zygisk-fork-observer](debug/herald-zygisk-fork-observer/) | system | 不打 | 真机验证 ptrace 住 init、在 zygote64 执行第一条指令前截停它这条链路(调研用,只观察不注入,默认不打) |  | required/general/herald-core |  |  |  |
-| 9 | 开机相机日志(诊断) | [diag-boot-camera-log](debug/diag-boot-camera-log/) | system | 不打 | 开机时记下相机驱动的日志(诊断用) |  | required/general/herald-core |  |  |  |
+| 1 | adb 可抓日志 | [shell-logcat](debug/shell-logcat/) | system | 不打 | Enforcing 下 adb 能 logcat |  |  |  |  |  |
+| 2 | 开机自动开 ADB | [adb-on-boot](debug/adb-on-boot/) | system | 不打 | 开机自动启用 ADB,并且免授权/免配对(ro.adb.secure=0,连电脑不弹授权框);不管 root(见 herald-rooted-shell);排在 debug-off 后面执行,把它关掉的都加回来。测试用 | 2 个部分:001.on-boot、002.no-auth |  |  |  |  |
+| 3 | adb root | [rooted-adbd](debug/rooted-adbd/) | system | 不打 | 让 adb root 能用:ro.debuggable=1,并把 adbd 和 shell 域设成 permissive;不改开机启用 ADB 和授权(那是 adb-on-boot),也不让 adbd 开机就是 root |  |  |  | adb root(按需,不是开机 root) |  |
+| 4 | root 只读命令 | [herald-readonly-shell](debug/herald-readonly-shell/) | system | 不打 | 以 root 跑只读查看命令 |  | required/general/herald-core |  | heraldctl rexec on\|off,默认关 |  |
+| 5 | root shell | [herald-rooted-shell](debug/herald-rooted-shell/) | system | 不打 | 经 herald broker 以 root 跑任意命令(经 sh -c,支持管道和重定向),默认关、限时打开、只接受命令行;不需要 debug/adb 的免授权和 ro.debuggable |  | required/general/herald-core |  | heraldctl rsh on\|off,默认关 |  |
+| 6 | zygote 时序测量(调研) | [herald-zygisk-timing-probe](debug/herald-zygisk-timing-probe/) | system | 不打 | 测量开机时 post-fs-data 到 zygote 启动的时间窗口(调研用,只读,默认不打) |  | required/general/herald-core |  |  |  |
+| 7 | zygote 注入点验证(调研) | [herald-zygisk-fork-observer](debug/herald-zygisk-fork-observer/) | system | 不打 | 真机验证 ptrace 住 init、在 zygote64 执行第一条指令前截停它这条链路(调研用,只观察不注入,默认不打) |  | required/general/herald-core |  |  |  |
+| 8 | 开机相机日志(诊断) | [diag-boot-camera-log](debug/diag-boot-camera-log/) | system | 不打 | 开机时记下相机驱动的日志(诊断用) |  | required/general/herald-core |  |  |  |
 
