@@ -40,7 +40,7 @@ boot header v3/v4 的 cmdline 在 header 的 offset 44,固定 1536 字节;解析
 ## 踩过的坑
 
 - **V25-A15ROOT ~ V46**:A15 线一直用原厂 boot,没打 cmdline 补丁,内核默认 Permissive,靠 `init.enforce.rc` 用户态翻转。V44 起 Momo 报开机宽容、Duck/春秋报 seqno split。
-- **V47 单变量实验**(`tb321fu_pixelos_15_tangorpro_cp3a.260905.009/releases/V47-PIF-bootfix/EXPERIMENT.md`):system 不动,只换这颗补丁 boot,seqno split 红灯消失。V48 起锁 BL 后全绿,Play Integrity 过。注意那次 cmdline 和编译者字符串是一起改的,没有单独验证过哪一个起作用;按上面的原理,起作用的是 cmdline。
+- **V47 单变量实验**(`tb321fu_pixelos_17_tangorpro_cp3a.260905.009/releases/V47-PIF-bootfix/EXPERIMENT.md`):system 不动,只换这颗补丁 boot,seqno split 红灯消失。V48 起锁 BL 后全绿,Play Integrity 过。注意那次 cmdline 和编译者字符串是一起改的,没有单独验证过哪一个起作用;按上面的原理,起作用的是 cmdline。
 
 ## 验证
 
