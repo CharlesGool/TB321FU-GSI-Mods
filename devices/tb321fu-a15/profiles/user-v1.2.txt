@@ -3,6 +3,5 @@
 +required
 +optional/smooth-display
 +optional/navbar-hide
-+optional/faceunlock
 +optional/free-rotation
 +optional/spoof/global-pif

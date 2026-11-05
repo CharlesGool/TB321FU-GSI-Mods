@@ -25,4 +25,4 @@ This repository distributes patch source, build scripts, and documentation, all 
 ### Compliance review
 
 - Copyleft components: this repository itself is GPL-3.0-or-later. `avbtool.py` (MIT) is compatible with GPL-3.0.
-- **Proprietary components not distributed with this repository**: the Megvii SDK needed for face unlock, and the face education page assets used by Pixel settings (`face_education_lottie.json`, `face_settings.mp4`). These are proprietary, gitignored, and must be supplied by the user (see the READMEs under `patches/optional/faceunlock`). External build tools (Android NDK, apktool, dex2jar, xdelta3, etc.) are not in the repository and must be supplied by the user.
+- **Proprietary components not distributed with this repository**: the Megvii SDK needed for face unlock, and the face education page assets used by Pixel settings (`face_education_lottie.json`, `face_settings.mp4`). These are proprietary, gitignored, and must be supplied by the user (see the READMEs under `patches/required/tangorpro/<base>/faceunlock`). External build tools (Android NDK, apktool, dex2jar, xdelta3, etc.) are not in the repository and must be supplied by the user.

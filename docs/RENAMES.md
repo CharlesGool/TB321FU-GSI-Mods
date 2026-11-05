@@ -126,7 +126,7 @@
 | `custom-font` | `optional/custom-font` |
 | `devopts-hide` | `optional/devopts-hide` |
 | `diag-boot-camera-log` | `debug/diag-boot-camera-log` |
-| `faceunlock` | `optional/faceunlock` |
+| `faceunlock` | `required/tangorpro/tangorpro_ap3a.241005.015/faceunlock`(改 services.jar 的 smali 需按底包适配 → 版本门控;BP1A 版在 `required/tangorpro/tangorpro_bp1a.250505.005/faceunlock`。2026-11-05 前在 `optional/faceunlock`) |
 | `game-mode` | `optional/game-mode` |
 | `herald-readonly-shell` | `debug/herald-readonly-shell` |
 | `herald-zygisk-fork-observer` | `debug/herald-zygisk-fork-observer` |

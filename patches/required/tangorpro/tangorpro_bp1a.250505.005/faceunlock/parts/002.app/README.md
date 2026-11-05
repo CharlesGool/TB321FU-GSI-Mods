@@ -35,7 +35,7 @@
 
 镜像里装的是 `files/FaceUnlock.apk`,平时不用重建。真要重建:`bash src/fetch_upstream.sh` 拉上游,再 `bash src/build.sh <底包system> <输出目录>`。需要环境变量 `JAVA_HOME`(JDK 17)、`D2J`、`R8`(8.5.35)、`APKTOOL`、`BT`(build-tools 35:aapt2/zipalign/apksigner)、`KOTLIN_HOME`(kotlinc 2.0.21),签名 keystore 用 `FACEUNLOCK_KEYSTORE`(alias `faceunlock`,口令 `android`,不进仓库)。
 
-注意 `build.sh` 借用了同组 `services-hooks` 的两样东西:AIDL stub 源码(`../../001.services-hooks/src/java/vendor`)和 `check_dex.py`。所以重建 App 时 `patches/optional/faceunlock/` 要整个在。只是**装**预编译 APK 不依赖它们。
+注意 `build.sh` 借用了同组 `services-hooks` 的两样东西:AIDL stub 源码(`../../001.services-hooks/src/java/vendor`)和 `check_dex.py`。所以重建 App 时 `patches/required/tangorpro/tangorpro_bp1a.250505.005/faceunlock/` 要整个在。只是**装**预编译 APK 不依赖它们。
 
 设置里入口的 overlay 以前和 App 在同一个 `build.sh` 里编,现在拆到 `faceunlock/settings-entry/src/build.sh`。
 

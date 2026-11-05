@@ -52,7 +52,7 @@
 
 ## 整组独立发布时要带什么
 
-`patches/optional/faceunlock/` 整个 + `toolkit/`(`common.sh`、`jarpatch.py`)+ `conf.d/faceunlock.conf` 里的变量。services-hooks 还依赖 `stale-boot-image` 做善后(可选,不带也能跑)。第三方旷视文件用户自己通过 `fetch_upstream.sh` 拉。
+`patches/required/tangorpro/tangorpro_ap3a.241005.015/faceunlock/` 整个 + `toolkit/`(`common.sh`、`jarpatch.py`)+ `conf.d/faceunlock.conf` 里的变量。services-hooks 还依赖 `stale-boot-image` 做善后(可选,不带也能跑)。第三方旷视文件用户自己通过 `fetch_upstream.sh` 拉。
 
 ## 版本
 

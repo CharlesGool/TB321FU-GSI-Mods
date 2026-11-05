@@ -1,7 +1,8 @@
 # faceunlock — 人脸解锁(ParanoidSense + 旷视 Megvii)· BP1A 适配版
 
-> **BP1A 专属版本**(底包 ID 门控:`required/tangorpro/tangorpro_bp1a.250505.005/`)。与通用 `optional/faceunlock`
-> 的区别只在 `parts/001.services-hooks` 的 Sense 框架类源码和 `apply_hooks.py` 的 AuthService 注入锚,照
+> **BP1A 专属版本**(底包 ID 门控:`required/tangorpro/tangorpro_bp1a.250505.005/`)。与 ap3a 版
+> `required/tangorpro/tangorpro_ap3a.241005.015/faceunlock` 的区别只在 `parts/001.services-hooks` 的
+> Sense 框架类源码和 `apply_hooks.py` 的 AuthService 注入锚,照
 > 官方 BP1A.250505.005 的 `services.jar` 重新适配(通用版是对 AP3A/Mystic 写的,直接编不过)。依据见 BP1A 工程
 > `doc/08-V8-BUILD.md` §5b。改动:
 > - `HalClientMonitor` 子类(FaceUpdateActiveUser/ResetLockout/SetFeature/GetFeature)super 末尾加 `isMandatoryBiometrics=false`;
@@ -64,7 +65,7 @@
 
 ## 整组独立发布时要带什么
 
-`patches/optional/faceunlock/` 整个 + `toolkit/`(`common.sh`、`jarpatch.py`)+ `conf.d/faceunlock.conf` 里的变量。services-hooks 还依赖 `stale-boot-image` 做善后(可选,不带也能跑)。第三方旷视文件用户自己通过 `fetch_upstream.sh` 拉。
+`patches/required/tangorpro/tangorpro_bp1a.250505.005/faceunlock/` 整个 + `toolkit/`(`common.sh`、`jarpatch.py`)+ `conf.d/faceunlock.conf` 里的变量。services-hooks 还依赖 `stale-boot-image` 做善后(可选,不带也能跑)。第三方旷视文件用户自己通过 `fetch_upstream.sh` 拉。
 
 ## 版本
 

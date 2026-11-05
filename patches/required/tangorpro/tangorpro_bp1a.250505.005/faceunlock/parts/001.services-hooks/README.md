@@ -61,7 +61,7 @@ Pixel 的 services.jar 是 R8 优化过的(泛型签名/常量/没人用的方�
 - 不依赖其他模块,不 `require_mod`。可以单独启用。
 - 要排在 `stale-boot-image` **前面**(它靠本模块打的改动标记决定删什么;它排在前面就看不到标记,本模块会直接报错提醒)。
 - `framework.jar` 只当编译 classpath 读,不改;和 `build-consistency-dialog-fix` 谁先谁后都行(它只改 Build 里一个方法体,不影响 classes4.dex 的编译)。
-- 功能上要配合 `faceunlock/app`(App 本体、权限 xml)和 `faceunlock/settings-entry`(设置入口)才有完整的人脸解锁。单独启用本模块:services.jar 补丁和属性都在,`SenseProvider` 会注册,但没有 `com.android.faceunlock` 可以绑,设置里也没有入口,人脸用不了,也没有别的副作用。完整的组合表见 `patches/optional/faceunlock/README.md`。
+- 功能上要配合 `faceunlock/app`(App 本体、权限 xml)和 `faceunlock/settings-entry`(设置入口)才有完整的人脸解锁。单独启用本模块:services.jar 补丁和属性都在,`SenseProvider` 会注册,但没有 `com.android.faceunlock` 可以绑,设置里也没有入口,人脸用不了,也没有别的副作用。完整的组合表见 `patches/required/tangorpro/tangorpro_bp1a.250505.005/faceunlock/README.md`。
 
 ## 适用范围和换底包注意
 

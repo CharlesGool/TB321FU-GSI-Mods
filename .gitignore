@@ -24,8 +24,9 @@ __pycache__/
 .local/
 .env
 
-# 含专有 Megvii SDK 的预编译 APK:由 parts/002.app/src + fetch_upstream.sh 重建,不入公开仓库
-patches/optional/faceunlock/parts/002.app/files/FaceUnlock.apk
+# 含专有 Megvii SDK 的预编译 APK:由 parts/002.app/src + fetch_upstream.sh 重建,不入公开仓库。
+# faceunlock 现为按底包门控补丁(optional/ 与 required/tangorpro/<底包>/ 下都可能有),用 ** 覆盖所有位置。
+patches/**/faceunlock/parts/002.app/files/FaceUnlock.apk
 # 人脸录入教育页的原厂素材(从 Pixel 设置提取),不随仓库分发;重建 overlay 前自备
-patches/optional/faceunlock/parts/003.settings-entry/src/overlay/res/raw/face_education_lottie.json
-patches/optional/faceunlock/parts/003.settings-entry/src/overlay/res/raw/face_settings.mp4
+patches/**/faceunlock/parts/003.settings-entry/src/overlay/res/raw/face_education_lottie.json
+patches/**/faceunlock/parts/003.settings-entry/src/overlay/res/raw/face_settings.mp4
