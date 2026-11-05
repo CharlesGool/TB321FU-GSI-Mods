@@ -12,6 +12,7 @@ Materiales de terceros distribuidos con este repositorio, y sus obligaciones de 
 |---|---|---|---|---|---|---|---|
 | avbtool | AOSP | android.googlesource.com (platform/external/avb) | MIT | `toolkit/avb/avbtool.py`, distribuido con el repositorio; lo invocan los scripts de firma AVB | The Android Open Source Project | Conservar el aviso de copyright y de licencia (en la cabecera del archivo) | 2026-11-04 |
 | herald-core | Véase el repositorio | github.com/CharlesGool/herald-core | GPL-3.0-or-later, etc. (véase el repositorio) | `patches/required/general/herald-core` es una copia sincronizada de su `patch/` (obra del autor de este repositorio, no un tercero externo) | CharlesGool | Igual que herald-core | 2026-11-04 |
+| tb321fu-tango-patch | Véase el repositorio | github.com/CharlesGool/tb321fu-tango-patch | GPL-3.0-or-later, etc. (véase el repositorio) | `patches/required/general/tango` es una copia sincronizada de su `patch/` (obra del autor de este repositorio, no un tercero externo; Tango, `tango32.ko` y las bibliotecas de 32 bits de Xiaomi no están incluidos) | CharlesGool | Igual que tb321fu-tango-patch | 2026-11-05 |
 
 ### Textos de licencia
 

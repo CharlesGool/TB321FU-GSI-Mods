@@ -24,6 +24,7 @@ Ninguno por el momento.
 | 2026-11-04 | `spoof set` deduce el release a partir del fingerprint | Aceptada | Los perfiles de máquina de tipo directorio no tienen campo de release; la lógica anterior informaba falsamente `WILL_FALLBACK` para panther_beta, etc., lo que no coincidía con el comportamiento del script de arranque |
 | 2026-11-04 | El lanzador de inyección en system_server está desactivado por defecto y usa una marca de un solo uso | Aceptada | Inyectar en system_server tiene riesgo alto (bootloop); la marca de consumo único evita la persistencia y nunca se mata system_server |
 | 2026-11-05 | Publicar la versión ancla `user-v1.4` y eliminar test-v1.3.x | Aceptada | Tras eliminar SOTER se fija una versión ancla; las 6 versiones test se borran con clean-releases y se conservan las tres versiones oficiales anteriores |
+| 2026-11-05 | La única fuente del parche `tango` pasa a ser el repositorio tb321fu-tango-patch; este repositorio conserva una copia sincronizada, que se sincroniza con `make sync-tango` y se comprueba con `make unit` | Aceptada | Igual que herald-core; el parche y la guía de portado ya se publican por separado |
 
 ## Traspaso
 
