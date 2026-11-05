@@ -21,6 +21,9 @@
 #   (required/<底包前缀>/…,见 toolkit/lib/runmods.sh 的 scope_ok),不在这里判断。
 base_id() {
     local f
+    # 显式覆盖(device.conf 里设 BASE_ID):底包指纹被 GSI 工具泛化(如新版 MysticGSI 把 product 改成
+    # generic_system_google)时,用它声明这台机器真正的底包 ID,让版本门控(required/<前缀>/…)正常命中。
+    if [[ -n ${BASE_ID:-} ]]; then printf '%s\n' "${BASE_ID,,}"; return; fi
     if [[ -s ${BUILD_STATE:-/nonexistent}/base-id ]]; then cat "$BUILD_STATE/base-id"; return; fi
     f=$(sudo grep -h '^ro.system.build.fingerprint=' "$SYS/build.prop" 2>/dev/null | tail -1 | cut -d= -f2- || true)
     [[ -n $f ]] || f=$(sudo grep -h '^ro.build.fingerprint=' "$SYS/build.prop" 2>/dev/null | tail -1 | cut -d= -f2- || true)

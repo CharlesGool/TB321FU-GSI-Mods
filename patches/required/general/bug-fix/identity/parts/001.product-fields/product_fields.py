@@ -34,7 +34,9 @@ def main():
 
     dev = env("ID_DEVICE")
     if part == "system":
-        set_all("ro.build.product", dev)
+        # ro.build.product 是旧别名,Android 17 起不再出现在 system/build.prop;有就改,没有就跳过。
+        if not set_all("ro.build.product", dev, required=False):
+            print("product_fields: system 里没有 ro.build.product(A17 起已移除),跳过", file=sys.stderr)
         # flavor / description 开头的 "<GSI_CODENAME>-user" 换成 "<ID_DEVICE>-user"。
         # 只在开头是 GSI 原机代号时才换:build-fingerprint 先跑过的话它们已经是原厂值,这里就不碰,
         # 所以两个模块谁先谁后、单开哪个,结果都合理。

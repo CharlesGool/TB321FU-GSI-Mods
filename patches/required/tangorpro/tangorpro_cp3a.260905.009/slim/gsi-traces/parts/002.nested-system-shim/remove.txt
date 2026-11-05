@@ -1,0 +1,10 @@
+# CP3A 的转换器(MysticGSI cli.py,phh-treble 系)在镜像里塞了一整棵嵌套的 system/system/ phh 垫片树:
+#   system/system/bin/(phh-on-boot.sh / phh-on-data.sh / rw-system.sh / busybox_phh / vndk-detect / bootctl / permissiver.sh)
+#   system/system/etc/(init/{vndk.rc,mystic.rc,permissiver.rc}、fstab.postinstall、两个 audio policy xml)
+#   system/system/phh/(各厂商按键布局/NFC 配置)、system/system/ph/
+# 这整棵树在运行时是死的:init 只扫 /system/etc/init(外层),不扫 /system/system/etc/init;实测外层
+# etc/init 里没有任何 phh/mystic/vndk/permissiver,也没有任何文件引用 /system/system/ 路径。它纯粹是
+# 转换器留下的检测痕迹(AP3A-Mystic 底包根本没有嵌套 system/system)。整棵删掉。路径相对 system/。
+# 注:AP3A 的 phh 在顶层且 rw-system.sh/phh_on_boot 是起作用的(要保留);CP3A 的在嵌套层且全是死的,
+#     所以 CP3A 这版和 AP3A 结构不同——直接整棵删,不做 AP3A 那种逐文件的外科切除。
+system
