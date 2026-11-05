@@ -58,8 +58,8 @@
 
 ## 构建与第三方来源
 
-- 所有预编译 APK 放在各自模块的 `files/`;源码和构建脚本在各自的 `src/`。
-- **旷视 Megvii SDK** 来自 PixelOS ParanoidSense 上游固定 commit,不进仓库,重建 App 时用 `app/src/fetch_upstream.sh` 拉。
+- 两个 APK 放在各自部分的 `files/`,都**不进仓库**(含旷视 SDK 或 Pixel 教育页素材),构建镜像前先用各自 `src/` 的脚本在本地编好;源码和构建脚本在各自的 `src/`。
+- **旷视 Megvii SDK** 和设置教育页素材来自 PixelOS ParanoidSense 上游固定 commit,不进仓库,编 App 和 overlay 前用 `app/src/fetch_upstream.sh` 拉。
 - `app/src/build.sh` 借用 `services-hooks/src/` 里的 AIDL stub 源码和 `check_dex.py`,所以**重建 App** 时这两个模块目录要都在;只**装**预编译 APK 不依赖。
 - 参数在 `devices/<设备>/conf.d/faceunlock.conf`:`FU_D2J`、`FU_R8`(8.5.35)、`FU_JAVA_HOME` 给 services-hooks;`FACEUNLOCK_KEYSTORE` 只在重建 APK 时用。
 

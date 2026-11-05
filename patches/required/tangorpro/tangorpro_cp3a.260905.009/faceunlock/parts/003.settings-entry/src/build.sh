@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # 编 FaceUnlockSettingsOverlay.apk(设置里人脸入口的静态 overlay), 不用 AOSP 编译系统.
-# 以前和 FaceUnlock.apk 在同一个脚本里编, 现在拆成独立脚本: 不依赖 App 源码, 也不依赖旷视上游文件.
+# 以前和 FaceUnlock.apk 在同一个脚本里编, 现在拆成独立脚本: 不依赖 App 源码.
+# 教育页的两个素材(res/raw/face_education_lottie.json, face_settings.mp4)不进仓库, 从 ParanoidSense 上游取:
+#   先跑 ../../002.app/src/fetch_upstream.sh, 或用 PARANOIDSENSE_DIR 指定上游目录.
 #
 # 用法: build.sh <底包 system 目录> <输出目录>
 # 工具(环境变量):
@@ -15,6 +17,8 @@ OUT=$(realpath -m "$2")
 HERE=$(cd "$(dirname "$0")" && pwd)
 : "${JAVA_HOME:=/usr/lib/jvm/java-17-openjdk-amd64}" "${BT:?缺 BT(build-tools 35 目录)}"
 KS=${FACEUNLOCK_KEYSTORE:-${KS:-$HERE/faceunlock.keystore}}
+RAW=${PARANOIDSENSE_DIR:-$HERE/../../002.app/src/third_party/ParanoidSense}/overlay/res/raw
+[[ -f $RAW/face_education_lottie.json && -f $RAW/face_settings.mp4 ]] || { echo "缺上游教育页素材 $RAW, 先跑 ../../002.app/src/fetch_upstream.sh" >&2; exit 1; }
 if [[ ! -f $KS ]]; then
     echo "==== 生成签名密钥 $KS"
     "$JAVA_HOME/bin/keytool" -genkeypair -keystore "$KS" -storetype PKCS12 -alias faceunlock -keyalg RSA -keysize 2048 \
@@ -24,7 +28,8 @@ T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 mkdir -p "$OUT" "$T/ores"
 
 echo "==== Settings overlay"
-for f in $(find "$HERE/overlay/res" -type f); do "$BT/aapt2" compile "$f" -o "$T/ores/"; done
+for f in $(find "$HERE/overlay/res" -type f -not -path "*/res/raw/*") "$RAW/face_education_lottie.json" "$RAW/face_settings.mp4"; do
+    "$BT/aapt2" compile "$f" -o "$T/ores/"; done
 "$BT/aapt2" link -o "$T/overlay.apk" --manifest "$HERE/overlay/AndroidManifest.xml" \
     -I "$SYS/framework/framework-res.apk" --min-sdk-version 35 --target-sdk-version 35 "$T"/ores/*.flat
 "$BT/zipalign" -f -p 4 "$T/overlay.apk" "$T/overlay-aligned.apk"
