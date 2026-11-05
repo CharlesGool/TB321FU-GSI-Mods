@@ -26,4 +26,4 @@
 ### 合规审查
 
 - Copyleft 组件:本仓库自身 GPL-3.0-or-later。`avbtool.py`(MIT)与 GPL-3.0 兼容。
-- **不随本仓库分发的专有件**:人脸解锁所需的旷视 Megvii SDK、Pixel 设置的人脸教育页素材(`face_education_lottie.json`、`face_settings.mp4`)均为专有材料,已 gitignore,需使用者自备(见 各 `patches/required/tangorpro/<底包>/faceunlock` 的 README)。外部构建工具(Android NDK、apktool、dex2jar、xdelta3 等)不在仓库内,由使用者自备。
+- **不随本仓库分发的专有件**:人脸解锁所需的旷视 Megvii SDK、Pixel 设置的人脸教育页素材(`face_education_lottie.json`、`face_settings.mp4`)均为专有材料,由 ParanoidSense 上游提供,构建时用 `fetch_upstream.sh` 拉取;含这些文件的 `FaceUnlock.apk` 和 `FaceUnlockSettingsOverlay.apk` 也不进仓库,需使用者本地编译(见 各 `patches/required/tangorpro/<底包>/faceunlock` 的 README)。2026-11-05 前 `FaceUnlockSettingsOverlay.apk` 曾入库,旧提交中仍有。外部构建工具(Android NDK、apktool、dex2jar、xdelta3 等)不在仓库内,由使用者自备。
