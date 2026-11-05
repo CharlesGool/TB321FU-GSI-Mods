@@ -24,6 +24,7 @@ None at the moment.
 | 2026-11-04 | `spoof set` prediction derives release from fingerprint | Accepted | Directory-style model profiles have no release field; the old logic falsely reported `WILL_FALLBACK` for panther_beta and similar, inconsistent with the boot script behavior |
 | 2026-11-04 | system_server injection launcher is off by default, with a one-shot flag | Accepted | Injecting into system_server is high risk (bootloop); the one-shot consumed flag prevents persistence, and system_server is never killed |
 | 2026-11-05 | Cut the `user-v1.4` anchor official release and delete test-v1.3.x | Accepted | Set an anchor after SOTER removal; the 6 test builds were deleted with clean-releases, and the three older official releases are kept |
+| 2026-11-05 | The only source of the `tango` patch is now the tb321fu-tango-patch repository; this repository keeps a synced copy, synced with `make sync-tango` and checked by `make unit` | Accepted | Same as herald-core; the patch and the porting guide are now published separately |
 
 ## Handover
 

@@ -11,6 +11,7 @@
 #   make test                              补丁独立性测试(每个补丁单独在干净底包上跑)
 #   make unit                              broker/heraldctl 插件的单元测试(不碰真机)
 #   make sync-core                         从 herald-core 仓库同步 patches/required/general/herald-core(那个补丁以它为准,别直接改副本)
+#   make sync-tango                        从 tb321fu-tango-patch 仓库同步 patches/required/general/tango(同上,以它为准)
 #
 # 选补丁(所有目标通用):
 #   PROFILE=名字     预设,devices/<设备>/profiles/<名字>.txt 或 profiles/<名字>.txt
@@ -26,7 +27,7 @@ OUT    ?= /tmp/9008-out/$(DEVICE)
 export PROFILE WITH WITHOUT
 
 .NOTPARALLEL:
-.PHONY: list info menu build 9008 pack survey test unit sync-core
+.PHONY: list info menu build 9008 pack survey test unit sync-core sync-tango
 
 list:
 	@toolkit/select.sh $(CONF) --list
@@ -58,9 +59,13 @@ test:
 
 unit:
 	@toolkit/sync-herald-core.sh --check
+	@toolkit/sync-tango.sh --check
 	@set -e; for t in toolkit/tests/test-*-plugin*.sh toolkit/tests/test-herald-start-prefix.sh toolkit/tests/test-slim-lists.sh toolkit/tests/test-smooth-display-hook.sh toolkit/tests/test-patch-scope.sh toolkit/tests/test-image-name.sh toolkit/tests/test-camera-choice.sh toolkit/tests/test-google-slim.sh toolkit/tests/test-qs-tiles.sh \
 	    "toolkit/tests/test-herald-start-full.sh --repo" "toolkit/tests/test-herald-protocol.sh $(CONF)"; do \
 	    echo "== $$t"; out=$$(bash $$t 2>&1) || { echo "$$out" | tail -n 30; echo "失败: $$t"; exit 1; }; echo "$$out" | tail -1; done
 
 sync-core:
 	toolkit/sync-herald-core.sh
+
+sync-tango:
+	toolkit/sync-tango.sh
