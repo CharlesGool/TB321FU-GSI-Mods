@@ -1,8 +1,6 @@
 --- a/smali/com/android/server/wifi/WifiCountryCode.smali
 +++ b/smali/com/android/server/wifi/WifiCountryCode.smali
-@@ -1338,11 +1338,59 @@
- .end method
- 
+@@ -1320,7 +1320,54 @@
  .method private setTelephonyCountryCode(Ljava/lang/String;)V
      .locals 5
  
@@ -51,12 +49,9 @@
 +
 +    :herald_cond_0
 +    const-string p1, "DE"
-+
-     .line 385
+     .line 388
 +    :herald_cond_1
 +    :herald_goto_0
      new-instance v0, Ljava/lang/StringBuilder;
- 
-     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
  
      const-string v1, "Set telephony country code to: "

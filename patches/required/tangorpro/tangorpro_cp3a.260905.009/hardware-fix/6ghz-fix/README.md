@@ -1,5 +1,13 @@
 # 6ghz-fix — 6GHz 修复
 
+> **CP3A(Android 17)适配版**(V1.1)。两段 smali 注入(`WifiCountryCode.setTelephonyCountryCode`、
+> `SoftApManager.startSoftAp`)的注入代码与 bp1a 逐字相同,只把上下文锚对到 A17 的 `service-wifi.jar`
+> 重新生成了 diff:A17 下方法体的 `.line` 号变了(385→388、841→926),且编译器把
+> `new StringBuilder();append(..)` 改成了 `new StringBuilder("..")`,老 diff 的尾部上下文对不上。
+> 另:A17 底包 Wi-Fi APEX 是压缩格式 `com.google.android.wifi.capex`,`conf.d/wifi.conf` 的
+> `WIFI_APEX_FILE` 已指向它(assemble 会解压、改 `service-wifi.jar`、重签成未压缩 `.apex`)。
+> 离线验证:两 diff 均干净打上,apextool 重打包 + 重签 + AVB 校验通过,service-wifi.jar 回读逐字节一致。
+
 > 一个补丁(`6ghz-fix`),内部 2 个部分在 `parts/NNN.<部分>/`,按编号顺序跑,只能整个打或整个不打。依赖和说明见本目录的 `patch.conf`,每个部分的原理见它自己的 `README.md`。
 
 ## 解决什么问题

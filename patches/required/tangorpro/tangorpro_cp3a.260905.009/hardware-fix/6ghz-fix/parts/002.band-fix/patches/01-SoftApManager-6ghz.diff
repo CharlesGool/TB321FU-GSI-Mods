@@ -1,8 +1,6 @@
 --- a/smali/com/android/server/wifi/SoftApManager.smali
 +++ b/smali/com/android/server/wifi/SoftApManager.smali
-@@ -2254,11 +2254,181 @@
- .end method
- 
+@@ -2394,7 +2394,176 @@
  .method private startSoftAp()I
      .locals 10
  
@@ -173,12 +171,9 @@
 +    const-string v7, "herald_6g override failed, keep system config"
 +
 +    invoke-static {v6, v7, v1}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
-+
-     .line 841
+     .line 926
 +    :herald_cond_4
 +    :herald_goto_1
      invoke-static {}, Lcom/android/wifi/x/com/android/modules/utils/build/SdkLevel;->isAtLeastS()Z
  
      move-result v0
- 
-     if-eqz v0, :cond_0
