@@ -27,8 +27,16 @@ sudo cat "$SYS/framework/services.jar"  > "$T/services.jar"
 "$D2J" -f -o "$T/cp/framework.jar" "$T/framework.jar" >/dev/null
 "$D2J" -f -o "$T/cp/services.jar"  "$T/services.jar"  >/dev/null
 # core-libart.jar 在 ART apex 的 payload(ext4)里。不 mount,用 unzip + debugfs dump 取出来。
-sudo cat "$SYS/apex/com.google.android.art.apex" > "$T/art.apex"
-( cd "$T" && unzip -q -o art.apex original_apex && unzip -q -o original_apex apex_payload.img )
+# A17 的 ART apex 是压缩格式 .capex(内含 original_apex),bp1a/ap3a 是 .apex;两种都找、都认。
+ART_APEX=$(sudo bash -c 'for f in "$1"/apex/com.google.android.art.capex "$1"/apex/com.google.android.art.apex; do [ -e "$f" ] && { echo "$f"; break; }; done' _ "$SYS")
+[[ -n $ART_APEX ]] || { echo "找不到 ART apex(com.google.android.art.{capex,apex})" >&2; exit 1; }
+sudo cat "$ART_APEX" > "$T/art.apex"
+( cd "$T"
+  if unzip -l art.apex 2>/dev/null | grep -q original_apex; then
+      unzip -q -o art.apex original_apex && unzip -q -o original_apex apex_payload.img   # 压缩 APEX:内层才是 payload
+  else
+      unzip -q -o art.apex apex_payload.img                                              # 未压缩 APEX:直接有 payload
+  fi )
 debugfs -R "dump /javalib/core-libart.jar $T/core-libart.jar" "$T/apex_payload.img" 2>/dev/null
 [[ -s $T/core-libart.jar ]] || { echo "从 ART apex 取 core-libart.jar 失败" >&2; exit 1; }
 "$D2J" -f -o "$T/cp/core-libart.jar" "$T/core-libart.jar" >/dev/null

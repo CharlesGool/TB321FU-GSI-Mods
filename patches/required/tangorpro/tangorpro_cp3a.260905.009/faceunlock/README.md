@@ -1,17 +1,19 @@
 # faceunlock — 人脸解锁(ParanoidSense + 旷视 Megvii)· CP3A 适配版
 
-> **CP3A 专属版本**(底包 ID 门控:`required/tangorpro/tangorpro_cp3a.260905.009/`)。与 ap3a 版
-> `required/tangorpro/tangorpro_ap3a.241005.015/faceunlock` 的区别只在 `parts/001.services-hooks` 的
-> Sense 框架类源码和 `apply_hooks.py` 的 AuthService 注入锚,照
-> 官方 CP3A.260905.009 的 `services.jar` 重新适配(通用版是对 AP3A/Mystic 写的,直接编不过)。依据见 CP3A 工程
-> `doc/08-V8-BUILD.md` §5b。改动:
-> - `HalClientMonitor` 子类(FaceUpdateActiveUser/ResetLockout/SetFeature/GetFeature)super 末尾加 `isMandatoryBiometrics=false`;
-> - `FaceRemovalClient` 加 `int reason` 透传给 `RemovalClient`;`FaceInternalCleanupClient.getRemovalClient` 同步加 `reason`;`SenseProvider` 两处 `new FaceRemovalClient` 传 `3`;
-> - 删 `FaceAuthenticationClient.handleFailedAttempt`(CP3A 该方法变 `final`,基类版是超集);
-> - `BiometricTestSessionImpl` 实现新抽象方法 `getSensorId()`;
-> - `apply_hooks.py`:CP3A 把 `registerFaceSensors` 重构、`"AuthService"` tag 提到方法头,注入锚改为"方法头 tag 后 `canUseProvider()` + `if-nez :cond_1`",保留老锚兼容。
+> **CP3A / Android 17 适配版**(V1.1,底包 ID 门控:`required/tangorpro/tangorpro_cp3a.260905.009/`)。
+> 源码以 bp1a 的 Sense 适配为基线(已含 A15 BP1A 的那批 biometric 内部 API 适配:`HalClientMonitor`
+> 子类的 `isMandatoryBiometrics=false`、`FaceRemovalClient` 的 `int reason`、`FaceAuthenticationClient`
+> 去掉变 `final` 的 `handleFailedAttempt`、`BiometricTestSessionImpl.getSensorId()` 等 —— 见 bp1a 工程
+> `doc/08` §5b)。这些签名 A17 **原样沿用**,直接编过。A17 相对 bp1a **只多一处** framework API 漂移:
+> - `BiometricLogger.ofUnknown(Context)` → `ofUnknown(Context, Handler)`;构造器 `BiometricLogger(Context, int, int, int, AuthenticationStatsCollector)` → `(Context, Handler, int, int, int, AuthenticationStatsCollector)`。`SenseProvider` 的 3 处调用加传 `mHandler`(= 本 provider 的 Handler,镜像 AOSP `FaceProvider` 的用法)。
 >
-> 离线验证:javac 干净、`check_dex` 0 问题、3/3 Sense 入口、57/57 `USE_BIOMETRIC_INTERNAL` 放行、`smali-equiv` 回编一致。换底包/真机注意同下。
+> 工具链 A17 适配(`parts/001.services-hooks/part.sh` + `src/build_dex.sh`):ART apex 在 A17 是压缩格式
+> `com.google.android.art.capex`(bp1a/ap3a 是 `.apex`),取 `core-libart.jar` 当 classpath 时两种格式都认
+> (有 `original_apex` 就先解内层)。`apply_hooks.py` 的 AuthService 注入锚沿用 bp1a 的"方法头 tag 后
+> `canUseProvider()` + `if-nez`",A17 的 `registerFaceSensors` 结构相同,命中正常。
+>
+> 离线验证(run-module 跑 A17 底包):javac 干净、`check_dex` 65 类 394 方法 **0 问题**、
+> **3/3 Sense 入口命中**、**57/57 `_enforcePermission` 放行**(FaceServiceWrapper 32 + BiometricServiceWrapper 20 + AuthServiceImpl 5)、`smali-equiv` 6 个 smali 回编一致、新 classes4.dex 塞入成功。换底包/真机注意同下。
 
 > 一个补丁(`faceunlock`),内部 3 个部分在 `parts/NNN.<部分>/`,按编号顺序跑,只能整个打或整个不打。依赖和说明见本目录的 `patch.conf`,每个部分的原理见它自己的 `README.md`。
 

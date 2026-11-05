@@ -11,7 +11,9 @@ for v in APKTOOL_JAR FU_D2J FU_R8; do need_input "$v"; done
 for t in java javac zipalign debugfs unzip; do need_tool "$t"; done
 need_file framework/services.jar
 need_file framework/framework.jar            # 只当编译 classpath 用,本模块不改它
-need_file apex/com.google.android.art.apex   # 取 core-libart.jar 当 classpath
+# 取 core-libart.jar 当 classpath。A17 底包的 ART apex 是压缩格式 .capex(bp1a/ap3a 是 .apex),两种都认。
+sudo test -e "$SYS/apex/com.google.android.art.apex" || sudo test -e "$SYS/apex/com.google.android.art.capex" \
+    || die "底包里没有 apex/com.google.android.art.{apex,capex},这个模块不适用于当前底包"
 need_file build.prop
 # services.jar 补丁必须排在 stale-boot-image 前面(那个模块要等所有改 jar 的模块跑完再清预编译产物)
 ! mod_ran required/general/boot-kernel/stale-boot-image \
