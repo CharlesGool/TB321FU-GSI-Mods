@@ -1,0 +1,6 @@
+# Google 相机及其配套服务(用户 2026-10-26: 系统里的相机用不了, 要删; 删完没有相机应用, 用户自己装)。
+# 路径相对 system/,底包里没有的自动跳过。
+
+product/priv-app/GoogleCamera
+product/priv-app/PixelCameraServices
+system_ext/app/PersistentBackgroundCameraServices

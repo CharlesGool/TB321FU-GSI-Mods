@@ -1,0 +1,3 @@
+# 开机向导后 Play 会按它自动装回一批 Google 应用, 必须删。路径相对 system/,底包里没有的自动跳过。
+
+product/app/PlayAutoInstallConfig

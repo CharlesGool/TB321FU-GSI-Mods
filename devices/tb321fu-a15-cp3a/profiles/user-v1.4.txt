@@ -1,0 +1,15 @@
+# user-v1.4 正式版(CP3A):对齐 ap3a 的 user-v1.4(补丁集 = user-v1.3)。
+# ap3a 侧 = 全部 required + optional{smooth-display,navbar-hide,faceunlock,free-rotation,spoof/global-pif},GOOGLE_SLIM=3。
+# CP3A 侧的两处差异(都是"按版本适配→版本门控补丁 / 通用补丁"的结果,功能对齐):
+#   - faceunlock:CP3A 需要按官方 services.jar 重新适配 Sense 框架类,放在
+#     required/tangorpro/tangorpro_cp3a.260905.009/faceunlock(版本门控),+required 即自动选中。
+#   - GOOGLE_SLIM=3:对应两个通用分级精简补丁 optional/slim/{google-apps,accessibility}。
+#   - 不打 rw-system-tmpfs(CP3A 里目标已被 gsi-traces 整树删除,无处可修)。
+-all
++required
++optional/smooth-display
++optional/navbar-hide
++optional/free-rotation
++optional/spoof/global-pif
++optional/slim/google-apps
++optional/slim/accessibility

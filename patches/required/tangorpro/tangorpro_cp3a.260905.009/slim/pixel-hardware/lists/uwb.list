@@ -1,0 +1,5 @@
+# Qorvo UWB(TB321FU 没有 UWB, 常驻服务每 19 秒崩一次: HAL is unavailable)。路径相对 system/,底包里没有的自动跳过。
+
+system_ext/priv-app/UwbVendorService
+system_ext/etc/permissions/privapp-permissions-qorvo.xml
+product/overlay/UwbOverlayT6pro
