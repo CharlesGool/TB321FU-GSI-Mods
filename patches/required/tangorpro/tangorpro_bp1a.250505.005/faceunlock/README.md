@@ -1,4 +1,16 @@
-# faceunlock — 人脸解锁(ParanoidSense + 旷视 Megvii)
+# faceunlock — 人脸解锁(ParanoidSense + 旷视 Megvii)· BP1A 适配版
+
+> **BP1A 专属版本**(底包 ID 门控:`required/tangorpro/tangorpro_bp1a.250505.005/`)。与通用 `optional/faceunlock`
+> 的区别只在 `parts/001.services-hooks` 的 Sense 框架类源码和 `apply_hooks.py` 的 AuthService 注入锚,照
+> 官方 BP1A.250505.005 的 `services.jar` 重新适配(通用版是对 AP3A/Mystic 写的,直接编不过)。依据见 BP1A 工程
+> `doc/08-V8-BUILD.md` §5b。改动:
+> - `HalClientMonitor` 子类(FaceUpdateActiveUser/ResetLockout/SetFeature/GetFeature)super 末尾加 `isMandatoryBiometrics=false`;
+> - `FaceRemovalClient` 加 `int reason` 透传给 `RemovalClient`;`FaceInternalCleanupClient.getRemovalClient` 同步加 `reason`;`SenseProvider` 两处 `new FaceRemovalClient` 传 `3`;
+> - 删 `FaceAuthenticationClient.handleFailedAttempt`(BP1A 该方法变 `final`,基类版是超集);
+> - `BiometricTestSessionImpl` 实现新抽象方法 `getSensorId()`;
+> - `apply_hooks.py`:BP1A 把 `registerFaceSensors` 重构、`"AuthService"` tag 提到方法头,注入锚改为"方法头 tag 后 `canUseProvider()` + `if-nez :cond_1`",保留老锚兼容。
+>
+> 离线验证:javac 干净、`check_dex` 0 问题、3/3 Sense 入口、57/57 `USE_BIOMETRIC_INTERNAL` 放行、`smali-equiv` 回编一致。换底包/真机注意同下。
 
 > 一个补丁(`faceunlock`),内部 3 个部分在 `parts/NNN.<部分>/`,按编号顺序跑,只能整个打或整个不打。依赖和说明见本目录的 `patch.conf`,每个部分的原理见它自己的 `README.md`。
 
