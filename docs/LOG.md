@@ -26,9 +26,16 @@
 | 2026-11-05 | 出 `user-v1.4` 锚点正式版,删 test-v1.3.x | 接受 | 删 SOTER 后立一个锚点;6 个 test 版用 clean-releases 删除,三个旧正式版保留 |
 | 2026-11-05 | BP1A 底包线对齐 ap3a user-v1.4,人脸按版本门控补丁重适配 | 接受 | 官方 BP1A 首个正式版;改 jar 的 smali 补丁需按新底包重做,放版本门控文件夹,通用补丁原位引用 |
 | 2026-11-05 | apextool 签名加 `--alignment-preserved true` | 接受 | apksigner 默认把 payload 重排成 4 字节对齐,抹掉 4096 页对齐,capex 重打包后过不了校验 |
+| 2026-11-05 | 单一仓库;各底包线的补丁按 `required/tangorpro/<底包ID>/` 文件夹隔离;底包工程目录(非 git)对外只发布成品 9008 刷机包 | 接受 | bp1a / cp3a 两条线并行更新,试合并只有自动生成的 `patches/README.md` 索引冲突;拆成多个仓库会让 46 个共用补丁和 toolkit 各拷一份、共用修复要手动同步(navbar-hide 两份拷贝漂移就是例子) |
+| 2026-11-05 | 发布号按底包线各自编号:bp1a 首个正式版 `user-v1.0`,未上机的候选 `test-vX.Y.Z` | 接受 | bp1a / ap3a / cp3a 都用 1.4 会撞号分不清是哪条线 |
+| 2026-11-05 | `navbar-hide`:新方案(收起高度 1dp)做通用 V1.1,旧方案(0dp)作为 ap3a 的版本门控特例 V1.0 | 接受 | 官方 BP1A 启动器里收起高度还决定手势收尾判定区,0dp 会让"上滑多任务中途掉头"卡死;Mystic 启动器上旧方案稳定且占位真正为 0 |
 
 ## 交接
 
-进行中:BP1A user-v1.4 在分支 `bp1a-v1.4`(未并入 `main`)。完整 9008 包已出并离线 + AVB 全验,存档在
-BP1A 工程 `releases/pixelos_tangorpro_bp1a.250505.005_user-v1.4_optional/`。**待真机验证**(裸刷开机、人脸实录实解、
-6GHz 热点、Play/Duck);验证通过后可将 `bp1a-v1.4` 并入 `main`。
+- **bp1a**:`user-v1.0` 正式版已出(`VERSION=V3 VERSION_LABEL=user-v1.0 PROFILE=user-v1.4`),真机测过的候选 `test-v1.4.1` 与它逐文件比对只差版本标签;
+  存档在 bp1a 工程 `releases/pixelos_tangorpro_bp1a.250505.005_user-v1.0_optional/`,旧发布目录已删。`PROFILE` 文件还叫 `user-v1.4.txt`(未改名)。
+- **cp3a**:`test-v1.5` 已构建、离线 AVB 全验,**待真机验证**;它的 `navbar-hide` 是自己的版本门控拷贝(内容与通用 V1.1 等价),是否改回引用通用版待定。
+- **仓库**:`main` 已合入 bp1a 与 cp3a 两条线(`a1c6e6b`,另有 `build-rro.sh` 回退修复),**未推送**:`origin/main` 仍在 `5d0ff8d`。
+- **推 GitHub 之前必须做**:① 清历史——bp1a 早期提交里带进过 30MB 的专有 `FaceUnlock.apk` 和 Pixel 素材(`.gitignore` 已改成 `patches/**/faceunlock/…`,
+  但旧提交里还有),新仓库可用干净历史起步;② 正式包 7z 有 4.15GB,GitHub Release 单文件上限 2GB,要分卷或放别处。
+- 英文 / 西班牙文文档(`docs/en`、`docs/es`)里 bp1a / cp3a 的新条目还没补。

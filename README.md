@@ -140,6 +140,10 @@ toolkit/tests/test-modules.sh devices/tb321fu-a15/device.conf --leave-out   # �
 | `legacy/` | V1–V66 手工流程的构建脚本和源码(`gsi/`、`overlay/`、`faceunlock/`…)。`gsi/strong/herald-payload` 是 herald 的私有 payload,`faceunlock/incoming/tools` 是 dex2jar/r8/apktool,构建仍在用 |
 | `doc/` | 后端接口文档(`herald-backend-api.md`)、研究笔记,`doc/history/` 是旧的 README、FIXES、TEST 和发布说明 |
 
+多条底包线(ap3a / bp1a / cp3a …)共用本仓库:各线通用的补丁放 `required/general/`、`optional/`、`debug/`;需要按底包适配的放
+`required/tangorpro/<底包ID>/`(底包 ID 不匹配就自动跳过);每个设备 / 底包线选哪些补丁在 `devices/<设备>/`。
+各底包线的工程目录不是 git 仓库,bp1a 的工程目录对外只发布做好的 9008 刷机包(7z 和校验和)。
+
 ## 要求
 
 - 构建主机:Linux,`sudo`、Python 3、Android build-tools 35,以及各补丁 README「输入」列明的外部工具(apktool、xdelta3 等,自备)。
