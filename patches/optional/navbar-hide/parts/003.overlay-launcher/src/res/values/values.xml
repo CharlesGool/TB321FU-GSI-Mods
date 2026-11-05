@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 导航栏隐藏(底部是启动器 Taskbar 时:平板模式,以及官方 BP1A 启动器在手机尺寸显示下也是 Taskbar):
-     任务栏收起后报给 App 的高度 = 收起高度。官方 BP1A 启动器里这两个值不只决定占位,还决定手势收尾的判定区:
-     改成 0 会让"上滑多任务到一半掉头"的手势收不了尾(App 点不动、侧滑失效,2026-11-05 真机)。
-     改成 1dp(444 密度下约 3px)占位肉眼不可见,手势正常。收起时的小白条全透明。
-     transient_taskbar_stashed_height = 手势导航下的"自动隐藏任务栏";taskbar_stashed_size = 常驻任务栏。 -->
+<!-- 导航栏隐藏(平板模式,低 DPI):任务栏收起后报给 App 的高度 = 收起高度,改成 0;收起时的小白条全透明。
+     transient_taskbar_stashed_height = 默认的"自动隐藏任务栏";taskbar_stashed_size = 常驻任务栏/启动器手机模式。
+     手势判定区用的是框架的 navigation_bar_gesture_height,不受影响 -->
 <resources>
-    <dimen name="transient_taskbar_stashed_height">1dp</dimen>
-    <dimen name="taskbar_stashed_size">1dp</dimen>
+    <dimen name="transient_taskbar_stashed_height">0dp</dimen>
+    <dimen name="taskbar_stashed_size">0dp</dimen>
     <color name="taskbar_stashed_handle_light_color">#00000000</color>
     <color name="taskbar_stashed_handle_dark_color">#00000000</color>
 </resources>
