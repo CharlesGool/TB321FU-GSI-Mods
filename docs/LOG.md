@@ -34,7 +34,11 @@
 
 - **bp1a**:`user-v1.0` 正式版已出(`VERSION=V3 VERSION_LABEL=user-v1.0 PROFILE=user-v1.4`),真机测过的候选 `test-v1.4.1` 与它逐文件比对只差版本标签;
   存档在 bp1a 工程 `releases/pixelos_tangorpro_bp1a.250505.005_user-v1.0_optional/`,旧发布目录已删。`PROFILE` 文件还叫 `user-v1.4.txt`(未改名)。
-- **cp3a**:`test-v1.5` 已构建、离线 AVB 全验,**待真机验证**;它的 `navbar-hide` 是自己的版本门控拷贝(内容与通用 V1.1 等价),是否改回引用通用版待定。
+- **cp3a(Android 17)**:`test-v1.5` 已构建、离线 AVB 全验,但**真机不开机**——2026-11-05 刷入后 bootloop,多次后掉进高通 9008/EDL
+  (增量补丁自检通过、system 与完整包逐字节一致,判断卡在 userspace/init 早期,不是 bootloader / AVB / boot.img)。最可疑的是 A17 system 配
+  A14 原厂 vendor(原厂 vendor 声明 `ro.vndk.version=34`,A17 底包不带 VNDK apex)。**属未完成线**;下一步先刷未打补丁的 MysticGSI 原版 A17 二分
+  (原版也 bootloop → A17-on-A14-vendor 不兼容,要换方向;能开机 → 是补丁集某项破坏的)。设备在 EDL 时重刷 ap3a / bp1a 完整包即可恢复。
+  它的 `navbar-hide` 是自己的版本门控拷贝(内容与通用 V1.1 等价),是否改回引用通用版待定。
 - **仓库**:`main` 已合入 bp1a 与 cp3a 两条线(`a1c6e6b`,另有 `build-rro.sh` 回退修复),**未推送**:`origin/main` 仍在 `5d0ff8d`。
 - **推 GitHub 之前必须做**:① 清历史——bp1a 早期提交里带进过 30MB 的专有 `FaceUnlock.apk` 和 Pixel 素材(`.gitignore` 已改成 `patches/**/faceunlock/…`,
   但旧提交里还有),新仓库可用干净历史起步;② 正式包 7z 有 4.15GB,GitHub Release 单文件上限 2GB,要分卷或放别处。
