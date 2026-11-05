@@ -1,5 +1,21 @@
 # navbar — 隐藏导航栏
 
+> **V1.1(2026-11-05)**:启动器 overlay 的收起高度 **0dp → 1dp**;控制脚本在底部栏是 Taskbar 时**不再强切导航模式**。
+> 起因:官方 BP1A 底包上开启隐藏后,"上滑到多任务**中途**掉头"会卡死:App 点不动、侧滑返回失效(多任务动作完整结束、
+> 或再进多任务点一下应用就恢复)。真机 + `dumpsys` 定位:
+>
+> 1. 这个底包上底部栏是**启动器的 `Taskbar` 窗口**(`mNavigationBar=Taskbar`,没有 SystemUI 的 `NavigationBar0`),
+>    即使显示大小调到手机尺寸(sw<600dp)也是。所以框架层 `navigation_bar_height` 那个 overlay 在这里不起作用,
+>    隐藏占位靠的是启动器 overlay。
+> 2. 启动器的 `transient_taskbar_stashed_height` / `taskbar_stashed_size` 不只决定占位,还决定手势收尾的判定区
+>    (清成 0 时 Taskbar 提供的 `mandatorySystemGestures` 等 inset 也全是 0)。改成 1dp(444 密度约 3px)占位肉眼不可见,
+>    手势正常。依据:真机 `adb install -r` 逐个换值,1dp 即不卡。
+> 3. 原控制逻辑按"sw<600 就是 SystemUI 导航栏"去把导航模式 手势→三键→手势 强切一遍,对 Taskbar 是白折腾
+>    (hide 那一秒连跑十次转场、Taskbar 窗口被销毁,还出现过"应用内导航栏不能用")。现在 `bar=taskbar` 只杀启动器。
+>
+> V1.0 的 0dp 在 ap3a(Mystic 启动器)上稳定;V1.1 起各底包共用这一份。overlay APK 版本号 200(高于测试时手动装的 101–105,
+> 刷入后系统自带版本不会被数据分区里的旧更新压住)。**ap3a 上的 V1.1 待真机验证。**
+
 > 一个补丁(`navbar-hide`),内部 4 个部分在 `parts/NNN.<部分>/`,按编号顺序跑,只能整个打或整个不打。依赖和说明见本目录的 `patch.conf`,每个部分的原理见它自己的 `README.md`。
 
 > 一个补丁(`navbar-hide`),内部 4 个部分在 `parts/` 下按顺序跑。原来各是一个补丁,关联太紧合成一个(2026-11-01);依赖和说明见本目录的 `patch.conf`,每部分的原理见 `parts/<部分>/README.md`。
@@ -30,9 +46,11 @@
 - **同一目录放多个包名不同的 APK,会被 PackageManager 当成一个包的拆分包,整目录作废**(V65 真机:三个放一个目录,`cmd overlay` 报 "Unable to retrieve overlay information",全没注册)。所以每个 APK 一个目录:`/system/product/overlay/<名字>/<名字>.apk`。
 - 这三个目标(framework-res / SystemUITitan / NexusLauncher)的 resources.arsc 里没有 overlayable 声明,预装的 /product overlay 能覆盖它们的任意资源,签名不受限。
 
-## 手势为什么不受影响
+## 手势为什么(基本)不受影响
 
-手势判定区是框架 `navigation_bar_gesture_height`(32dp),启动器 `TaskbarInsetsController` 的 `mandatorySystemGestures` 也用这个值,三个 overlay 都没碰它。`navigation_bar_frame_height`(48dp)也没动。
+手势判定区是框架 `navigation_bar_gesture_height`(32dp);三个 overlay 都没碰它,`navigation_bar_frame_height`(48dp)也没动。
+**但启动器 Taskbar 路径例外**:Taskbar 自己提供的 `navigationBars` / `tappableElement` / `mandatorySystemGestures` inset 是由
+它的收起高度算出来的(V1.0 清成 0 时 `dumpsys window` 里这几项全是 `[0,0][0,0]`),所以收起高度不能清成 0,V1.1 取 1dp。
 
 ## 整组独立发布
 
