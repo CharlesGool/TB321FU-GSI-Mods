@@ -13,6 +13,7 @@ Third-party materials distributed by this repository, along with their attributi
 | avbtool | AOSP | android.googlesource.com (platform/external/avb) | MIT | `toolkit/avb/avbtool.py`, distributed with the repo and called by the AVB signing scripts | The Android Open Source Project | Keep the copyright and license notice (in the file header) | 2026-11-04 |
 | herald-core | See that repository | github.com/CharlesGool/herald-core | GPL-3.0-or-later, etc. (see that repository) | `patches/required/general/herald-core` is a synced copy of its `patch/` (the author's own work, not an external third party) | CharlesGool | Same as herald-core | 2026-11-04 |
 | tb321fu-tango-patch | See that repository | github.com/CharlesGool/tb321fu-tango-patch | GPL-3.0-or-later, etc. (see that repository) | `patches/required/general/tango` is a synced copy of its `patch/` (the author's own work, not an external third party; Tango itself, `tango32.ko` and the Xiaomi 32-bit libraries are not included) | CharlesGool | Same as tb321fu-tango-patch | 2026-11-05 |
+| tb321fu-faceunlock-patch | See that repository | github.com/CharlesGool/tb321fu-faceunlock-patch | Apache-2.0 (see that repository) | Each `patches/required/tangorpro/<base>/faceunlock` is a synced copy of its `patch/<base>/` (the author's own work, not an external third party; the Megvii SDK and the education assets are not included) | CharlesGool | Same as tb321fu-faceunlock-patch | 2026-11-05 |
 
 ### License texts
 

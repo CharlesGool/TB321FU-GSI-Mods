@@ -13,6 +13,7 @@
 | avbtool | AOSP | android.googlesource.com(platform/external/avb) | MIT | `toolkit/avb/avbtool.py`,随仓库分发,被 AVB 签名脚本调用 | The Android Open Source Project | 保留版权与许可声明(在文件头) | 2026-11-04 |
 | herald-core | 见该仓库 | github.com/CharlesGool/herald-core | GPL-3.0-or-later 等(见该仓库) | `patches/required/general/herald-core` 是其 `patch/` 的同步副本(本作者作品,非外部第三方) | CharlesGool | 与 herald-core 一致 | 2026-11-04 |
 | tb321fu-tango-patch | 见该仓库 | github.com/CharlesGool/tb321fu-tango-patch | GPL-3.0-or-later 等(见该仓库) | `patches/required/general/tango` 是其 `patch/` 的同步副本(本作者作品,非外部第三方;Tango 本体、`tango32.ko` 和小米 32 位库不在其中) | CharlesGool | 与 tb321fu-tango-patch 一致 | 2026-11-05 |
+| tb321fu-faceunlock-patch | 见该仓库 | github.com/CharlesGool/tb321fu-faceunlock-patch | Apache-2.0(见该仓库) | 各 `patches/required/tangorpro/<底包>/faceunlock` 是其 `patch/<底包>/` 的同步副本(本作者作品,非外部第三方;旷视 SDK 和教育页素材不在其中) | CharlesGool | 与 tb321fu-faceunlock-patch 一致 | 2026-11-05 |
 
 ### 许可证文本
 

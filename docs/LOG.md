@@ -28,6 +28,7 @@
 | 2026-11-05 | apextool 签名加 `--alignment-preserved true` | 接受 | apksigner 默认把 payload 重排成 4 字节对齐,抹掉 4096 页对齐,capex 重打包后过不了校验 |
 | 2026-11-05 | `tango` 补丁的唯一来源改为 tb321fu-tango-patch 仓库,本仓库只放同步副本,用 `make sync-tango` 同步,`make unit` 检查一致 | 接受 | 与 herald-core 相同;补丁和移植教程已分别公开发布 |
 | 2026-11-05 | `FaceUnlockSettingsOverlay.apk` 不再入库,教育页素材从 ParanoidSense 上游取,本地编译 | 接受 | 该 APK 内含 Pixel 设置的专有素材,与"不分发专有件"的决定矛盾;旧提交不改写 |
+| 2026-11-05 | `faceunlock` 补丁的唯一来源改为 tb321fu-faceunlock-patch 仓库(每个底包一个目录),用 `make sync-faceunlock` 同步,`make unit` 检查一致 | 接受 | 与 herald-core、tango 相同;通用教程和模块工具留在 paranoidsense-gsi-port |
 
 ## 交接
 
