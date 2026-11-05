@@ -31,6 +31,7 @@
 | 2026-11-05 | `navbar-hide`:新方案(收起高度 1dp)做通用 V1.1,旧方案(0dp)作为 ap3a 的版本门控特例 V1.0 | 接受 | 官方 BP1A 启动器里收起高度还决定手势收尾判定区,0dp 会让"上滑多任务中途掉头"卡死;Mystic 启动器上旧方案稳定且占位真正为 0 |
 | 2026-11-05 | `tango` 补丁的唯一来源改为 tb321fu-tango-patch 仓库,本仓库只放同步副本,用 `make sync-tango` 同步,`make unit` 检查一致 | 接受 | 与 herald-core 相同;补丁和移植教程已分别公开发布 |
 | 2026-11-05 | `FaceUnlockSettingsOverlay.apk` 不再入库,教育页素材从 ParanoidSense 上游取,本地编译 | 接受 | 该 APK 内含 Pixel 设置的专有素材,与"不分发专有件"的决定矛盾;旧提交不改写 |
+| 2026-11-05 | `faceunlock` 补丁的唯一来源改为 tb321fu-faceunlock-patch 仓库(每个底包一个目录),用 `make sync-faceunlock` 同步,`make unit` 检查一致 | 接受 | 与 herald-core、tango 相同;通用教程和模块工具留在 paranoidsense-gsi-port |
 
 ## 交接
 

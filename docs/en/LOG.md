@@ -26,6 +26,7 @@ None at the moment.
 | 2026-11-05 | Cut the `user-v1.4` anchor official release and delete test-v1.3.x | Accepted | Set an anchor after SOTER removal; the 6 test builds were deleted with clean-releases, and the three older official releases are kept |
 | 2026-11-05 | The only source of the `tango` patch is now the tb321fu-tango-patch repository; this repository keeps a synced copy, synced with `make sync-tango` and checked by `make unit` | Accepted | Same as herald-core; the patch and the porting guide are now published separately |
 | 2026-11-05 | `FaceUnlockSettingsOverlay.apk` is no longer tracked; the education assets come from upstream ParanoidSense and the APK is built locally | Accepted | The APK contains proprietary Pixel settings assets, which contradicts the decision not to distribute proprietary files; older commits are not rewritten |
+| 2026-11-05 | The only source of the `faceunlock` patch is now the tb321fu-faceunlock-patch repository (one directory per base), synced with `make sync-faceunlock` and checked by `make unit` | Accepted | Same as herald-core and tango; the general guide and module tool stay in paranoidsense-gsi-port |
 
 ## Handover
 
