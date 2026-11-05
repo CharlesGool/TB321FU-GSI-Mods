@@ -64,12 +64,12 @@ class FaceInternalCleanupClient extends InternalCleanupClient {
             Supplier lazyDaemon, IBinder token,
             int biometricId, int userId, String owner, BiometricUtils utils, int sensorId,
             @NonNull BiometricLogger logger, @NonNull BiometricContext biometricContext,
-            Map authenticatorIds) {
+            Map authenticatorIds, int reason) {
         // Internal remove does not need to send results to anyone. Cleanup (enumerate + remove)
         // is all done internally.
         return new FaceRemovalClient(context, lazyDaemon, token,
                 null /* ClientMonitorCallbackConverter */, biometricId, userId, owner, utils,
-                sensorId, logger, biometricContext, authenticatorIds);
+                sensorId, logger, biometricContext, authenticatorIds, reason);
     }
 
     // Pixel 这一版的 InternalCleanupClient 多了这个抽象方法; 照 Pixel 自己的 face/aidl 实现写

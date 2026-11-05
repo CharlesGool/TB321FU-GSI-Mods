@@ -131,6 +131,14 @@ public class BiometricTestSessionImpl extends ITestSession.Stub {
         mRandom = new Random();
     }
 
+    // BP1A: ITestSession added abstract getSensorId(); mirror the base face/aidl impl.
+    @android.annotation.EnforcePermission(android.Manifest.permission.TEST_BIOMETRIC)
+    @Override
+    public int getSensorId() {
+        super.getSensorId_enforcePermission();
+        return mSensorId;
+    }
+
     @android.annotation.EnforcePermission(android.Manifest.permission.TEST_BIOMETRIC)
     @Override
     public void setTestHalEnabled(boolean enabled) {

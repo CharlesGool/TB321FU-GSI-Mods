@@ -704,7 +704,7 @@ public class SenseProvider implements ServiceProvider {
                     FaceUtils.getLegacyInstance(mSensorId), mSensorId,
                     createLogger(BiometricsProtoEnums.ACTION_REMOVE,
                             BiometricsProtoEnums.CLIENT_UNKNOWN),
-                    mBiometricContext, mAuthenticatorIds);
+                    mBiometricContext, mAuthenticatorIds, 3 /* reason */);
             mScheduler.scheduleClientMonitor(client, mBiometricStateCallback);
         });
     }
@@ -732,7 +732,7 @@ public class SenseProvider implements ServiceProvider {
                     FaceUtils.getLegacyInstance(mSensorId), mSensorId,
                     createLogger(BiometricsProtoEnums.ACTION_REMOVE,
                             BiometricsProtoEnums.CLIENT_UNKNOWN),
-                    mBiometricContext, mAuthenticatorIds);
+                    mBiometricContext, mAuthenticatorIds, 3 /* reason */);
             mScheduler.scheduleClientMonitor(client, mBiometricStateCallback);
         });
     }

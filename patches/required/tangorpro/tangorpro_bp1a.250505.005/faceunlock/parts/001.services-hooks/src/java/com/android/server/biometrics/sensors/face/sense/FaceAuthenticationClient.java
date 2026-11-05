@@ -153,20 +153,9 @@ class FaceAuthenticationClient
         mCallback.onClientFinished(this, true /* success */);
     }
 
-    @Override
-    public int handleFailedAttempt(int userId) {
-        final int lockoutMode =
-                getLockoutTracker().getLockoutModeForUser(userId);
-        final PerformanceTracker performanceTracker =
-                PerformanceTracker.getInstanceForSensorId(getSensorId());
-        if (lockoutMode == 2 /* LOCKOUT_PERMANENT */) {
-            performanceTracker.incrementPermanentLockoutForUser(userId);
-        } else if (lockoutMode == 1 /* LOCKOUT_TIMED */) {
-            performanceTracker.incrementTimedLockoutForUser(userId);
-        }
-
-        return lockoutMode;
-    }
+    // BP1A: AuthenticationClient.handleFailedAttempt(int) became final; its base version is a
+    // superset (also calls LockoutTracker.addFailedAttemptForUser) so dropping this override
+    // loses no functionality.
 
     @Override
     public void onAuthenticated(BiometricAuthenticator.Identifier identifier,

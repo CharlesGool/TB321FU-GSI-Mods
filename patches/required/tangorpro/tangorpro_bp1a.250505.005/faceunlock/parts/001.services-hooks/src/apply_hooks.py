@@ -184,7 +184,25 @@ def patch_original_hooks(root):
             print("  ok: AuthService.registerFaceSensors")
             changed = True
         else:
-            print("  FAIL: AuthService marker not found")
+            # BP1A 锚:registerFaceSensors 被重构,"AuthService" tag 提到方法头
+            # (const-string v1),空传感器走 :cond_5/:goto_3,老的"tag 紧跟 No face sensors."
+            # 两行锚失效。改在方法头 tag 之后注入 canUseProvider():Sense 可用就跳注册分支 :cond_1
+            # (= 底包里数组非空时的同一跳转目标),否则落回原逻辑。只在 registerFaceSensors 方法体内改。
+            mm = re.search(
+                r"(\.method public static registerFaceSensors\([^\n]*\n.*?\.end method)",
+                s, re.DOTALL)
+            tm = re.search(r'\n    const-string v\d+, "AuthService"\n', mm.group(1)) if mm else None
+            if mm and tm and ":cond_1" in mm.group(1):
+                body = mm.group(1)
+                inj = (tm.group(0) + "\n    " + CANUSE
+                       + "\n\n    move-result v0\n\n    if-nez v0, :cond_1\n")
+                body = body[:tm.start()] + inj + body[tm.end():]
+                s = s[:mm.start(1)] + body + s[mm.end(1):]
+                write(p, s)
+                print("  ok: AuthService.registerFaceSensors (BP1A head anchor)")
+                changed = True
+            else:
+                print("  FAIL: AuthService marker not found")
     else:
         print("  skip (already applied): AuthService.registerFaceSensors")
 
