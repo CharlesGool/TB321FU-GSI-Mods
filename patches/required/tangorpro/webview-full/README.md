@@ -28,10 +28,17 @@ Chrome(`Chrome-Stub` + `Chrome.apk.gz`,依赖同样是占位 + 压缩包的 `Tri
 
 `TrichromeLibrary`、`Chrome` 的占位和压缩包不动。
 
+## 保留数据刷机(user-v1.1 真机,2026-11-06)
+
+user-v1.1 保留数据刷在 v1.0 上,WebView 在系统里但用不了,把同一个 APK 当更新装一遍就正常。原因不在本补丁:各版指纹相同,PackageManager 不当成系统升级,
+沿用了 v1.0 时占位包的 ABI(空),原生库加载不了。已在 `identity/version-label` 里让每版的 `ro.system_ext.build.fingerprint` 不同来修(identity V1.4)。
+已经刷了 v1.1 的机器:手动装一遍 `WEBVIEW_APK`,或者清数据。
+
 ## 验证
 
 ```bash
 adb shell dumpsys webviewupdate | head
 adb shell pm path com.google.android.webview
 ```
+另外 `adb shell dumpsys package com.google.android.webview | grep -i abi` 的 `primaryCpuAbi` 应是 `arm64-v8a`(不能是 null)。
 `Current WebView package` 应是 `com.google.android.webview`,路径在 `/product/app/WebViewGoogle/`。
