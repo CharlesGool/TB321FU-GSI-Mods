@@ -20,7 +20,16 @@ sudo cat "$SYS/framework/framework.jar" > "$WORK/framework.orig.jar"
 APK d -f -r -o "$WORK/fw" "$WORK/framework.orig.jar" >/dev/null || die "apktool 反编译 framework.jar 失败"
 
 BUILD_SMALI=$(cd "$WORK/fw" && grep -rl 'isBuildConsistent()Z' smali*/android/os/Build.smali 2>/dev/null || true)
-[[ -n $BUILD_SMALI ]] || die "framework.jar 里找不到 android/os/Build.smali 的 isBuildConsistent(),底包和预期不同(见 README)"
+if [[ -z $BUILD_SMALI ]]; then
+    # A17 QPR(DP11)起 framework.jar 的 classes.dex 是 DEX 041 容器,Build 在后面的段里,apktool 只看得到第一段,所以找不到。
+    # framework.jar 在 bootclasspath 上:整包重 dex 会丢 hiddenapi 标志、让预编译 boot image 全部失效,不改它。
+    # 改调用方:弹窗唯一的入口是 services.jar 里 ActivityTaskManagerService$LocalService.showSystemReadyErrorDialogsIfNeeded()
+    # 调 Build.isBuildConsistent() 的那一处,把结果换成常量 true。services.jar 不在 bootclasspath,拆开重 dex 无副作用
+    # (smooth-display / faceunlock 同样这么改)。用户 2026-11-06 test-v1.2 实测 DP11 开机仍有版本不一致弹窗。
+    log "framework.jar 里看不到 Build.isBuildConsistent(DEX 041 容器),改 services.jar 里弹窗的调用方"
+    source "$MOD/patch_services_caller.sh"
+    return 0
+fi
 grep -q 'TB321FU: 短路跳过' "$WORK/fw/$BUILD_SMALI" && die "Build.smali 里已经有补丁标记,底包可能已打过"
 python3 -I "$MOD/patch_build_consistent.py" "$WORK/fw" | sed 's/^/    /'
 grep -q 'TB321FU: 短路跳过' "$WORK/fw/$BUILD_SMALI" || die "补丁没落到 $BUILD_SMALI"

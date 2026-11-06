@@ -9,6 +9,9 @@ OFF_HZ=${SMOOTH_DISPLAY_OFF_HZ:-120}
 
 APK() { java -jar "$APKTOOL_JAR" "$@"; }
 sudo cat "$SYS/framework/services.jar" > "$WORK/services.orig.jar"
+# A17 QPR(DP11)起 classes.dex 是 DEX 041 容器,apktool 只看得到第一段;先转成标准 multidex(非 041 原样不动)。
+source "$TOOLKIT/lib/dex041.sh"
+undex041_jar "$WORK/services.orig.jar" "$WORK/services.orig.jar"
 APK d -f -r -o "$WORK/svc" "$WORK/services.orig.jar" >/dev/null || die "apktool 反编译 services.jar 失败"
 sleep 1; touch "$WORK/.patch_stamp"; sleep 1
 python3 -I "$MOD/apply_hook.py" "$WORK/svc" "$OFF_HZ" | tee "$WORK/hook.log" | sed 's/^/    /'

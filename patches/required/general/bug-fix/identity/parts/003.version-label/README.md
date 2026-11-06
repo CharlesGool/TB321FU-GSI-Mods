@@ -6,13 +6,16 @@
 
 ## 原理
 
-只改 `system/build.prop` 里的一行。GSI 原值是 `Ported.By.MysticTech`。key 不存在会报错(用的是 `prop`,不加 `--add`)。
+改 `system/build.prop` 里的一行(GSI 原值是 `Ported.By.MysticTech`)。
+
+`system_ext/etc/build.prop`、`product/etc/build.prop` 里要是也有这个键,一并改:init 按 system → system_ext → vendor → odm → product 读,同名 ro.* 后读的覆盖先读的。新版 MysticGSI(DP11 起)在 product 里写了 `ro.build.display.id=Ported.Using.MysticGSI.Tool`,只改 system 时设置里的版本号一直是这个(2026-11-06 test-v1.4 真机)。key 不存在会报错(用的是 `prop`,不加 `--add`)。
 
 它单独成模块,因为版本号每个版本都要变,和其它机型身份的改动没关系。`DISPLAY_ID` 里带 `${VERSION}`,构建时有产物名(`IMAGE_NAME`)就显示产物名,没有才用 `VERSION`。
 
 ## 改动清单
 
 - 改 `system/build.prop`:`ro.build.display.id`
+- `system_ext/etc/build.prop`、`product/etc/build.prop` 有这个键时同样改
 
 ## 依赖和顺序
 

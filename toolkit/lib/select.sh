@@ -8,7 +8,7 @@
 #   3. WITH=规则,规则…      加上
 #   4. WITHOUT=规则,规则…   去掉
 # 规则写法:
-#   optional/battery、battery   一个补丁(全名或末尾几段的短名,如 battery、brightness/hbm-unlimited)
+#   required/general/battery、battery   一个补丁(全名或末尾几段的短名,如 battery、brightness/hbm-unlimited)
 #   optional、slim、required/general   一个文件夹下的全部补丁(短名同理)
 #   hotspot-*、tango/*     通配
 #   必须打的在 required/(general 通用修复、<底包前缀> 特定底包限定,如 tangorpro),可选的在 optional/,调试用的在 debug/

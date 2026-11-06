@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# 电池插件(patches/optional/battery/*)的单元测试:假的 sysfs 树 + 桩函数,在 dash 和 busybox sh 下各跑一遍。
+# 电池插件(patches/required/general/battery/*)的单元测试:假的 sysfs 树 + 桩函数,在 dash 和 busybox sh 下各跑一遍。
 # 用法: toolkit/test-battery-plugins.sh      (不碰真机,不需要 root)
 set -u
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-B=$REPO/patches/optional/battery/parts
+B=$REPO/patches/required/general/battery/parts
 T=$(mktemp -d "${TMPDIR:-/tmp}/battest.XXXXXX"); trap 'rm -rf "$T"' EXIT
 pass=0; fail=0
 ok()   { pass=$((pass + 1)); }

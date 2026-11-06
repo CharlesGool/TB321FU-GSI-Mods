@@ -1,0 +1,11 @@
+# DP11(A17)只精简这 8 个 Google 应用,路径相对 system/。用户 2026-11-06 指定。
+# 其余 Google 应用全部保留;特别地【数字健康 WellbeingPrebuilt 必须保留】(删了装回来功能不正常)。
+# 带版本后缀的目录名以本 DP11 底包(DP11.261016.003 / incremental 16708287)实际为准;换底包要重新核对。
+product/app/CalculatorGooglePrebuilt_85022643
+product/app/CalendarGooglePrebuilt
+product/app/GoogleContacts
+product/priv-app/TipsPrebuilt_v8.7.4.949233121
+product/priv-app/PrebuiltBugle
+product/priv-app/KidsHomePrebuilt
+product/app/PlayBooksPrebuilt
+product/app/YouTubeKidsPrebuilt

@@ -11,7 +11,7 @@ A=tangorpro_ap3a.241005.015_12366759
 chk 0 $A required/general/bug-fix/identity
 chk 0 $A required/tangorpro/rotation-fix
 chk 0 $A required/tangorpro/tangorpro_ap3a.241005.015/bug-fix/dcservice-seapp-fix
-chk 0 $A optional/battery
+chk 0 $A required/general/battery
 chk 0 $A debug/herald-rooted-shell
 B=tangorpro_bp1a.250505.005_1
 chk 0 $B required/tangorpro/rotation-fix

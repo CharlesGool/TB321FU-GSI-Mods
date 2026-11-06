@@ -7,7 +7,8 @@
 need_input STOCK_VENDOR_IMG
 need_tool python3
 need_file bin/app_process32
-need_file bin/boringssl_self_test64
+# bin/boringssl_self_test64:A15 的 system 有、A17(DP11)已把 boringssl 自检独立二进制移除。不强制;
+# 下面第 5 步按它在不在决定 tango-boringssl32.rc 带不带"系统侧两条兜底 override"(必须接管的 vendor 那条跟 system 无关)。
 need_file etc/init/hw/init.zygote64_32.rc     # 只用来核对服务定义没变(我们自带的那份抄自它)
 
 # 1. 声明 32 位 ABI 会让原厂 vendor 里"只在有 32 位 ABI 时才跑"的服务被触发。带 reboot_on_failure/critical 的,
@@ -38,7 +39,27 @@ prop build.prop ro.dalvik.vm.enable_uffd_gc false --add
 
 # 5. vendor 的 32 位 BoringSSL 自检改跑 64 位那份(它只看 abilist32,不看 ro.zygote),原因见 rc 文件头。
 #    system 的两个 32 位自检在 ro.zygote=zygote64 下根本不触发,rc 里那两条 override 只是兜底。
-put "$MOD/files/tango-boringssl32.rc" etc/init/tango-boringssl32.rc 0644 0:0 u:object_r:system_file:s0
+#    A15:system 有 boringssl_self_test64 → 原样打完整 rc(含系统侧兜底)。
+#    A17:system 已无该二进制,系统侧两条会引用不存在的文件 → 只打必须接管的 vendor 那条(→ /vendor/bin/boringssl_self_test64)。
+sys_bssl64=0; sudo test -e "$SYS/bin/boringssl_self_test64" && sys_bssl64=1
+if [[ $sys_bssl64 == 1 ]]; then
+    put "$MOD/files/tango-boringssl32.rc" etc/init/tango-boringssl32.rc 0644 0:0 u:object_r:system_file:s0
+else
+    log "system 无 bin/boringssl_self_test64(A17):tango-boringssl32.rc 只保留 vendor 那条"
+    _rc=$(mktemp)
+    cat > "$_rc" <<'RC'
+# A17:system 已移除 boringssl self-test 独立二进制;只保留必须接管的 vendor 32 位自检。
+# 联想 vendor 的 boringssl_self_test.rc 在 on early-init 跑 boringssl_self_test32_vendor(/vendor/bin/boringssl_self_test32,
+# 带 reboot_on_failure),vendor 只有 64 位 → 不接管就重启。这里先定义同名服务改跑 /vendor/bin/boringssl_self_test64;
+# /system/etc/init 先于 /vendor/etc/init 解析,vendor 那份作为重复定义被 init 丢弃,exec_start 跑这一份,不重启。
+service boringssl_self_test32_vendor /vendor/bin/boringssl_self_test64
+    setenv BORINGSSL_SELF_TEST_CREATE_FLAG true
+    stdio_to_kmsg
+    user root
+RC
+    put "$_rc" etc/init/tango-boringssl32.rc 0644 0:0 u:object_r:system_file:s0
+    rm -f "$_rc"
+fi
 
 # 6. 32 位 zygote 服务(不动原版 init.zygote64_32.rc)
 put "$MOD/files/tango-zygote32.rc" etc/init/tango-zygote32.rc 0644 0:0 u:object_r:system_file:s0
