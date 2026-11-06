@@ -1,0 +1,12 @@
+# 正式版选补丁集(DP11 / A17):对齐 ap3a/bp1a 的标准(= 全部 required + 下列 optional)。
+# DP11 适配要点:
+#   - faceunlock / navbar-hide:A17 按版本适配,放 required/tangorpro/tangorpro_dp11.261016.003/{faceunlock,navbar-hide}(版本门控),+required 自动选中。
+#   - 精简:只删 8 个指定 Google 应用(required/.../slim/google-apps-min,+required 自动选中),保留数字健康;
+#     不再用旧的 optional/slim/{google-apps,accessibility} 大精简。
+# 注:DP11 是本设备新的 A17 线,正式发布按本线重新编号(首个正式版 = user-v1.0),这里的文件名只是沿用"标准选集"叫法。
+-all
++required
++optional/smooth-display
++optional/free-rotation
++optional/spoof/global-pif
++optional/desktop-unlimited

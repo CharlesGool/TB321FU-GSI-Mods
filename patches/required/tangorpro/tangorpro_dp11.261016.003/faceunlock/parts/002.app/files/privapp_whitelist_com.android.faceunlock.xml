@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="com.android.faceunlock">
+        <permission name="android.permission.SYSTEM_CAMERA"/>
+        <permission name="android.permission.WRITE_SECURE_SETTINGS"/>
+        <permission name="android.permission.SCHEDULE_EXACT_ALARM"/>
+        <permission name="android.permission.MANAGE_BIOMETRIC"/>
+        <permission name="android.permission.USE_BIOMETRIC_INTERNAL"/>
+    </privapp-permissions>
+</permissions>

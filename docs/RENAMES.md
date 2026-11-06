@@ -121,7 +121,7 @@
 |---|---|
 | `app-backup` | `optional/app-backup` |
 | `attestation-engine` | `optional/attestation-engine` |
-| `battery` | `optional/battery` |
+| `battery` | `optional/battery` → `required/general/battery`(2026-11-06 并入必装) |
 | `brightness/hbm-unlimited` | `optional/brightness/hbm-unlimited` |
 | `custom-font` | `optional/custom-font` |
 | `devopts-hide` | `optional/devopts-hide` |

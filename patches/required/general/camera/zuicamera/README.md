@@ -19,6 +19,7 @@
 | [`camera-id-check`](parts/003.camera-id-check/README.md) | 修相机应用的编号核对(漏了 `back_wide`/`back_tele`),系统没有 2 号相机时不再闪退;APK 重签 | 能(关了在本系统上一打开就闪退) | 无 |
 | [`real-device-id`](parts/004.real-device-id/README.md) | 相机读机型改成读 `ro.product.vendor.*`/`system.*`,全局伪装开着时也看到 TB321FU,不再崩;APK 重签 | 能(关了在全局伪装下一启动就崩) | 无 |
 | [`hide-unsupported`](parts/005.hide-unsupported/README.md) | 屏蔽依赖缺失组件的功能:模式栏去掉互联录制和微距,许可/隐私链接点了不再闪退;APK 重签 | 能 | 无 |
+| [`memory-check`](parts/007.memory-check/README.md) | 拍照前"内存已满"判断改按真实已用量(`max-(total-free)`);A17 上原判断恒为满,快门没反应(2026-11-06 DP11 真机);APK 重签 | 能(关了在 A17 上拍照基本没反应) | 无 |
 
 ## 顺序和依赖
 

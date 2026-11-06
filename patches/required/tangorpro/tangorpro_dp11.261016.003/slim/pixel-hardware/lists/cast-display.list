@@ -1,0 +1,6 @@
+# 投屏/智能显示屏(Hub 模式的配套)。路径相对 system/,底包里没有的自动跳过。
+
+product/priv-app/SmartDisplayPrebuilt
+product/priv-app/AmbientStreaming
+product/priv-app/AndroidMediaShell
+product/priv-app/CastAuthPrebuilt

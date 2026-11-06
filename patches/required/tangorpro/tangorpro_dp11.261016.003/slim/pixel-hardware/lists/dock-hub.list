@@ -1,0 +1,8 @@
+# Hub 模式/底座(TB321FU 没有底座)。路径相对 system/,底包里没有的自动跳过。
+
+product/priv-app/DockManagerPrebuilt
+system_ext/priv-app/DockSetup
+product/overlay/DockSetup__tangorpro__auto_generated_rro_product.apk
+mystic/vo/DockSetup__tangorpro__auto_generated_rro_vendor.apk
+product/etc/permissions/com.google.android.apps.nest.dockmanager.app.xml
+product/etc/sysconfig/pixel_docking_experience_2022.xml

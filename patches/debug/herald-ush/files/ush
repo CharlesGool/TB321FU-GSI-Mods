@@ -1,0 +1,57 @@
+#!/system/bin/sh
+# ush —— 调试用的 root 命令前端(debug/herald-ush,烤在 /system/bin/ush,adb shell 里直接用)。
+# 本身没有任何特权、没有 setuid 位:只把命令写进 herald broker 的命令通道,由 root broker(herald 域)执行、结果读回。
+# 不叫 su、不放 su 二进制、没有 setuid 位,查 su / 查 setuid 的常规 root 检测都扫不到(但 broker 本身仍在系统里)。
+# 用法:
+#   adb shell ush <命令>         以 root 跑整条命令(经 sh -c,支持管道/重定向;带管道要整条用引号包住)
+#   adb shell ush -c "<命令>"    同上,su 风格
+#   adb shell ush                不带参数进入交互式 root shell(逐条执行,exit/quit 退出)
+# 退出码就是所跑命令的退出码。慢命令设 HERALD_TIMEOUT=秒 调大等待上限(默认 120)。
+D=/data/local/tmp/herald
+TMO=${HERALD_TIMEOUT:-120}
+
+die() { echo "ush: $*" >&2; exit 2; }
+
+# send_cmd <命令串>:把命令发给 broker 的 ush,原样打印输出,返回所跑命令的退出码
+send_cmd() {
+  [ -d "$D" ] || die "herald broker 不在($D 不存在):系统没装 herald-core,或开机后 broker 还没起来"
+  id=$$.$RANDOM
+  printf 'ush %s\n' "$1" > "$D/new.$id" 2>/dev/null || die "写不进 $D"
+  chmod 0666 "$D/new.$id" 2>/dev/null
+  mv -f "$D/new.$id" "$D/req.$id" 2>/dev/null || die "提交请求失败"
+  _waited=0; _limit=$((TMO * 100))     # 单位:百分之一秒
+  while [ ! -f "$D/resp.$id" ]; do
+    if [ $_waited -ge $_limit ]; then
+      if [ -f "$D/req.$id" ]; then rm -f "$D/req.$id"; die "${TMO}s 内请求没被取走:broker 没在跑?(ps -A | grep herald-start;heraldctl log)"; fi
+      die "${TMO}s 内没等到结果:命令还在跑(慢命令设 HERALD_TIMEOUT=秒 调大)"
+    fi
+    if [ $_waited -lt 300 ]; then sleep 0.05; _waited=$((_waited + 5)); else sleep 0.5; _waited=$((_waited + 50)); fi
+  done
+  f=$D/resp.$id
+  first=$(head -1 "$f")
+  case "$first" in
+    "ok ush rc="*)
+      tail -n +2 "$f"
+      rc=${first#ok ush rc=}; case "$rc" in ""|*[!0-9]*) rc=1 ;; esac
+      rm -f "$f"; return "$rc" ;;
+    *) cat "$f"; rm -f "$f"; return 1 ;;      # broker 返回的 err 等,原样打印,退出码 1
+  esac
+}
+
+if [ $# -eq 0 ]; then
+  # 交互式:逐条读、逐条以 root 跑。每条是独立 sh -c,cd / 环境变量不跨条保留。
+  echo "ush: 交互式 root shell(每条命令独立执行,cd/变量不跨条保留;exit 退出)" >&2
+  while :; do
+    printf 'ush# ' >&2
+    IFS= read -r _line || { echo >&2; break; }
+    case "$_line" in ""|" ") continue ;; exit|quit) break ;; esac
+    send_cmd "$_line"
+  done
+  exit 0
+fi
+
+case "$1" in
+  -h|--help) echo "用法: ush <命令> | ush -c \"<命令>\" | ush(交互式 root shell)"; exit 0 ;;
+  -c) shift; [ $# -ge 1 ] || die "用法: ush -c \"<命令>\""; send_cmd "$*" ;;
+  *) send_cmd "$*" ;;
+esac

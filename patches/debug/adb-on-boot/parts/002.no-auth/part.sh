@@ -1,4 +1,4 @@
-# 免授权 ADB:ro.adb.secure=0(连电脑不再弹授权框)。不碰 ro.debuggable / ro.secure(root 的事归 herald-rooted-shell)。debug-off 写的 system 和 system_ext 两处 ro.adb.secure 都要改回去。
+# 免授权 ADB:ro.adb.secure=0(连电脑不再弹授权框)。不碰 ro.debuggable / ro.secure(root 的事归 herald-ush)。debug-off 写的 system 和 system_ext 两处 ro.adb.secure 都要改回去。
 need_file build.prop
 need_file system_ext/etc/build.prop
 prop build.prop ro.adb.secure 0 --add

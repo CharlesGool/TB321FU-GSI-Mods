@@ -1,0 +1,6 @@
+# TB321FU V7.3+: 内核默认 Permissive, 这里尽早切 Enforcing.
+# 用 early-init 阶段单次 setenforce 1, 全程只有一次 enforce 翻转, 比
+# "宽容->严格" 两段式少一半 /sys/fs/selinux/status 的 sequence bump,
+# 和原厂 user 构建的行为一致, 不触发 Duck Detector 这类 heuristic.
+on early-init
+    write /sys/fs/selinux/enforce 1

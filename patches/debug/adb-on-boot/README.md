@@ -9,7 +9,7 @@
 | `001.on-boot` | 开机自动启用 ADB:`persist.sys.usb.config=adb,mtp`,不用先去开发者选项里打开 |
 | `002.no-auth` | 免授权 ADB:`ro.adb.secure=0`(连电脑不弹授权框,system 和 system_ext 两处都改) |
 
-不碰 `ro.debuggable`、`ro.secure`:`adb shell` 还是 shell 用户,要 root 用 [herald-rooted-shell](../herald-rooted-shell/)。
+不碰 `ro.debuggable`、`ro.secure`:`adb shell` 还是 shell 用户,要 root 用 [herald-ush](../herald-ush/)(`adb shell ush <命令>`)。
 
 ## 顺序
 

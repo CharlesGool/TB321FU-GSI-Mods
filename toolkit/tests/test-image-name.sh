@@ -10,8 +10,8 @@ chk() { # <说明> <期望> <PROFILE> <WITH> <WITHOUT>
 }
 printf -- '-all\n+required\n' > "$REPO/devices/tb321fu-a15/profiles/_t-required.txt"
 printf -- '-all\n+required\n+optional/statusbar-netspeed\n' > "$REPO/devices/tb321fu-a15/profiles/_t-opt.txt"
-printf -- '-all\n+required\n+debug/herald-rooted-shell\n' > "$REPO/devices/tb321fu-a15/profiles/_t-dbg.txt"
-printf -- '-all\n+required\n+optional/statusbar-netspeed\n+debug/herald-rooted-shell\n' > "$REPO/devices/tb321fu-a15/profiles/_t-both.txt"
+printf -- '-all\n+required\n+debug/herald-ush\n' > "$REPO/devices/tb321fu-a15/profiles/_t-dbg.txt"
+printf -- '-all\n+required\n+optional/statusbar-netspeed\n+debug/herald-ush\n' > "$REPO/devices/tb321fu-a15/profiles/_t-both.txt"
 chk "只有 required" "" _t-required "" ""
 chk "选了 optional" "_optional" _t-opt "" ""
 chk "选了 debug" "_debug" _t-dbg "" ""
