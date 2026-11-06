@@ -93,6 +93,7 @@
 | 52 | 精简 GSI 残留 | [tangorpro_graphene_2026110200/slim/gsi-traces](required/tangorpro/tangorpro_graphene_2026110200/slim/gsi-traces/) | system | 不在目录 | 删 GSI 工具留下的东西:Mystic 的 vendor overlay 和开机 root logcat、phh 的按键布局/远程 adb 隧道/属性处理脚本 | 2 个部分:001.mystic-vendor-overlays、002.nested-system-shim |  |  |  | 其中 phh 的三个部分没有在真机上单独试过,理论上无副作用;刷后要查开机、热点、蓝牙、亮度 |
 | 53 | 精简 Pixel 硬件组件 | [tangorpro_graphene_2026110200/slim/pixel-hardware](required/tangorpro/tangorpro_graphene_2026110200/slim/pixel-hardware/) | system | 不在目录 | 删本机没有对应硬件的 Pixel 组件:底座、投屏、零售演示、Tensor 服务、侧边指纹、UWB、强光/UV、基带、NFC 应用(只有 Pixel Tablet 的 GSI 才带) |  |  |  |  |  |
 | 54 | 精简 Pixel 专属应用和数据 | [tangorpro_graphene_2026110200/slim/pixel-leftovers](required/tangorpro/tangorpro_graphene_2026110200/slim/pixel-leftovers/) | system | 不在目录 | 删 TB321FU 用不上的 Pixel 专属东西:Play 自动安装配置、"正在播放"歌曲库、Pixel 相机、儿童模式 |  |  |  |  |  |
+| 55 | 完整 WebView | [webview-full](required/tangorpro/webview-full/) | system | 不在目录 | 用完整的 Android System WebView 换掉 Pixel 镜像里要开机解压的占位包,修 WebView 不可用(谷歌账号登录界面闪退) |  |  |  |  | WebView 版本固定为 APK 的版本,之后靠 Play 商店更新;APK 由用户提供 |
 
 ## 可选
 
