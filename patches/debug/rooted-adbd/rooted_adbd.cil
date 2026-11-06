@@ -1,4 +1,0 @@
-; adb root 之后的 shell 在 adbd 域(也可能是 shell 域)里跑,user 版策略下这两个域受限。
-; 照 herald 域的做法设成 permissive:判定变成空操作、AVC 照常记。只放在调试版里。
-(typepermissive adbd)
-(typepermissive shell)
