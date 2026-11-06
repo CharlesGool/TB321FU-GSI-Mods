@@ -49,4 +49,6 @@ adb shell "ush 'resetprop -n ro.product.manufacturer Lenovo'"
 
 ## 验证
 
-没上真机。在电脑上用假环境核对了:插件命令名/通道拒绝 App、前端把 `ush <命令>` 正确拼成请求、`ok ush rc=` 协议解析和退出码透传、`-c` 与直接传参、交互式读到 EOF 退出。真机行为以 herald 域的实际 SELinux 表现为准(该域在已见日志里是 permissive)。
+DP11(A17 QPR3)真机验证通过(在 user-v1.2-cust-bebug 上):`adb shell ush id` 得 `uid=0(root) … context=u:r:herald:s0`;`-c`、分号/管道(整条包引号时)、直接传参都以 root 跑;`ls /data/data`、`/data/misc` 等只有 root 能读的路径读得了;`/system/bin/ush` 是 `-rwxr-xr-x`(**无 setuid 位**),`which su` 为空、`/system/bin/su` 不存在。herald 域在真机上确为 permissive,命令照跑。
+
+构建侧也在电脑上用假环境核对过:插件命令名/通道拒绝 App、前端把 `ush <命令>` 正确拼成请求、`ok ush rc=` 协议解析和退出码透传、`-c` 与直接传参、交互式读到 EOF 退出。

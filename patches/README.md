@@ -128,11 +128,12 @@
 
 | 编号 | 中文名 | 补丁 | 改哪里 | 默认 | 做什么 | 包含 | 要先有 | 登记到 / 负责 | 运行时开关 | 可能的问题 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | adb 可抓日志 | [shell-logcat](debug/shell-logcat/) | system | 不打 | Enforcing 下 adb 能 logcat |  |  |  |  |  |
-| 2 | 开机自动开 ADB | [adb-on-boot](debug/adb-on-boot/) | system | 不打 | 开机自动启用 ADB,并且免授权/免配对(ro.adb.secure=0,连电脑不弹授权框);不管 root(见 herald-ush);排在 debug-off 后面执行,把它关掉的都加回来。测试用 | 2 个部分:001.on-boot、002.no-auth |  |  |  |  |
-| 3 | root 只读命令 | [herald-readonly-shell](debug/herald-readonly-shell/) | system | 不打 | 以 root 跑只读查看命令 |  | required/general/herald-core |  | heraldctl rexec on\|off,默认关 |  |
-| 4 | root 命令 ush | [herald-ush](debug/herald-ush/) | system | 不打 | 装上即用的 root 命令 ush:adb shell ush <命令> 以 root 跑整条命令(经 sh -c,支持管道/重定向),另有 ush -c 和不带参数的交互式 root shell;经 herald broker 执行,不叫 su、无 setuid 位、不放 su 二进制,查 su/查 setuid 的检测扫不到;只接受命令行通道。调试用 |  | required/general/herald-core |  | adb shell ush <命令>(装上即用,不限时) | 装上即对能 adb shell(uid 2000,需 USB 调试授权)的人无门槛开放 root,只放调试版;命令跑在 herald 域(permissive) |
-| 5 | zygote 时序测量(调研) | [herald-zygisk-timing-probe](debug/herald-zygisk-timing-probe/) | system | 不打 | 测量开机时 post-fs-data 到 zygote 启动的时间窗口(调研用,只读,默认不打) |  | required/general/herald-core |  |  |  |
-| 6 | zygote 注入点验证(调研) | [herald-zygisk-fork-observer](debug/herald-zygisk-fork-observer/) | system | 不打 | 真机验证 ptrace 住 init、在 zygote64 执行第一条指令前截停它这条链路(调研用,只观察不注入,默认不打) |  | required/general/herald-core |  |  |  |
-| 7 | 开机相机日志(诊断) | [diag-boot-camera-log](debug/diag-boot-camera-log/) | system | 不打 | 开机时记下相机驱动的日志(诊断用) |  | required/general/herald-core |  |  |  |
+| 1 | 机上刷 root 变体 | [root-selfflash](debug/root-selfflash/) | system | 打 | 以 herald broker 的 root 在设备上把 root 变体 init_boot+vbmeta 写进当前槽分区(等价 PC apply_root);严格 sha 校验输入镜像与当前基线、备份、回读校验、出错自动还原。调试用,默认不动。 |  | required/general/herald-core |  | heraldctl raw rootflash status\|apply --confirm\|restore,默认不触发 |  |
+| 2 | adb 可抓日志 | [shell-logcat](debug/shell-logcat/) | system | 不打 | Enforcing 下 adb 能 logcat |  |  |  |  |  |
+| 3 | 开机自动开 ADB | [adb-on-boot](debug/adb-on-boot/) | system | 不打 | 开机自动启用 ADB,并且免授权/免配对(ro.adb.secure=0,连电脑不弹授权框);不管 root(见 herald-ush);排在 debug-off 后面执行,把它关掉的都加回来。测试用 | 2 个部分:001.on-boot、002.no-auth |  |  |  |  |
+| 4 | root 只读命令 | [herald-readonly-shell](debug/herald-readonly-shell/) | system | 不打 | 以 root 跑只读查看命令 |  | required/general/herald-core |  | heraldctl rexec on\|off,默认关 |  |
+| 5 | root 命令 ush | [herald-ush](debug/herald-ush/) | system | 不打 | 装上即用的 root 命令 ush:adb shell ush <命令> 以 root 跑整条命令(经 sh -c,支持管道/重定向),另有 ush -c 和不带参数的交互式 root shell;经 herald broker 执行,不叫 su、无 setuid 位、不放 su 二进制,查 su/查 setuid 的检测扫不到;只接受命令行通道。调试用 |  | required/general/herald-core |  | adb shell ush <命令>(装上即用,不限时) | 装上即对能 adb shell(uid 2000,需 USB 调试授权)的人无门槛开放 root,只放调试版;命令跑在 herald 域(permissive) |
+| 6 | zygote 时序测量(调研) | [herald-zygisk-timing-probe](debug/herald-zygisk-timing-probe/) | system | 不打 | 测量开机时 post-fs-data 到 zygote 启动的时间窗口(调研用,只读,默认不打) |  | required/general/herald-core |  |  |  |
+| 7 | zygote 注入点验证(调研) | [herald-zygisk-fork-observer](debug/herald-zygisk-fork-observer/) | system | 不打 | 真机验证 ptrace 住 init、在 zygote64 执行第一条指令前截停它这条链路(调研用,只观察不注入,默认不打) |  | required/general/herald-core |  |  |  |
+| 8 | 开机相机日志(诊断) | [diag-boot-camera-log](debug/diag-boot-camera-log/) | system | 不打 | 开机时记下相机驱动的日志(诊断用) |  | required/general/herald-core |  |  |  |
 
