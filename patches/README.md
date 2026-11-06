@@ -118,8 +118,10 @@
 | 17 | 自定义字体 | [custom-font](optional/custom-font/) | system | 不打 | 自定义系统字体:SystemFonts 改读 /data/fonts/herald/ 的字体包(不挂载、不占 system)+ heraldctl 装包/选用/撤回 | 2 个部分:001.hook、002.control | required/general/herald-core |  | heraldctl font install\|use\|reset\|list |  |
 | 18 | 应用备份还原 | [app-backup](optional/app-backup/) | system | 不打 | App 备份 / 还原 |  | required/general/herald-core |  | heraldctl backup app\|restore\|list\|delete\|job |  |
 | 19 | 桌面模式不限应用数 | [desktop-unlimited](optional/desktop-unlimited/) | system | 不在目录 | 去掉 Android 17 桌面模式最多同时开 4 个应用的限制(persist.wm.debug.desktop_max_task_limit=0) |  |  |  | adb/heraldctl: setprop persist.wm.debug.desktop_max_task_limit <N> 后重启;0 = 不限 | 开很多窗口时内存压力大,后台应用会被系统杀;DESKTOP_MAX_TASKS=N 可改成固定上限 |
-| 20 | 精简无障碍应用 | [slim/accessibility](optional/slim/accessibility/) | system | 不在目录 | 删无障碍应用(读屏、屏幕切换、声音放大器、Scribe 等);需要读屏的用户不要打 |  |  |  |  |  |
-| 21 | 精简 Google 应用 | [slim/google-apps](optional/slim/google-apps/) | system | 不在目录 | 删 Google 预装应用、Google 助理和 GoogleTTS 语音数据(能从 Play 装回来;想留着 Google 应用就别打) |  |  |  |  |  |
+| 20 | 替换 emoji 字体 | [font-replace/emoji-font](optional/font-replace/emoji-font/) | system | 不在目录 | 打包时用 EMOJI_FONT 覆盖 system/fonts/NotoColorEmoji.ttf(默认三星 emoji),EMOJI_FLAGS_FONT 设了再覆盖国旗字体 |  |  |  |  | 新 emoji 码位以替换字体为准,字体比系统旧的话最新 emoji 会落到国旗/符号字体或显示方框;Google Play 系统更新可能在 /data/fonts 下发新 emoji 盖过它 |
+| 21 | 替换系统字体 | [font-replace/system-font](optional/font-replace/system-font/) | system | 不在目录 | 打包时用 SYSTEM_FONT 覆盖 system/fonts/Roboto-Regular.ttf(默认 MiSans VF),不改字体配置 |  |  |  |  | 字体打进 system,换回要重刷;字体约 20MB,占 system 空间;不可变字体的粗细档位会退化成假粗体 |
+| 22 | 精简无障碍应用 | [slim/accessibility](optional/slim/accessibility/) | system | 不在目录 | 删无障碍应用(读屏、屏幕切换、声音放大器、Scribe 等);需要读屏的用户不要打 |  |  |  |  |  |
+| 23 | 精简 Google 应用 | [slim/google-apps](optional/slim/google-apps/) | system | 不在目录 | 删 Google 预装应用、Google 助理和 GoogleTTS 语音数据(能从 Play 装回来;想留着 Google 应用就别打) |  |  |  |  |  |
 
 ## 调试
 

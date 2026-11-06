@@ -1,0 +1,15 @@
+# 自用 cust 变种 = 正式选集(user-v1.4.txt)+ 换字体(MiSans VF)+ 换 emoji(三星)。不发布。
+# DP11 适配要点:
+#   - faceunlock / navbar-hide:A17 按版本适配,放 required/tangorpro/tangorpro_dp11.261016.003/{faceunlock,navbar-hide}(版本门控),+required 自动选中。
+#   - 精简:只删 8 个指定 Google 应用(required/.../slim/google-apps-min,+required 自动选中),保留数字健康;
+#     不再用旧的 optional/slim/{google-apps,accessibility} 大精简。
+# 注:DP11 是本设备新的 A17 线,正式发布按本线重新编号(首个正式版 = user-v1.0),这里的文件名只是沿用"标准选集"叫法。
+-all
++required
++optional/smooth-display
++optional/free-rotation
++optional/spoof/global-pif
++optional/desktop-unlimited
+# cust(自用变种):在正式选集上加换字体 + 换 emoji
++optional/font-replace/system-font
++optional/font-replace/emoji-font
