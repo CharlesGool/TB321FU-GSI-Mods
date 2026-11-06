@@ -1,0 +1,7 @@
+# Pixel Tensor 专属服务(AICore / Ensemble / Maestro / 诊断 / BetterBug)。路径相对 system/,底包里没有的自动跳过。
+
+product/priv-app/AICorePrebuilt
+product/priv-app/EnsemblePrebuilt-stub
+product/priv-app/MaestroPrebuilt
+product/priv-app/DiagnosticsToolPrebuilt
+product/priv-app/BetterBugStub

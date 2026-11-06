@@ -1,0 +1,16 @@
+# GrapheneOS A17 GSI 首个测试版选补丁集(test-v0.1,未经真机验证)。
+# = 全部 required + 下列 optional,去掉 3 个在 GrapheneOS 上不适用/需重做的:
+#   - hardware-fix/6ghz-fix:GrapheneOS 没有 Google 的 wifi capex(用 AOSP wifi),smali 补丁无处可打;
+#     wifi-apex-assemble 随之去掉(没有贡献者,空转)。
+#   - faceunlock:services-hooks 需要 Google ART apex 取 classpath,GrapheneOS 是 AOSP com.android.art;
+#     且 Sense 框架类要对 GrapheneOS 的 services.jar 重编。整体待重做。
+#   - tango(32 位):GrapheneOS 纯 64 位,底包没有 system/bin/app_process32。
+-all
++required
++optional/smooth-display
++optional/free-rotation
++optional/spoof/global-pif
+-required/tangorpro/tangorpro_graphene_2026110200/hardware-fix/6ghz-fix
+-required/tangorpro/tangorpro_graphene_2026110200/hardware-fix/wifi-apex-assemble
+-required/tangorpro/tangorpro_graphene_2026110200/faceunlock
+-required/general/tango
