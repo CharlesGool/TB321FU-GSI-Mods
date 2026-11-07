@@ -8,6 +8,13 @@
 |---|---|
 | `product/app/NowPlayingPrebuilt` | Now Playing 应用(环境音乐识别,包名 `com.google.android.apps.pixel.nowplaying`) |
 | `product/etc/sysconfig/nowplaying_app_26q1.xml` | 它的 sysconfig(预装/权限声明) |
+| `product/etc/firmware/music_detector.*` | 4 个声学模型(`.descriptor` / `.sound_model` / `.sound_model_2` / `.sound_model_tflite`),ASI 靠它起音乐识别(V1.1 加) |
+
+## 为什么要删模型(V1.1)
+
+V1.0 只删了 App,但真机上「文曲知音」还会自启动 —— **Android System Intelligence(ASI)** 本身也会从
+`product/etc/firmware/music_detector.*` 这 4 个声学模型起环境音乐识别,仍常驻占录音。把模型删掉,ASI
+就加载不了识别器,从根上关掉;且只删模型、**不动 ASI 本体**,实时字幕等不受影响。
 
 ## 为什么
 

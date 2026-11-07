@@ -4,3 +4,6 @@
 # 路径相对 system/,DP11.261016.003 底包实际目录;换底包要重新核对目录/文件名。
 product/app/NowPlayingPrebuilt
 product/etc/sysconfig/nowplaying_app_26q1.xml
+# V1.1:光删 App 不够——ASI(Android System Intelligence)仍会从这 4 个声学模型文件起"文曲知音"的
+# 音乐识别(常驻占录音)。删掉模型 ASI 就加载不了识别器,从根上关掉,且不碰 ASI 本体(实时字幕等不受影响)。
+product/etc/firmware/music_detector.*
