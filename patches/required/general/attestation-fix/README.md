@@ -6,7 +6,8 @@
 
 - keystore2 attestation 伪造:用自带 keybox 签出 deviceLocked=true、verifiedBootState=green 的证书链。
 - 指纹(PIF)profile 管理、本机 RKP 下发、keybox 导入导出、安全补丁日期同步。
-- 命令:`heraldctl spoof get|list|apply|set|off|patch|mode|apps`、`heraldctl keybox …`、`heraldctl rkp …`(`spoof mode|apps` 转发给 spoof/app-spoof 的 broker 命令)。
+- 命令:`heraldctl spoof get|list|apply|set|on|tablet|off|patch|mode|apps`、`heraldctl keybox …`、`heraldctl rkp …`(`spoof mode|apps` 转发给 spoof/app-spoof 的 broker 命令)。
+  - 一键伪装:`heraldctl spoof tablet`(= 伪装成 Pixel Tablet `tangorpro_beta`)或 `heraldctl spoof on <product>`(任意内建机型),一条命令完成 `apply + set`,重启生效;关闭用 `heraldctl spoof off`。真机实测 `tablet` 过 Play 认证(2026-11-07)。
 
 **不靠 root**:引擎(keymint + inject)跑在核心的 `herald` SELinux 域里,inject 用 ptrace 注入 keystore2,全程不需要 KSU/Magisk/Zygisk。
 

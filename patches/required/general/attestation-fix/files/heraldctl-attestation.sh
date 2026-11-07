@@ -7,6 +7,8 @@ heraldctl_help_attestation() {
   spoof list                    内建机型列表
   spoof apply <product> [b p v] 用内建机型预填(不打开全局开关); product 取 spoof list 里的名字, 如 panther_beta
   spoof set <profile.json>      写入 profile 并打开全局伪装(重启生效)
+  spoof tablet                  一键伪装成 Pixel Tablet(= apply tangorpro_beta + set,打开全局伪装,重启生效)
+  spoof on <product>            一键:用内建机型预填并打开全局伪装(= apply + set,重启生效); product 取 spoof list 里的名字
   spoof off                     关闭全局伪装(重启生效)
   spoof mode [app|global]       伪装方式:app = 只给名单里的 App 换 Build.*(默认),global = 全局改属性(重启生效)
   spoof apps [add|remove <名字>] 按 App 伪装的名单(默认 + 额外,重启生效)
@@ -39,6 +41,12 @@ heraldctl_cmd_spoof() {
       set)   [ -f "$1" ] || die "用法: heraldctl spoof set <profile.json>(文件不存在: $1)"
              grep -q '"fingerprint"' "$1" || die "err $1 里没有 fingerprint 字段"
              send set "$1" ;;
+      on)    [ -n "$1" ] || die "用法: heraldctl spoof on <product>(product 取 spoof list 里的名字,如 tangorpro_beta)"
+             # 一键:apply 内建机型(返回完整 profile JSON)→ 存临时文件 → set 打开全局伪装。等价于手动 apply + get + set。
+             send "apply $1" > "$TMPF.on" || { cat "$TMPF.on" >&2; rm -f "$TMPF.on"; die "err apply $1 失败" ; }
+             grep -q '"fingerprint"' "$TMPF.on" || { cat "$TMPF.on" >&2; rm -f "$TMPF.on"; die "err apply $1 没返回有效 profile(机型名对不对?看 spoof list)" ; }
+             send set "$TMPF.on"; _rc=$?; rm -f "$TMPF.on"; return $_rc ;;
+      tablet) heraldctl_cmd_spoof on tangorpro_beta ;;
       mode)  case "$1" in ""|app|global) ;; *) die "用法: heraldctl spoof mode [app|global]" ;; esac; send "spoof_mode $*" ;;
       apps)  case "$1" in ""|list) send "spoof_apps list" ;;
                add|remove) [ -n "$2" ] || die "用法: heraldctl spoof apps add|remove <进程名或包名>"; send "spoof_apps $1 $2" ;;
@@ -48,7 +56,7 @@ heraldctl_cmd_spoof() {
                on)     send "auto_targets_set 1" ;;
                off)    send "auto_targets_set 0" ;;
                *) die "用法: heraldctl spoof auto-targets [get|on|off]" ;; esac ;;
-      *)     die "spoof 子命令: get list apply set off patch mode apps auto-targets" ;;
+      *)     die "spoof 子命令: get list apply set on tablet off patch mode apps auto-targets" ;;
     esac
 }
 heraldctl_cmd_keybox() {
