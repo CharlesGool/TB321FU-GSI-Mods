@@ -1,0 +1,6 @@
+# Now Playing(环境音乐识别,包名 com.google.android.apps.pixel.nowplaying)。
+# 它常驻后台持续占用录音(音频输入)会话,和正常播放抢音频通路,导致声音断断续续
+# (2026-11-07 TB321FU DP11 真机定位)。独立应用,不在 ASI 里,删它不影响实时字幕等。
+# 路径相对 system/,DP11.261016.003 底包实际目录;换底包要重新核对目录/文件名。
+product/app/NowPlayingPrebuilt
+product/etc/sysconfig/nowplaying_app_26q1.xml
