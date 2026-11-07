@@ -10,6 +10,7 @@
 #   环境变量: ONLY=补丁,文件夹   在选择结果里只跑这些(调试用,出来的东西不能刷,不打包)
 #             KEEP_TREE=1      构建完保留工作树($OUT/tree),方便和别的版本对比
 #             SURVEY=1         换底包摸底:补丁失败不停,跑完全部后汇总哪些失败(不打包)
+#             IMAGE_FLAVOR=_x  覆盖产物名后缀(默认按选择算 _optional/_debug);自用变种设 _bebug 让版本号显示成 bebug。空串 = 无后缀
 #
 # 输出目录里:
 #   system/<IMAGE_NAME>.img、system/vbmeta_system.img        system 分区和配套的 vbmeta_system
@@ -48,7 +49,10 @@ step() { echo; echo "==== $*"; }
 if [[ -n ${IMAGE_PREFIX:-} ]]; then
     [[ $VERSION =~ ^V([0-9]+) ]] || { echo "VERSION=$VERSION 取不出版本号"; exit 1; }
     _lab=${VERSION_LABEL:-${BASH_REMATCH[1]}}; [[ $_lab == [0-9]* ]] && _lab=v$_lab   # 数字开头加 v(v110、v110-beta),字母开头原样(test-v1)
-    IMAGE_NAME=${IMAGE_PREFIX}_${_lab}$(select_flavor)
+    # 后缀默认按 select_flavor 算(_optional/_debug);环境变量 IMAGE_FLAVOR 显式覆盖(连空串也认,用 ${x-default} 不是 :-)。
+    # 用途:cust-bebug 等自用变种选了 optional+debug 补丁,select_flavor 会算成 _optional_debug,但想让版本号(IMAGE_NAME,
+    # 会烤进 ro.build.display.id)显示成自定的 _bebug —— 设 IMAGE_FLAVOR=_bebug 即可,版本号和包名一致。
+    IMAGE_NAME=${IMAGE_PREFIX}_${_lab}${IMAGE_FLAVOR-$(select_flavor)}
 fi
 NAME=${IMAGE_NAME:-system_${VERSION}}
 TREE=$OUT/tree
