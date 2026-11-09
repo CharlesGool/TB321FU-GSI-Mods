@@ -651,6 +651,19 @@ heraldp_cmdf_apply() {
       herald_km apply --webui-apply-pif-fingerprint $arg > "$resp"
 }
 
+# V1.3 一键开伪装(内置"机型伪装与密钥认证"App 用):apply 目录机型后,直接用 keymint 刚写好的规范 profile 走 set。
+#   不让前端把 apply / get 的输出转一道再 set:那是状态 JSON(带 enabled 等字段),而 pif_fingerprint.json 要求规范 profile
+#   (deny_unknown_fields、字段顺序固定、无空格无结尾换行),转一道有写坏 profile 的风险。
+heraldp_cmdf_spoof_on() {
+  case "$1" in ""|*[!a-z0-9_]*) echo "err spoof_on 机型名只能是小写字母、数字、下划线: [$1]" > "$resp"; return ;; esac
+  if ! herald_km apply --webui-apply-pif-fingerprint "$1" > "$W/herald_so"; then
+    cat "$W/herald_so" > "$resp"; rm -f "$W/herald_so"; return
+  fi
+  rm -f "$W/herald_so"
+  cp -f "$DATA_PIF" "$W/herald_profile_in" 2>/dev/null || { echo "err spoof_on keymint 没写出 profile" > "$resp"; return; }
+  heraldp_cmdf_set ""
+}
+
 # ---- Keybox 完整控制:导出/导入/状态/吊销检查(直接对应 keymint --webui-* 用法字符串)----
 heraldp_cmdf_keybox_export() {
   arg=$1

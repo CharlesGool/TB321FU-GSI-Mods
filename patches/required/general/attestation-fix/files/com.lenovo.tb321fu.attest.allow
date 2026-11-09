@@ -1,0 +1,13 @@
+# 机型伪装与密钥认证 App(com.lenovo.tb321fu.attest)可以跑的命令:每行一个 ERE,请求整行完全匹配其中一条。
+# 不放:keybox_export(私钥不出系统)、patch / auto_targets(诊断用,留在 bebug 的 heraldctl)。
+get
+list
+spoof_on [a-z0-9][a-z0-9_]{0,125}
+disable
+keybox_state
+keybox_inspector
+keybox_revocation
+keybox_import
+rkp_list
+rkp_issue( v2)?
+rkp_import [0-9a-f]{32}

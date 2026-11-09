@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- = DP11 SettingsGoogle 原文件 + 末尾的 tb321fu_navbar 入口 -->
+<PreferenceScreen android:title="@com.android.settings:string/gesture_settings_activity_title" android:key="gesture_navigation_settings_page" settings:keywords="@com.android.settings:string/keywords_gesture_navigation_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
+    <PreferenceCategory android:persistent="false">
+        <com.android.settingslib.widget.ButtonPreference android:icon="@com.android.settings:drawable/touch_app" android:title="@com.android.settings:string/gesture_navigation_tutorial_title" android:key="assistant_gesture_navigation_tutorial" settings:buttonPreferenceSize="normal" settings:buttonPreferenceType="filled" />
+    </PreferenceCategory>
+    <PreferenceCategory android:persistent="false" android:title="@com.android.settings:string/assistant_gesture_category_title" android:key="assistant_gesture_category">
+        <SwitchPreferenceCompat android:title="@com.android.settings:string/assistant_corner_gesture_title" android:key="assistant_gesture_corner_swipe" android:summary="@com.android.settings:string/assistant_corner_gesture_summary" settings:controller="com.android.settings.gestures.GestureNavigationSettingsAssistController" />
+    </PreferenceCategory>
+    <PreferenceCategory android:persistent="false" android:title="@com.android.settings:string/back_sensitivity_dialog_title" android:key="back_sensitivity_category">
+        <com.android.settingslib.widget.SliderPreference android:max="2" android:title="@com.android.settings:string/left_edge" android:key="gesture_left_back_sensitivity" android:min="0" settings:textEnd="@com.android.settings:string/high_label" settings:textStart="@com.android.settings:string/low_label" />
+        <com.android.settingslib.widget.SliderPreference android:max="2" android:title="@com.android.settings:string/right_edge" android:key="gesture_right_back_sensitivity" android:min="0" settings:textEnd="@com.android.settings:string/high_label" settings:textStart="@com.android.settings:string/low_label" />
+    </PreferenceCategory>
+    <PreferenceCategory android:persistent="false" android:title="导航栏" android:key="tb321fu_navbar_category" android:order="1000">
+        <Preference android:title="隐藏导航栏" android:key="tb321fu_navbar" android:summary="手势导航下隐藏底部提示线和导航栏占位" settings:searchable="false">
+            <intent android:action="android.intent.action.MAIN" android:targetPackage="com.lenovo.tb321fu.navbar" android:targetClass="com.lenovo.tb321fu.navbar.MainActivity" />
+        </Preference>
+    </PreferenceCategory>
+    <com.android.settingslib.widget.FooterPreference android:title="@com.android.settings:string/back_sensitivity_dialog_message" android:key="gesture_navigation_settings_footer" settings:searchable="false" />
+</PreferenceScreen>

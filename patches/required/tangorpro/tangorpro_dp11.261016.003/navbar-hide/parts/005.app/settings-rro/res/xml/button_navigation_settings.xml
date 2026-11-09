@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- = DP11 SettingsGoogle 原文件 + 末尾的 tb321fu_navbar 入口 -->
+<PreferenceScreen android:title="@com.android.settings:string/button_navigation_settings_activity_title" android:key="button_navigation_settings_page" settings:keywords="@com.android.settings:string/keywords_button_navigation_settings"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
+    <com.android.settingslib.widget.IllustrationPreference android:key="gesture_power_menu_video" settings:controller="com.android.settings.gestures.ButtonNavigationSettingsAssistController" settings:dynamicColor="true" settings:lottie_imageAssetsFolder="button_nav_menu" settings:lottie_rawRes="@com.android.settings:raw/lottie_button_nav_menu" settings:searchable="false" />
+    <SwitchPreferenceCompat android:title="@com.android.settings:string/assistant_long_press_home_gesture_title" android:key="assistant_long_press_home_gesture" android:summary="@com.android.settings:string/assistant_long_press_home_gesture_summary" settings:controller="com.android.settings.gestures.ButtonNavigationSettingsAssistController" />
+    <PreferenceCategory android:persistent="false" android:title="导航栏" android:key="tb321fu_navbar_category" android:order="1000">
+        <Preference android:title="隐藏导航栏" android:key="tb321fu_navbar" android:summary="手势导航下隐藏底部提示线和导航栏占位" settings:searchable="false">
+            <intent android:action="android.intent.action.MAIN" android:targetPackage="com.lenovo.tb321fu.navbar" android:targetClass="com.lenovo.tb321fu.navbar.MainActivity" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

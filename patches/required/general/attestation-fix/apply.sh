@@ -40,3 +40,13 @@ log "默认 profile: $(cat "$WORK/pif_fingerprint.json")"
 replace "$WORK/pif_fingerprint.json" etc/herald_payload/seed/pif_fingerprint.json
 
 log "完成(payload $(sha256sum "$HERALD_PAYLOAD/bin/keymint" | cut -c1-12)…)"
+
+# 5. "机型伪装与密钥认证"App(设置 → 关于平板电脑 → 型号下面;没有桌面图标)+ herald-apps 白名单。
+#   App 经 herald-apps 通道跑上面这些命令(spoof_on / keybox / rkp);没打 herald-apps 的底包线不装。源码在 app/。
+if mod_ran required/general/herald-apps; then
+    put_dir system_ext/app/TB321FU-Attest 0755 0:0 u:object_r:system_file:s0
+    put "$MOD/files/TB321FU-Attest.apk" system_ext/app/TB321FU-Attest/TB321FU-Attest.apk 0644 0:0 u:object_r:system_file:s0
+    put "$MOD/files/com.lenovo.tb321fu.attest.allow" etc/herald_payload/apps/com.lenovo.tb321fu.attest.allow 0644 0:0 u:object_r:herald_exec:s0
+else
+    log "(没打 required/general/herald-apps,不装机型伪装与密钥认证 App)"
+fi

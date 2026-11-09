@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lenovo.tb321fu.overlay.settings.navbar">
+    <application android:extractNativeLibs="false" android:hasCode="false"/>
+    <!-- 静态 RRO:在设置 → 系统 → 导航模式 → 三按钮导航 / 手势导航 的齿轮页底部加"隐藏导航栏"入口(打开导航栏 App)。
+         两个页面的原有内容照抄 DP11 SettingsGoogle(引用 Settings 自己的属性和资源,链接时 -I SettingsGoogle.apk、本包 id 0x7e)。
+         只在 TB321FU 原厂 vendor 上生效 -->
+    <overlay android:isStatic="true" android:priority="326" android:requiredSystemPropertyName="ro.product.vendor.device" android:requiredSystemPropertyValue="TB321FU" android:targetPackage="com.android.settings"/>
+</manifest>

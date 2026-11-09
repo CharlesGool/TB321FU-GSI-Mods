@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 标量锚点:只含 xml 文件资源的静态 overlay 可能生成不了 idmap(V69 的教训,array-only 在真机 NO_IDMAP),带一个标量。
+         值和 DP11 SettingsGoogle 默认值相同(true),系统、vendor、odm 里没有别的 overlay 改它,同值重复无害。 -->
+    <bool name="config_show_emergency_gesture_settings">true</bool>
+</resources>

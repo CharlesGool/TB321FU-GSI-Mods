@@ -1,0 +1,2 @@
+# 导航栏 App(com.lenovo.tb321fu.navbar)可以跑的命令:每行一个 ERE,请求整行完全匹配其中一条。
+navbar (status|hide|show)

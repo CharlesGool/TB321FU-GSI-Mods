@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">机型伪装与密钥认证</string>
+    <string name="tile_title">机型伪装与密钥认证</string>
+    <string name="tile_summary">机型伪装、Keybox、本机 RKP 签发</string>
+</resources>
