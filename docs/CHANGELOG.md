@@ -2,6 +2,28 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
+## DP11 未发布(test-v2.0 … test-v2.6)— 2026-11-09
+
+user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 起陆续验证),等下一个正式版一起发布。
+
+### 新增
+- `required/general/herald-apps` V1.0:内置功能 App 的专用通道。每个功能做成一个装在系统分区的小 App,入口注入设置;不用配对,鉴权 = 包装在系统分区 + uid 一致,每个 App 只能跑 `apps/<包名>.allow` 白名单里的命令;支持附带数据(spoof set / keybox import)。回包 O_EXCL 新建后 `chown -h` + `chcon -h`(App 数据文件带 MLS 类别,不改上下文 App 打不开)。
+- 电池管理 App(`battery` 的 `006.app`,设置 → 电池):电池健康、双电芯、实时状态、充电上限、长期插电保护、旁路充电。
+- 机型伪装与密钥认证 App(`attestation-fix` V1.3,设置 → 关于平板电脑 → 型号下面):全局机型伪装(从 Pixel 机型目录选)、Keybox 类型 / 证书状态 / 证书链 / 更换、本机 RKP 签发与导入。插件加 `spoof_on <机型>`(apply 后直接用 keymint 写好的规范 profile 走 set)。
+- 导航栏 App(DP11 `navbar-hide` V1.2 的 `005.app`):入口在 设置 → 系统 → 导航模式 → 三按钮 / 手势导航的齿轮页底部,用 Settings 的静态 RRO 加进去(导航模式页不支持注入)。
+- `required/general/hardware-fix/vibrator-hal` V1.2:系统侧 `IVibratorManager/default`(tb321fu-vibrator),两颗 Awinic 马达都认,支持 primitives / 组合 / 同步振动。
+- `required/general/qs-auto-brightness` V1.1:快捷设置"自动亮度"开关,长按进 显示和触控。
+- `required/general/hardware-fix/wifi-only` V1.0:按纯 Wi-Fi 平板处理(去 dsds 双卡、telephony 特性、voice/sms/data capable)。
+- `required/general/hardware-fix/power-profile` V1.0:power_profile 补 `audio` / `video` 键名,电池用量里音视频耗电不再是 0。
+- `required/general/bug-fix/herald-quiet` V1.0:herald 域 dontaudit,dmesg 不再被 herald 的 avc 冲掉。
+- `toolkit/tests/test-herald-apps.sh`;`test-battery-plugins.sh` 加 mksh 和 V1.2 用例。
+
+### 变更
+- `battery` V1.2:节点读取改用 shell 内建(不再每个节点 fork cat/tr)、不变的值每次开机只读一次、新增 `battery overview`(一次读完 info + 三个 status)、`battery info` 带整机 `soh` / `cycle_count` / `charge_full_uah` / `charge_full_design_uah`。
+
+### 修复
+- 振动(vibrator-hal):haptic_hv 每颗马达只有 1 个 FF 槽位,换效果类型前先 `EVIOCRMFF`(第三方 App 的 one-shot 全部 ENOSPC 不振);≤30 ms 的 one-shot 走 RAM 波形;不空发 stop;init 要能 search herald_payload 目录(test-v2.2 卡开机的原因);马达按 i2c 名找。
+
 ## DP11 user-v1.9(V10)— 2026-11-09
 
 DP11 线正式版(标准 `user-v1.9` + 自用 `user-v1.9-cust_bebug`),上一个正式版是 user-v1.5。中间的 test-v1.6、BTtest-v1.7、test-v1.8 是测试版。tag `dp11-user-v1.9`。
