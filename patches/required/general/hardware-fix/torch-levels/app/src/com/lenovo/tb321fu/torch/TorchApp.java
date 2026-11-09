@@ -7,126 +7,145 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Torch strength levels for TB321FU. The vendor camera HAL advertises 4 torch levels but always
  * drives the LEDs at 2 x 75 mA, and changing the level while lit switches the second LED off.
- * This persistent, UI-less app listens to TorchCallback and, whenever the torch is turned on or
- * its level changes, asks the herald broker (root) to rewrite the PMIC flash LED nodes for that
- * level (`torch apply N`, see the torch-levels herald plugin), and sends `torch off` when the
- * torch goes off after we wrote it. Default table: levels 1-3 one LED at 50 / 100 / 200 mA,
- * level 4 both LEDs at 300 mA.
+ *
+ * This persistent, UI-less, direct-boot-aware app keeps one "latest wanted state" and publishes
+ * it atomically (write tmp, rename) to its device-protected files/torch_state:
+ * {@code <seq> on <1-4>} or {@code <seq> off}. The torch-levels herald plugin watches the
+ * directory with inotify, re-reads the file on every event and applies only the newest line, so
+ * nothing queues up and a stale state can never run (test-v2.8: the request/reply channel took
+ * 0.35-0.57 s per round trip and stale requests switched a freshly lit torch off).
+ *
+ * Level callbacks get lost (right after setTorchMode(true), and sometimes for a whole slider
+ * drag), so while lit the level is also polled every {@link #POLL_MS}. Every turn-on gets a new
+ * seq: the HAL always relights at its own 2 x 75 mA, so the level must be rewritten even if it
+ * did not change. Turning on without choosing a level follows getTorchStrengthLevel() (what the
+ * Quick Settings slider shows).
  */
 public final class TorchApp extends Application {
     private static final String TAG = "TB321FU-Torch";
-    /** Slider drags fire bursts of level changes; turning the torch on is a single event and goes out at once. */
-    private static final long DEBOUNCE_MS = 40, TIMEOUT_MS = 6_000;
+    private static final long POLL_MS = 150;
 
-    private Handler handler;
-    /**
-     * Requests to herald go out one at a time on their own thread, in the order the callbacks
-     * asked for them: an "off" queued after an "apply" always runs after it, so an apply that
-     * was already on its way can never leave the LEDs lit after the user switched the torch off
-     * (test-v2.6). The callback thread never blocks on herald.
-     */
-    private final ExecutorService sender = Executors.newSingleThreadExecutor();
-    /** We wrote the LEDs since the torch was last off: an "off" must follow. Callback thread only. */
-    private boolean written;
-    private Backend backend;
     private CameraManager cm;
+    private Handler h;
     private final Set<String> lit = new HashSet<>();
-    private int pendingLevel;
-    private final Runnable send = this::sendNow;
+    /** FLASH_INFO_STRENGTH_MAXIMUM_LEVEL per camera id (fixed; read once). */
+    private final Map<String, Integer> maxLevel = new HashMap<>();
+    /** Camera id of the latest change (whose level we read). Handler thread only, like the rest. */
+    private String cur;
+    private int level;
+    private long seq;
+    private File state, tmp;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        File dir = createDeviceProtectedStorageContext().getFilesDir();   // usable before first unlock
+        dir.mkdirs();
+        state = new File(dir, "torch_state");
+        tmp = new File(dir, "torch_state.tmp");
+        seq = System.currentTimeMillis();   // never repeats a line left over from an earlier process
         HandlerThread t = new HandlerThread(TAG);
         t.start();
-        handler = new Handler(t.getLooper());
-        backend = new HeraldBackend(this);
+        h = new Handler(t.getLooper());
         cm = getSystemService(CameraManager.class);
         if (cm == null) {
             Log.e(TAG, "no CameraManager");
             return;
         }
-        cm.registerTorchCallback(new CameraManager.TorchCallback() {
-            @Override
-            public void onTorchModeChanged(String id, boolean enabled) {
-                if (enabled) {
-                    lit.add(id);
-                    int level;
-                    try {
-                        level = cm.getTorchStrengthLevel(id);
-                    } catch (Exception e) {
-                        level = -1;
-                    }
-                    schedule(id, level, 0);
-                } else {
-                    lit.remove(id);
-                    if (lit.isEmpty()) {
-                        handler.removeCallbacks(send);   // drop a level change still waiting for its debounce
-                        if (written) {
-                            written = false;
-                            // The HAL has already switched off; this only undoes a write of ours that
-                            // may still be in flight (it would switch the LEDs back on).
-                            sender.execute(() -> exec("torch off"));
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onTorchStrengthLevelChanged(String id, int level) {
-                if (lit.contains(id)) schedule(id, level, DEBOUNCE_MS);
-            }
-        }, handler);
+        h.post(() -> publish("start"));     // (re)start: off until the callback says otherwise
+        cm.registerTorchCallback(cb, h);
         Log.i(TAG, "torch callback registered");
     }
 
-    /**
-     * Maps the HAL level (1..max) onto our 4 levels; unknown → the HAL's default level.
-     * Turning the torch on without choosing a level reports the last level used (what the
-     * Quick Settings slider shows), so that is what gets applied.
-     */
-    private int toOurLevel(String id, int level) {
-        int max = 4, def = 3;
+    /** HAL level of camera {@code id} mapped onto our 1..4, or -1 if unknown. */
+    private int read(String id) {
+        int l;
         try {
-            CameraCharacteristics c = cm.getCameraCharacteristics(id);
-            Integer m = c.get(CameraCharacteristics.FLASH_INFO_STRENGTH_MAXIMUM_LEVEL);
-            Integer d = c.get(CameraCharacteristics.FLASH_INFO_STRENGTH_DEFAULT_LEVEL);
-            if (m != null && m > 0) max = m;
-            if (d != null && d > 0) def = d;
+            l = cm.getTorchStrengthLevel(id);
         } catch (Exception e) {
-            Log.w(TAG, "characteristics of camera " + id, e);
+            return -1;
         }
-        if (level < 1) level = def;
-        int ours = (int) Math.ceil(level * 4.0 / max);
-        return Math.max(1, Math.min(4, ours));
+        if (l < 1) return -1;
+        Integer max = maxLevel.get(id);
+        if (max == null) {
+            max = 4;
+            try {
+                Integer m = cm.getCameraCharacteristics(id)
+                        .get(CameraCharacteristics.FLASH_INFO_STRENGTH_MAXIMUM_LEVEL);
+                if (m != null && m > 0) max = m;
+            } catch (Exception e) {
+                // keep 4
+            }
+            maxLevel.put(id, max);
+        }
+        return max == 4 ? l : Math.max(1, Math.min(4, (int) Math.ceil(l * 4.0 / max)));
     }
 
-    private void schedule(String id, int level, long delayMs) {
-        pendingLevel = toOurLevel(id, level);
-        handler.removeCallbacks(send);
-        handler.postDelayed(send, delayMs);
-    }
+    private final CameraManager.TorchCallback cb = new CameraManager.TorchCallback() {
+        @Override
+        public void onTorchModeChanged(String id, boolean on) {
+            if (on) {
+                lit.add(id);
+                cur = id;
+                int l = read(id);
+                level = l >= 1 ? l : 3;
+                publish("on");                  // new seq on every turn-on, even at the same level
+                h.removeCallbacks(poll);
+                h.postDelayed(poll, POLL_MS);
+            } else if (lit.remove(id) && lit.isEmpty()) {
+                h.removeCallbacks(poll);
+                publish("off");
+            }
+        }
 
-    /** Runs on the callback thread after the debounce. */
-    private void sendNow() {
-        if (lit.isEmpty()) return;
-        written = true;
-        final int level = pendingLevel;
-        sender.execute(() -> exec("torch apply " + level));
-    }
+        @Override
+        public void onTorchStrengthLevelChanged(String id, int l) {
+            if (!lit.contains(id)) return;
+            cur = id;
+            int ours = read(id);
+            if (ours >= 1 && ours != level) {
+                level = ours;
+                publish("level");
+            }
+        }
+    };
 
-    /** Runs on the sender thread. */
-    private void exec(String cmd) {
-        Resp r = backend.exec(cmd, TIMEOUT_MS);
-        if (!r.ok()) Log.w(TAG, cmd + ": " + r.errorText());
-        else Log.i(TAG, r.first());
+    private final Runnable poll = new Runnable() {
+        @Override
+        public void run() {
+            if (lit.isEmpty() || cur == null) return;
+            int l = read(cur);
+            if (l >= 1 && l != level) {
+                level = l;
+                publish("poll");
+            }
+            h.postDelayed(this, POLL_MS);
+        }
+    };
+
+    /** Handler thread only. */
+    private void publish(String why) {
+        String line = (++seq) + (lit.isEmpty() ? " off" : " on " + Math.max(1, Math.min(4, level))) + "\n";
+        try {
+            try (FileOutputStream o = new FileOutputStream(tmp)) {
+                o.write(line.getBytes(StandardCharsets.US_ASCII));
+            }
+            if (!tmp.renameTo(state)) Log.w(TAG, "rename failed");
+        } catch (IOException e) {
+            Log.w(TAG, "write state: " + e);
+        }
+        Log.i(TAG, "state " + line.trim() + " (" + why + ")");
     }
 }
