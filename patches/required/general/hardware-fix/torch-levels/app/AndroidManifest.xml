@@ -2,11 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lenovo.tb321fu.torch">
     <uses-sdk android:minSdkVersion="34" android:targetSdkVersion="35" />
-    <!-- 没有界面、没有入口:常驻(系统分区的 App 才能 persistent),开机后一直监听手电筒的开关和档位 -->
+    <!-- 没有界面、没有入口:常驻(系统分区的 App 才能 persistent),开机后一直监听手电筒的开关和档位。
+         directBootAware:重启后首次解锁前(锁屏下拉面板开手电筒)也要起来;和 herald 的通道放在 DE 存储 -->
     <application
         android:name=".TorchApp"
         android:allowBackup="false"
         android:label="@string/app_name"
         android:persistent="true"
+        android:directBootAware="true"
         android:hasCode="true" />
 </manifest>

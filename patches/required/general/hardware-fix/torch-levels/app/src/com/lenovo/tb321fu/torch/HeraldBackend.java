@@ -12,7 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * File channel to the herald backend (herald-apps), in this app's own files/ directory:
+ * File channel to the herald backend (herald-apps), in this app's own device-protected files/
+ * directory (/data/user_de/0/<pkg>/files): the app is directBootAware and must work on the lock
+ * screen right after a reboot, before the credential-encrypted storage is unlocked.
  *
  *   1. delete a stale herald_resp
  *   2. write the command line to herald_req.tmp, then rename it to herald_req
@@ -38,7 +40,7 @@ final class HeraldBackend implements Backend {
     private final File dir;
 
     HeraldBackend(Context app) {
-        dir = app.getFilesDir();
+        dir = app.createDeviceProtectedStorageContext().getFilesDir();
         dir.mkdirs();
         // Let the backend (root, different uid) find and write the files.
         dir.setExecutable(true, false);

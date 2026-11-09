@@ -23,7 +23,8 @@ import java.util.concurrent.Executors;
  */
 public final class TorchApp extends Application {
     private static final String TAG = "TB321FU-Torch";
-    private static final long DEBOUNCE_MS = 80, TIMEOUT_MS = 6_000;
+    /** Slider drags fire bursts of level changes; turning the torch on is a single event and goes out at once. */
+    private static final long DEBOUNCE_MS = 40, TIMEOUT_MS = 6_000;
 
     private Handler handler;
     /**
@@ -64,7 +65,7 @@ public final class TorchApp extends Application {
                     } catch (Exception e) {
                         level = -1;
                     }
-                    schedule(id, level);
+                    schedule(id, level, 0);
                 } else {
                     lit.remove(id);
                     if (lit.isEmpty()) {
@@ -81,7 +82,7 @@ public final class TorchApp extends Application {
 
             @Override
             public void onTorchStrengthLevelChanged(String id, int level) {
-                if (lit.contains(id)) schedule(id, level);
+                if (lit.contains(id)) schedule(id, level, DEBOUNCE_MS);
             }
         }, handler);
         Log.i(TAG, "torch callback registered");
@@ -108,10 +109,10 @@ public final class TorchApp extends Application {
         return Math.max(1, Math.min(4, ours));
     }
 
-    private void schedule(String id, int level) {
+    private void schedule(String id, int level, long delayMs) {
         pendingLevel = toOurLevel(id, level);
         handler.removeCallbacks(send);
-        handler.postDelayed(send, DEBOUNCE_MS);   // dragging the slider fires a burst of level changes
+        handler.postDelayed(send, delayMs);
     }
 
     /** Runs on the callback thread after the debounce. */

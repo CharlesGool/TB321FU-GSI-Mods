@@ -16,10 +16,12 @@
 
 ## 协议(每个 App 自己的 `files/` 目录,只服务 user 0)
 
+CE(`/data/data/<包>/files`)和 DE(`/data/user_de/0/<包>/files`)两边都看(V1.2)。重启后首次解锁前 CE 没解密,要在这期间工作的 App(`directBootAware`,如手电筒档位)用 DE 的 `files/`;两边鉴权、回包规则相同。
+
 | 步骤 | 谁 | 做什么 |
 |---|---|---|
 | 1 | App | 删旧的 `herald_resp`,写 `herald_req.tmp`(一行命令)再 rename 成 `herald_req` |
-| 2 | herald | ≤0.2 秒内取走(读完即删) |
+| 2 | herald | ≤0.2 秒内取走(读完即删;刚处理过请求的 3 秒内 ≤0.05 秒) |
 | 3 | herald | 鉴权 + 白名单,执行 `heraldp_cmd_<命令>` |
 | 4 | herald | 回包写 `herald_resp.tmp` 再 rename 成 `herald_resp`(第一行 `ok …` / `err <原因>`,后面 `key=value`) |
 
@@ -40,10 +42,10 @@ App 等 2.5 秒请求没被取走就认为后端不在。
 
 ## 运行方式
 
-`HERALDP_START` 起一个独立子进程轮询各登记 App 的 `files/`:装了就每 0.2 秒看一次(手电筒改档要跟得上),都没装就 5 秒;等待用 `read -t` 读一个空 FIFO,不 fork sleep。
+`HERALDP_START` 起一个独立子进程轮询各登记 App 的 `files/`:装了就每 0.2 秒看一次,刚处理过请求的 3 秒内每 0.05 秒(拖手电筒滑块这类连续操作跟得上),都没装就 5 秒;等待用 `read -t` 读一个空 FIFO,不 fork sleep。
 不占 broker 主循环;`herald_sys` 的临时文件放自己的 `/data/local/tmp/herald/.work-apps`(root 0700)。
 
 ## 测试
 
-`HERALD_APPS_DIR` / `HERALD_APPS_DATA` / `HERALD_APPS_W` 可换成假目录离线测(桩掉 `herald_sys`、`stat -c %C`、`chcon`)。
-已测:合法命令、白名单外、参数越界、符号链接 / FIFO / 属主不对的请求、装在 /data/app、回包位置预置符号链接。
+`HERALD_APPS_DIR` / `HERALD_APPS_DATA` / `HERALD_APPS_DE` / `HERALD_APPS_W` 可换成假目录离线测(桩掉 `herald_sys`、`stat -c %C`、`chcon`)。
+已测:合法命令、白名单外、参数越界、符号链接 / FIFO / 属主不对的请求、装在 /data/app、回包位置预置符号链接、DE 目录。

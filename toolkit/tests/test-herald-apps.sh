@@ -10,9 +10,9 @@ command -v mksh >/dev/null || { echo "跳过:没装 mksh"; exit 0; }
 sudo -n true 2>/dev/null || { echo "跳过:要免密 sudo"; exit 0; }
 PKG=com.lenovo.tb321fu.battery; AU=10123
 T=$(mktemp -d "${TMPDIR:-/tmp}/happtest.XXXXXX"); trap 'sudo rm -rf --one-file-system "$T"' EXIT
-mkdir -p "$T/apps" "$T/data/$PKG/files" "$T/w"
+mkdir -p "$T/apps" "$T/data/$PKG/files" "$T/de/$PKG/files" "$T/w"
 { cat "$ALLOW"; printf 'set\nkeybox_import\n'; } > "$T/apps/$PKG.allow"; touch "$T/packages.list"
-sudo chown -R $AU:$AU "$T/data/$PKG"
+sudo chown -R $AU:$AU "$T/data/$PKG" "$T/de/$PKG"
 F=$T/data/$PKG/files
 cat > "$T/run.sh" <<EOS
 PAYDIR=/nonexistent; HERALD_APPS_PKGLIST=$T/packages.list; HERALD_APPS_DIR=$T/apps; HERALD_APPS_DATA=$T/data; HERALD_APPS_W=$T/w
@@ -26,13 +26,13 @@ stat() { if [ "\$2" = %C ]; then echo u:object_r:app_data_file:s0:c123,c256,c512
 chcon() { :; }
 . $PLUGIN
 W=\$HAPP_W; mkdir -p \$HAPP_W
-heraldapp_once $PKG
+heraldapp_once $PKG \${BASE:+$T/de}
 EOS
 pass=0; fail=0
 as_app() { sudo chown -h $AU:$AU "$@"; }
 req() { sudo rm -f "$F/herald_resp"; printf '%s\n' "$1" | sudo tee "$F/herald_req.tmp" >/dev/null; as_app "$F/herald_req.tmp"; sudo mv "$F/herald_req.tmp" "$F/herald_req"; }
 att() { printf '%s' "$2" | sudo tee "$F/$1" >/dev/null; as_app "$F/$1"; }
-run() { sudo env PMPATH="${PMPATH:-}" timeout 20 mksh "$T/run.sh" >/dev/null 2>&1; }
+run() { sudo env PMPATH="${PMPATH:-}" BASE="${BASE:-}" timeout 20 mksh "$T/run.sh" >/dev/null 2>&1; }
 resp() { sudo cat "$F/herald_resp" 2>/dev/null; }
 chk() { # chk <说明> <期望:none 或回包第一行> [回包里应有的行]
   local first; first=$(resp | head -1)
@@ -61,5 +61,9 @@ sudo test -e "$F/herald_profile_in" && { fail=$((fail+1)); echo "  FAIL 附带�
 att herald_keybox_b64_in "$(printf 'QUJD\nREVG\r\n')"; req "keybox_import"; run; chk b64去换行 "ok kb" "got=QUJDREVG"
 sudo ln -sf /etc/hostname "$F/herald_profile_in"; as_app "$F/herald_profile_in"; req "set"; run; chk 附带是链接 "ok set" "got="
 printf '{"fingerprint":"x"}' | sudo tee "$F/herald_profile_in" >/dev/null; req "set"; run; chk 附带属主不对 "ok set" "got="
+# DE(解锁前):同一套规则,在 /data/user_de/0/<包>/files 里收发
+F=$T/de/$PKG/files
+req "battery info"; BASE=de run; chk DE目录 "ok battery info" "level=80"
+req "reboot"; BASE=de run; chk DE白名单外 "err not allowed"
 echo "通过 $pass 项, 失败 $fail 项"
 [ $fail = 0 ]
