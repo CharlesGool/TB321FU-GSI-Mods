@@ -3,7 +3,7 @@
 #   每个 App 只能跑自己白名单里的命令。用户接触不到 herald 的其他能力。
 # 登记:/system/etc/herald_payload/apps/<包名>.allow,每行一个 ERE,请求必须整行完全匹配其中一条。
 # 协议(每个 App 自己的 files/ 目录,只服务 user 0):
-#   App 写 herald_req.tmp(一行命令)再 rename 成 herald_req;这里 ≤0.4 秒内取走、执行;
+#   App 写 herald_req.tmp(一行命令)再 rename 成 herald_req;这里 ≤0.2 秒内取走、执行;
 #   回包写 herald_resp.tmp 再 rename 成 herald_resp(第一行 ok… / err <原因>,后面 key=value)。
 # 鉴权:包装在系统分区(没被 /data/app 的更新盖住);数据目录、files、请求文件的属主都 = 包的 uid。
 # 钩子:插件可定义 heraldapp_post_<包名里的 . 换成 _>() { $1 = 请求整行 },输出追加到回包(补字段用)。
@@ -112,9 +112,9 @@ heraldapp_loop() {
       heraldapp_once "$_ap" && _abusy=1
     done
     [ $_abusy = 1 ] && continue
-    # 装了登记的 App 就每 0.4 秒看一次(App 等 2.5 秒没人取就认为后端不在),一个都没装就 5 秒。
+    # 装了登记的 App 就每 0.2 秒看一次(App 等 2.5 秒没人取就认为后端不在),一个都没装就 5 秒。
     # 用 read -t 读一个没人写的 FIFO 来等,不每次 fork sleep。
-    if [ $_aany = 1 ]; then _at=0.4; else _at=5; fi
+    if [ $_aany = 1 ]; then _at=0.2; else _at=5; fi
     read -t "$_at" -u9 _x 2>/dev/null || sleep "$_at"
   done
 }

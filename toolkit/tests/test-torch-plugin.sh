@@ -26,7 +26,7 @@ DRV
   }
   o=$(run 1 - - 'heraldp_cmd_torch "apply 3"')
   eq 单颗默认 "$o" "ok torch level=3 leds=1 ma=200
-WRITES: switch_2=0 torch_0=200 torch_3=200 switch_2=1 torch_3=0 "
+WRITES: switch_2=0 torch_0=200 torch_3=200 switch_2=1 torch_3=0 torch_0=400 "
   o=$(run 1 - - 'heraldp_cmd_torch "apply 4"')
   eq 两颗默认 "$o" "ok torch level=4 leds=2 ma=300
 WRITES: switch_2=0 torch_0=300 torch_3=300 switch_2=1 "
@@ -41,7 +41,13 @@ WRITES: switch_2=0 torch_0=80 torch_3=80 switch_2=1 "
 WRITES: switch_2=0 torch_0=500 torch_3=500 switch_2=1 "
   o=$(run 1 persist.tb321fu.torch.l2 abc 'heraldp_cmd_torch "apply 2"')
   eq 坏配置回默认 "$o" "ok torch level=2 leds=1 ma=100
-WRITES: switch_2=0 torch_0=100 torch_3=100 switch_2=1 torch_3=0 "
+WRITES: switch_2=0 torch_0=100 torch_3=100 switch_2=1 torch_3=0 torch_0=200 "
+  o=$(run 1 persist.tb321fu.torch.l3 1x400 'heraldp_cmd_torch "apply 3"')
+  eq 单颗上限250 "$o" "ok torch level=3 leds=1 ma=250
+WRITES: switch_2=0 torch_0=250 torch_3=250 switch_2=1 torch_3=0 torch_0=500 "
+  o=$(run 1 - - 'heraldp_cmd_torch "off"')
+  eq 关灯 "$o" "ok torch off
+WRITES: switch_2=0 "
   o=$(run 1 - - 'heraldp_cmd_torch "apply 5"')
   eq 档位越界 "$o" "err torch 档位只能是 1~4: [5]
 WRITES: "

@@ -9,20 +9,32 @@ import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Torch strength levels for TB321FU. The vendor camera HAL advertises 4 torch levels but always
  * drives the LEDs at 2 x 75 mA, and changing the level while lit switches the second LED off.
  * This persistent, UI-less app listens to TorchCallback and, whenever the torch is turned on or
  * its level changes, asks the herald broker (root) to rewrite the PMIC flash LED nodes for that
- * level (`torch apply N`, see the torch-levels herald plugin). Default table: levels 1-3 one LED
- * at 50 / 100 / 200 mA, level 4 both LEDs at 300 mA.
+ * level (`torch apply N`, see the torch-levels herald plugin), and sends `torch off` when the
+ * torch goes off after we wrote it. Default table: levels 1-3 one LED at 50 / 100 / 200 mA,
+ * level 4 both LEDs at 300 mA.
  */
 public final class TorchApp extends Application {
     private static final String TAG = "TB321FU-Torch";
-    private static final long DEBOUNCE_MS = 250, TIMEOUT_MS = 6_000;
+    private static final long DEBOUNCE_MS = 80, TIMEOUT_MS = 6_000;
 
     private Handler handler;
+    /**
+     * Requests to herald go out one at a time on their own thread, in the order the callbacks
+     * asked for them: an "off" queued after an "apply" always runs after it, so an apply that
+     * was already on its way can never leave the LEDs lit after the user switched the torch off
+     * (test-v2.6). The callback thread never blocks on herald.
+     */
+    private final ExecutorService sender = Executors.newSingleThreadExecutor();
+    /** We wrote the LEDs since the torch was last off: an "off" must follow. Callback thread only. */
+    private boolean written;
     private Backend backend;
     private CameraManager cm;
     private final Set<String> lit = new HashSet<>();
@@ -55,7 +67,15 @@ public final class TorchApp extends Application {
                     schedule(id, level);
                 } else {
                     lit.remove(id);
-                    if (lit.isEmpty()) handler.removeCallbacks(send);
+                    if (lit.isEmpty()) {
+                        handler.removeCallbacks(send);   // drop a level change still waiting for its debounce
+                        if (written) {
+                            written = false;
+                            // The HAL has already switched off; this only undoes a write of ours that
+                            // may still be in flight (it would switch the LEDs back on).
+                            sender.execute(() -> exec("torch off"));
+                        }
+                    }
                 }
             }
 
@@ -67,7 +87,11 @@ public final class TorchApp extends Application {
         Log.i(TAG, "torch callback registered");
     }
 
-    /** Maps the HAL level (1..max) onto our 4 levels; unknown → the HAL's default level. */
+    /**
+     * Maps the HAL level (1..max) onto our 4 levels; unknown → the HAL's default level.
+     * Turning the torch on without choosing a level reports the last level used (what the
+     * Quick Settings slider shows), so that is what gets applied.
+     */
     private int toOurLevel(String id, int level) {
         int max = 4, def = 3;
         try {
@@ -90,10 +114,18 @@ public final class TorchApp extends Application {
         handler.postDelayed(send, DEBOUNCE_MS);   // dragging the slider fires a burst of level changes
     }
 
+    /** Runs on the callback thread after the debounce. */
     private void sendNow() {
         if (lit.isEmpty()) return;
-        Resp r = backend.exec("torch apply " + pendingLevel, TIMEOUT_MS);
-        if (!r.ok()) Log.w(TAG, "torch apply " + pendingLevel + ": " + r.errorText());
+        written = true;
+        final int level = pendingLevel;
+        sender.execute(() -> exec("torch apply " + level));
+    }
+
+    /** Runs on the sender thread. */
+    private void exec(String cmd) {
+        Resp r = backend.exec(cmd, TIMEOUT_MS);
+        if (!r.ok()) Log.w(TAG, cmd + ": " + r.errorText());
         else Log.i(TAG, r.first());
     }
 }

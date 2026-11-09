@@ -2,7 +2,7 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
-## DP11 未发布(test-v2.0 … test-v2.6)— 2026-11-09
+## DP11 未发布(test-v2.0 … test-v2.7)— 2026-11-09
 
 user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 起陆续验证),等下一个正式版一起发布。
 
@@ -16,7 +16,7 @@ user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 �
 - `required/general/hardware-fix/wifi-only` V1.0:按纯 Wi-Fi 平板处理(去 dsds 双卡、telephony 特性、voice/sms/data capable)。
 - `required/general/hardware-fix/power-profile` V1.0:power_profile 补 `audio` / `video` 键名,电池用量里音视频耗电不再是 0。
 - `required/general/bug-fix/herald-quiet` V1.0:herald 域 dontaudit,dmesg 不再被 herald 的 avc 冲掉。
-- `required/general/hardware-fix/torch-levels` V1.0:手电筒亮度滑块真正生效。vendor 相机 HAL 忽略档位(固定两颗各 75 mA)、亮着改档还会关掉第二颗灯;常驻小 App 监听 TorchCallback,经 herald 按档位重写 PMIC 闪光灯节点(1~3 档单颗 50/100/200 mA,4 档两颗各 300 mA)。
+- `required/general/hardware-fix/torch-levels` V1.1:手电筒亮度滑块真正生效。vendor 相机 HAL 忽略档位(固定两颗各 75 mA)、亮着改档还会关掉第二颗灯;常驻小 App 监听 TorchCallback,经 herald 按档位重写 PMIC 闪光灯节点(1~3 档单颗 50/100/200 mA,4 档两颗各 300 mA)。V1.1 修 test-v2.6 实测的三处:关灯后已在路上的写入把灯重新点亮(请求按序排队 + 关灯发 `torch off`)、单颗电流只有一半(补写 `torch_0=2X`)、改档约 1 秒才生效(防抖 80 ms,herald-apps 轮询 0.2 秒)。
 - `required/general/bug-fix/qti-testscripts-fix` V1.0:补原厂 vendor rc 用到的两个 QTI 调试脚本 SELinux 类型(不给权限),开机 init 子进程不再 SIGABRT 两次。
 - `toolkit/tests/test-herald-apps.sh`、`test-torch-plugin.sh`;`test-battery-plugins.sh` 加 mksh 和 V1.2 用例。
 

@@ -19,7 +19,7 @@
 | 步骤 | 谁 | 做什么 |
 |---|---|---|
 | 1 | App | 删旧的 `herald_resp`,写 `herald_req.tmp`(一行命令)再 rename 成 `herald_req` |
-| 2 | herald | ≤0.4 秒内取走(读完即删) |
+| 2 | herald | ≤0.2 秒内取走(读完即删) |
 | 3 | herald | 鉴权 + 白名单,执行 `heraldp_cmd_<命令>` |
 | 4 | herald | 回包写 `herald_resp.tmp` 再 rename 成 `herald_resp`(第一行 `ok …` / `err <原因>`,后面 `key=value`) |
 
@@ -40,7 +40,7 @@ App 等 2.5 秒请求没被取走就认为后端不在。
 
 ## 运行方式
 
-`HERALDP_START` 起一个独立子进程轮询各登记 App 的 `files/`:装了就每 0.4 秒看一次,都没装就 5 秒;等待用 `read -t` 读一个空 FIFO,不 fork sleep。
+`HERALDP_START` 起一个独立子进程轮询各登记 App 的 `files/`:装了就每 0.2 秒看一次(手电筒改档要跟得上),都没装就 5 秒;等待用 `read -t` 读一个空 FIFO,不 fork sleep。
 不占 broker 主循环;`herald_sys` 的临时文件放自己的 `/data/local/tmp/herald/.work-apps`(root 0700)。
 
 ## 测试
