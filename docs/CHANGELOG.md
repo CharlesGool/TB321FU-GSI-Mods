@@ -2,6 +2,16 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
+## DP11 test-v1.6(V7)— 2026-11-09
+
+DP11 线候选版,未上真机(所以是 test)。补丁集 = user-v1.5 + 下面一项。
+
+### 修复
+- `required/general/hardware-fix/video-freeze-fix` V1.1(新,唯一来源是独立仓库 [tb321fu-video-freeze-patch](https://github.com/CharlesGool/tb321fu-video-freeze-patch),`make sync-video-freeze` 同步):X 等 app 刷视频时声音继续、画面定格(拖进度条恢复)。两个独立原因各改 1 条指令:
+  - `001.codec2-alloc-retry`:高通 vendor 解码器申请输出缓冲超时后"距上次输入 >1s 就放弃",输入槽又被它自己占满 → 死锁。改成超时后永远重试;补丁版 `libqcodec2_v4l2codec.so` 用 vendor-bind 开机盖到 /vendor(vendor 分区不动)。A15/A17 都有这个问题。
+  - `002.libgui-surface-gen`:A17 `Surface::disconnect` 清零 generation,HIDL Codec2 切 Surface 时缓冲迁移全部失败。`libgui.so` 里那条清零改 NOP;A15/A16 的 libgui 没有这段,自动跳过。
+  - 排查全过程和通用方法见 [gsi-codec2-video-freeze-guide](https://github.com/CharlesGool/gsi-codec2-video-freeze-guide)。2026-11-09 刷 `BTtest-v1.7-cust_bebug` 真机验证:X 刷视频不再卡画面。
+
 ## BP1A user-v1.0(V3)— 2026-11-05
 
 官方 BP1A.250505.005 底包线(`devices/tb321fu-a15-bp1a`)首个正式版,补丁集对齐 ap3a 的 user-v1.4,出完整 9008 刷机包。发布号按底包线各自编号(此前的 `user-v1.4` / `test-v1.4.1` 是过渡命名,已被取代并删除)。

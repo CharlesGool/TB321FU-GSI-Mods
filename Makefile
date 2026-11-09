@@ -13,6 +13,7 @@
 #   make sync-core                         从 herald-core 仓库同步 patches/required/general/herald-core(那个补丁以它为准,别直接改副本)
 #   make sync-tango                        从 tb321fu-tango-patch 仓库同步 patches/required/general/tango(同上,以它为准)
 #   make sync-faceunlock                   从 tb321fu-faceunlock-patch 仓库同步各底包的 faceunlock(同上)
+#   make sync-video-freeze                 从 tb321fu-video-freeze-patch 仓库同步 patches/required/general/hardware-fix/video-freeze-fix(同上)
 #
 # 选补丁(所有目标通用):
 #   PROFILE=名字     预设,devices/<设备>/profiles/<名字>.txt 或 profiles/<名字>.txt
@@ -28,7 +29,7 @@ OUT    ?= /tmp/9008-out/$(DEVICE)
 export PROFILE WITH WITHOUT
 
 .NOTPARALLEL:
-.PHONY: list info menu build 9008 pack survey test unit sync-core sync-tango sync-faceunlock
+.PHONY: list info menu build 9008 pack survey test unit sync-core sync-tango sync-faceunlock sync-video-freeze
 
 list:
 	@toolkit/select.sh $(CONF) --list
@@ -62,6 +63,7 @@ unit:
 	@toolkit/sync-herald-core.sh --check
 	@toolkit/sync-tango.sh --check
 	@toolkit/sync-faceunlock.sh --check
+	@toolkit/sync-video-freeze.sh --check
 	@set -e; for t in toolkit/tests/test-*-plugin*.sh toolkit/tests/test-herald-start-prefix.sh toolkit/tests/test-slim-lists.sh toolkit/tests/test-smooth-display-hook.sh toolkit/tests/test-patch-scope.sh toolkit/tests/test-image-name.sh toolkit/tests/test-camera-choice.sh toolkit/tests/test-google-slim.sh toolkit/tests/test-qs-tiles.sh \
 	    "toolkit/tests/test-herald-start-full.sh --repo" "toolkit/tests/test-herald-protocol.sh $(CONF)"; do \
 	    echo "== $$t"; out=$$(bash $$t 2>&1) || { echo "$$out" | tail -n 30; echo "失败: $$t"; exit 1; }; echo "$$out" | tail -1; done
@@ -74,3 +76,6 @@ sync-tango:
 
 sync-faceunlock:
 	toolkit/sync-faceunlock.sh
+
+sync-video-freeze:
+	toolkit/sync-video-freeze.sh

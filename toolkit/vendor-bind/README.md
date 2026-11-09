@@ -2,7 +2,7 @@
 
 这是基础设施库,**不是模块**。没有 `MODS` 里的条目,谁都不需要"先启用"它。用它的模块在 `apply.sh` 里 `source "$TOOLKIT/lib/vendorbind.sh"`,
 调用 `vendor_bind_add`;第一次调用时它自动把开机脚本和 rc 装进树里(树里已经有一模一样的就跳过),之后每次调用只追加自己的描述符。
-所以用它的模块之间互不依赖,单独启用、任意组合、任意顺序都行。目前的使用者:`bluetooth/a2dp-offload-policy`、`bluetooth/sco-call-fix`。
+所以用它的模块之间互不依赖,单独启用、任意组合、任意顺序都行。目前的使用者:`bluetooth/a2dp-offload-policy`、`bluetooth/sco-call-fix`、`video-freeze-fix/codec2-alloc-retry`。
 
 ## 做什么
 
