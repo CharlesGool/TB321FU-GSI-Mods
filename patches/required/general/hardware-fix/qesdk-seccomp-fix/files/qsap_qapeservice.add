@@ -1,0 +1,6 @@
+
+# TB321FU GSI: A17 bionic calls lseek here; stock policy lacks it -> SIGSYS crash loop.
+lseek: 1
+# abort paths, same as qesdk.policy
+tgkill: 1
+rt_tgsigqueueinfo: 1
