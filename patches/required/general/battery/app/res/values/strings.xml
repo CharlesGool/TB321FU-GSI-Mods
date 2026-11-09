@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">电池管理</string>
+    <string name="tile_title">电池管理</string>
+    <string name="tile_summary">电池健康、充电上限、旁路充电</string>
+</resources>

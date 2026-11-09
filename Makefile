@@ -64,7 +64,7 @@ unit:
 	@toolkit/sync-tango.sh --check
 	@toolkit/sync-faceunlock.sh --check
 	@toolkit/sync-video-freeze.sh --check
-	@set -e; for t in toolkit/tests/test-*-plugin*.sh toolkit/tests/test-herald-start-prefix.sh toolkit/tests/test-slim-lists.sh toolkit/tests/test-smooth-display-hook.sh toolkit/tests/test-patch-scope.sh toolkit/tests/test-image-name.sh toolkit/tests/test-camera-choice.sh toolkit/tests/test-google-slim.sh toolkit/tests/test-qs-tiles.sh \
+	@set -e; for t in toolkit/tests/test-*-plugin*.sh toolkit/tests/test-herald-start-prefix.sh toolkit/tests/test-slim-lists.sh toolkit/tests/test-smooth-display-hook.sh toolkit/tests/test-patch-scope.sh toolkit/tests/test-image-name.sh toolkit/tests/test-camera-choice.sh toolkit/tests/test-google-slim.sh toolkit/tests/test-qs-tiles.sh toolkit/tests/test-herald-apps.sh \
 	    "toolkit/tests/test-herald-start-full.sh --repo" "toolkit/tests/test-herald-protocol.sh $(CONF)"; do \
 	    echo "== $$t"; out=$$(bash $$t 2>&1) || { echo "$$out" | tail -n 30; echo "失败: $$t"; exit 1; }; echo "$$out" | tail -1; done
 

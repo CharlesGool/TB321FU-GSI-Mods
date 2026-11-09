@@ -20,10 +20,28 @@ herald_bat_node() {                      # 逻辑名 -> 节点路径
     *) return 1 ;;
   esac
 }
-herald_bat_read() {                      # 读一个节点,去掉换行回车(保留中间的空格,状态是 "Not charging" 这种);读不了返回 1 且不输出
+BAT_CR=$(printf '\r')
+# 输出不带换行:真机的 mksh 用内建 print(printf 在 mksh 里是外部命令,要 fork);测试用的 dash / busybox 用 printf
+if type print >/dev/null 2>&1; then herald_bat_out() { print -nr -- "$1"; }; else herald_bat_out() { printf '%s' "$1"; }; fi
+herald_bat_read() {                      # 读一个节点的第一行,去掉回车(保留中间的空格,状态是 "Not charging" 这种);读不了返回 1 且不输出
+  # V1.2:用 shell 内建的 read / print,不再每个节点 fork cat + printf + tr(battery info 一次读 30 多个节点,原来要 4.8 秒)
   [ -r "$1" ] || return 1
-  _bv=$(cat "$1" 2>/dev/null) || return 1
-  printf '%s' "$_bv" | tr -d '\r\n'
+  _bv=
+  { IFS= read -r _bv || [ -n "$_bv" ]; } < "$1" 2>/dev/null || return 1
+  _bv=${_bv%"$BAT_CR"}
+  herald_bat_out "$_bv"
+}
+# 开机后不变的值(电芯出厂/激活日期、厂商代码、设计容量):每个进程第一次读真节点,之后用内存里的值。
+#   电量计的日期节点走 I2C,一个 150 ms;$1 = 缓存名(字母数字下划线),$2 = 节点。
+#   结果放在 $_bsv,不输出:必须在当前 shell 里调用(不能 $(...)),否则缓存写进子 shell 就丢了。
+herald_bat_static() {
+  _bsv=
+  case "$1" in ""|*[!A-Za-z0-9_]*) return 1 ;; esac
+  eval "_bsv=\${BATS_$1-__none__}"
+  if [ "$_bsv" = __none__ ]; then
+    _bsv=$(herald_bat_read "$2")
+    eval "BATS_$1=\$_bsv"
+  fi
 }
 herald_bat_write() {                     # 写节点并读回:写不进去返回 1;读回和写入不同返回 2(值照实输出到 $BAT_RB)
   [ -e "$1" ] || { BAT_RB=; return 1; }
@@ -39,6 +57,17 @@ herald_bat_cget() { [ -f "$BAT_CONF" ] && sed -n "s/^$1=//p" "$BAT_CONF" | tail 
 herald_bat_cset() {                      # $1 键 $2 值;值为空 = 删掉这个键
   { [ -f "$BAT_CONF" ] && grep -v "^$1=" "$BAT_CONF"; [ -n "$2" ] && echo "$1=$2"; } > "$BAT_CONF.new" 2>/dev/null
   mv -f "$BAT_CONF.new" "$BAT_CONF" 2>/dev/null
+}
+
+# `battery overview`:一次给出 info + 三个 status(电池管理 App 用,一次请求代替四次)。
+#   每段以 "--- <名字>" 开头,段内就是对应命令的原样回包。
+heraldp_bat_sub_overview() {
+  echo "ok battery overview"
+  for _os in info protect limit bypass; do
+    type "heraldp_bat_sub_$_os" >/dev/null 2>&1 || continue
+    echo "--- $_os"
+    if [ "$_os" = info ]; then "heraldp_bat_sub_$_os"; else "heraldp_bat_sub_$_os" status; fi
+  done
 }
 
 # `battery <子命令> [参数…]`:找 heraldp_bat_sub_<子命令>

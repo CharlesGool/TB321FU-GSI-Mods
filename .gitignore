@@ -34,3 +34,7 @@ patches/**/faceunlock/parts/003.settings-entry/src/overlay/res/raw/
 # fetch_upstream.sh 拉下来的上游和自动生成的签名密钥
 patches/**/faceunlock/parts/*/src/third_party/
 *.keystore
+# 内置功能 App 的签名 key(以后升级必须用同一把,但不进公开仓库)和编译输出
+*.jks
+patches/**/app/keystore/
+patches/**/app/out/

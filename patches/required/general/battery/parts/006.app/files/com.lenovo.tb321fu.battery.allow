@@ -1,0 +1,10 @@
+# 电池管理 App(com.lenovo.tb321fu.battery)可以跑的命令:每行一个 ERE,请求整行完全匹配其中一条。
+# 参数范围(protect 要求 min < max、bypass on 要求电量 > 15% 等)由 battery 插件自己再校验。
+battery info
+battery (protect|limit|bypass) status
+battery protect on ([2-9][0-9]|100) ([2-9][0-9]|100)
+battery protect off
+battery limit ([2-9][0-9]|100)( ([5-9][0-9]|100))?
+battery limit off
+battery bypass (on|off)
+battery overview

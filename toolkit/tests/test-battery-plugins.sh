@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 电池插件(patches/required/general/battery/*)的单元测试:假的 sysfs 树 + 桩函数,在 dash 和 busybox sh 下各跑一遍。
+# 电池插件(patches/required/general/battery/*)的单元测试:假的 sysfs 树 + 桩函数,在 mksh(真机的 sh)、dash、busybox sh 下各跑一遍。
 # 用法: toolkit/test-battery-plugins.sh      (不碰真机,不需要 root)
 set -u
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
@@ -44,7 +44,7 @@ DRV
   $sh "$T/drv.sh" 2>&1
 }
 
-for SH in dash "busybox sh"; do
+for SH in mksh dash "busybox sh"; do
   command -v ${SH%% *} >/dev/null || { echo "跳过 $SH(没装)"; continue; }
   echo "== $SH"
   S=$T/sys; ST=$T/state; rm -rf "$ST"; mkfake "$S"
@@ -53,6 +53,16 @@ for SH in dash "busybox sh"; do
   chk info "$o" "level=61"; chk info "$o" "temp_c=31.7"; chk info "$o" "voltage_mv=4200"; chk info "$o" "current_ma=-1500"
   chk info "$o" "cell1_cycle_count_raw=123"; chk info "$o" "cell2_soh_raw=97"; chk info "$o" "cells=2"; chk info "$o" "cycle_max=456"
   chk info "$o" "cell2_manufacturer=SCUD"; chk info "$o" "node_protection=95100"; chk info "$o" "node_limit=195100"
+  # --- V1.2:整机字段、overview、静态值只读一次
+  echo 95 > $S/class/power_supply/battery/soh; echo 6550000 > $S/class/power_supply/battery/charge_full_design; echo 20250101 > $S/class/qcom-battery/fg1_produce_date
+  o=$(run "$SH" "$S" "$ST" 'heraldp_cmd_battery "info"'); chk info-v12 "$o" "soh=95"; chk info-v12 "$o" "charge_full_design_uah=6550000"; chk info-v12 "$o" "cell1_produce_date_raw=20250101"
+  o=$(run "$SH" "$S" "$ST" 'heraldp_cmd_battery "info" >/dev/null; echo 20991231 > '"$S"'/class/qcom-battery/fg1_produce_date; heraldp_cmd_battery "info"'); chk static-cache "$o" "cell1_produce_date_raw=20250101"
+  o=$(run "$SH" "$S" "$ST" 'heraldp_cmd_battery "overview"'); chk overview "$o" "ok battery overview"; chk overview "$o" "--- info"; chk overview "$o" "--- protect"; chk overview "$o" "--- limit"; chk overview "$o" "--- bypass"; chk overview "$o" "level=61"; chk overview "$o" "protect=off"
+  printf 'Charging\r\n' > $S/class/power_supply/battery/status
+  o=$(run "$SH" "$S" "$ST" 'heraldp_cmd_battery "info"'); chk cr-strip "$o" "status=Charging"
+  printf 'Not charging' > $S/class/power_supply/battery/status
+  o=$(run "$SH" "$S" "$ST" 'heraldp_cmd_battery "info"'); chk no-newline "$o" "status=Not charging"
+  mkfake "$S"
   rm -f "$S/class/power_supply/battery/temp" "$S/class/qcom-battery/fg2_soh"
   o=$(run "$SH" "$S" "$ST" 'heraldp_cmd_battery "info"'); nochk info-missing "$o" "temp_c=31.7"; nochk info-missing "$o" "cell2_soh_raw=97"
   # --- protect
