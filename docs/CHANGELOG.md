@@ -2,15 +2,19 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
-## DP11 test-v1.6(V7)— 2026-11-09
+## DP11 user-v1.9(V10)— 2026-11-09
 
-DP11 线候选版,未上真机(所以是 test)。补丁集 = user-v1.5 + 下面一项。
+DP11 线正式版(标准 `user-v1.9` + 自用 `user-v1.9-cust_bebug`),上一个正式版是 user-v1.5。中间的 test-v1.6、BTtest-v1.7、test-v1.8 是测试版。tag `dp11-user-v1.9`。
+
+### 新增
+- `required/general/hardware-fix/dt2w` V1.1:双击唤醒。静态 RRO 把 `config_supportDoubleTapWake` 设为 true(设置 → 显示 → 其他显示控制 → 点按唤醒),herald 插件把 `Secure.double_tap_to_wake` 同步到 Novatek 触摸的 `/proc/gesture_control`;`heraldctl dt2w on|off|status`。V1.0(只有插件,开机 fabricated overlay)在 test-v1.8 上机验证;V1.1 的静态 RRO 是因为 fabricated overlay 撑不过重启而加的,未单独上机。
+
+### 变更
+- 蓝牙改用 DP11 专用的 `required/tangorpro/tangorpro_dp11.261016.003/hardware-fix/bluetooth-fix` V2.0:A2DP 和 LE Audio(LC3)走高通 ADSP 硬件卸载,vendor 用原厂音频策略(不再 bind 改过的 `audio_policy_configuration.xml`,`persist.bluetooth.a2dp_offload.disabled=false`);打开 LE Audio profile,耳机详情里出现"LE 音频"。SCO 通话补丁保留。其他底包线仍用 general 的 V1.0。BTtest-v1.7(A2DP AAC 卸载)和 test-v1.8(LE Audio 左右耳)上机验证。
 
 ### 修复
-- `required/general/hardware-fix/video-freeze-fix` V1.1(新,唯一来源是独立仓库 [tb321fu-video-freeze-patch](https://github.com/CharlesGool/tb321fu-video-freeze-patch),`make sync-video-freeze` 同步):X 等 app 刷视频时声音继续、画面定格(拖进度条恢复)。两个独立原因各改 1 条指令:
-  - `001.codec2-alloc-retry`:高通 vendor 解码器申请输出缓冲超时后"距上次输入 >1s 就放弃",输入槽又被它自己占满 → 死锁。改成超时后永远重试;补丁版 `libqcodec2_v4l2codec.so` 用 vendor-bind 开机盖到 /vendor(vendor 分区不动)。A15/A17 都有这个问题。
-  - `002.libgui-surface-gen`:A17 `Surface::disconnect` 清零 generation,HIDL Codec2 切 Surface 时缓冲迁移全部失败。`libgui.so` 里那条清零改 NOP;A15/A16 的 libgui 没有这段,自动跳过。
-  - 排查全过程和通用方法见 [gsi-codec2-video-freeze-guide](https://github.com/CharlesGool/gsi-codec2-video-freeze-guide)。2026-11-09 刷 `BTtest-v1.7-cust_bebug` 真机验证:X 刷视频不再卡画面。
+- `required/general/hardware-fix/video-freeze-fix` V1.1(唯一来源是独立仓库 [tb321fu-video-freeze-patch](https://github.com/CharlesGool/tb321fu-video-freeze-patch),`make sync-video-freeze` 同步):X 等 app 刷视频时声音继续、画面定格。两个独立原因各改 1 条指令:高通解码器申请输出缓冲超时后放弃重试(补丁版 `libqcodec2_v4l2codec.so` 开机 bind 到 /vendor);A17 `Surface::disconnect` 清零 generation(`libgui.so` 那条改 NOP)。排查过程见 [gsi-codec2-video-freeze-guide](https://github.com/CharlesGool/gsi-codec2-video-freeze-guide)。BTtest-v1.7 上机验证。
+- LE Audio 下 VoIP(TG/X 语音)下行约 60 秒延迟:vendor `btaudio_offload_if.so` 把 LE 会话的 `peerDelayUs`(微秒)当毫秒报给 PAL,补丁版先 /1000 再上报,开机 bind 到 /vendor(bluetooth-fix V2.0 的 `003.le-audio-latency`)。test-v1.8 上机验证,TG 语音实时。
 
 ## BP1A user-v1.0(V3)— 2026-11-05
 
