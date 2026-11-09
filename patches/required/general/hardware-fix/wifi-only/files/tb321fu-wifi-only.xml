@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TB321FU has no modem (ro.baseband=apq). The vendor ships the matching exclusion list at
+  /vendor/etc/permissions/noRil/apq_excluded_telephony_features.xml, but SystemConfig does not
+  read subdirectories, so it never applies and /vendor/etc/permissions/android.hardware.telephony.mbms.xml
+  still declares android.hardware.telephony.mbms. This file applies the same list (plus euicc)
+  from /system; unavailable-feature removes the feature no matter which partition declared it.
+-->
+<permissions>
+    <unavailable-feature name="android.hardware.telephony" />
+    <unavailable-feature name="android.hardware.telephony.gsm" />
+    <unavailable-feature name="android.hardware.telephony.cdma" />
+    <unavailable-feature name="android.hardware.telephony.ims" />
+    <unavailable-feature name="android.hardware.telephony.calling" />
+    <unavailable-feature name="android.hardware.telephony.data" />
+    <unavailable-feature name="android.hardware.telephony.mbms" />
+    <unavailable-feature name="android.hardware.telephony.messaging" />
+    <unavailable-feature name="android.hardware.telephony.subscription" />
+    <unavailable-feature name="android.hardware.telephony.radio.access" />
+    <unavailable-feature name="android.hardware.telephony.euicc" />
+</permissions>

@@ -1,0 +1,5 @@
+; vibrator-hal:init 直接 exec /system/etc/herald_payload/bin/tb321fu-vibrator(seclabel u:r:herald:s0)。
+; herald-core 只给了 init 对 herald_exec 文件的 execute;payload 目录本身也是 herald_exec,
+; init(enforcing)stat/execve 走路径时要 search 这两级目录,否则 Service::Start 报 "Cannot find ... Permission denied",
+; 服务永远起不来,而 VINTF 声明了 IVibratorManager/default,system_server 无限等待 = 卡开机(test-v2.2 实测)。
+(allow init herald_exec (dir (search getattr)))

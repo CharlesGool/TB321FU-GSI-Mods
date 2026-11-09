@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lenovo.tb321fu.qsbrightness">
+    <uses-sdk android:minSdkVersion="34" android:targetSdkVersion="35" />
+    <!-- signature|preinstalled|appop:装在系统分区的 App 自动获得 -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <application android:label="@string/tile_label" android:icon="@drawable/ic_brightness_auto"
+        android:allowBackup="false" android:hasCode="true">
+        <!-- 下拉快捷设置里的"自动亮度"开关:切换 Settings.System.SCREEN_BRIGHTNESS_MODE(0 手动 / 1 自动) -->
+        <service android:name=".AutoBrightnessTile"
+            android:exported="true"
+            android:icon="@drawable/ic_brightness_auto"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE" android:value="true" />
+        </service>
+        <!-- 长按开关:SystemUI 找本包响应 QS_TILE_PREFERENCES 的 Activity(没有就打开应用信息页),这里转到 设置 → 显示和触控 -->
+        <activity android:name=".TilePrefsActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

@@ -1,0 +1,10 @@
+# tb321fu-vibrator：IVibratorManager/default（两颗 Awinic 马达、primitives、同步振动）。见 README。
+# 跑在 herald 域（permissive，和 herald 其他 payload 一样），不需要新的 sepolicy 类型。
+# user system + group input：只需要读写 /dev/input/event*（root:input 0660）。
+# class hal：在 system_server 起来前后几秒内注册；system_server 会等它（VINTF 里声明了）。
+service tb321fu_vibrator /system/etc/herald_payload/bin/tb321fu-vibrator
+    class hal
+    interface aidl android.hardware.vibrator.IVibratorManager/default
+    user system
+    group system input
+    seclabel u:r:herald:s0

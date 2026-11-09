@@ -1,0 +1,10 @@
+<!-- TB321FU：声明系统侧的 IVibratorManager/default（tb321fu-vibrator 提供）。
+     A17 的 VibratorManagerService 优先用 IVibratorManager/default，有它就不再走 vendor 的 IVibrator/default。
+     注意：声明了就必须有服务；system_server 会一直等它注册。只装这个文件不装二进制 = 开机卡住。 -->
+<manifest version="9.0" type="framework">
+    <hal format="aidl">
+        <name>android.hardware.vibrator</name>
+        <version>2</version>
+        <fqname>IVibratorManager/default</fqname>
+    </hal>
+</manifest>

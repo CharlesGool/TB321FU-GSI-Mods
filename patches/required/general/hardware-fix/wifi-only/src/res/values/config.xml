@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wi-Fi-only tablet: no voice calls, no SMS, no mobile data (framework-res defaults are all true). -->
+<resources>
+    <bool name="config_voice_capable">false</bool>
+    <bool name="config_sms_capable">false</bool>
+    <bool name="config_mobile_data_capable">false</bool>
+</resources>

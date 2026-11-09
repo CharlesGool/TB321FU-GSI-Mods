@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lenovo.tb321fu.overlay.wifionly">
+    <application android:extractNativeLibs="false" android:hasCode="false"/>
+    <!-- 静态 RRO:纯 Wi-Fi 平板,config_voice_capable / sms_capable / mobile_data_capable = false。只在 TB321FU 原厂 vendor 上生效 -->
+    <overlay android:isStatic="true" android:priority="325" android:requiredSystemPropertyName="ro.product.vendor.device" android:requiredSystemPropertyValue="TB321FU" android:targetPackage="android"/>
+</manifest>

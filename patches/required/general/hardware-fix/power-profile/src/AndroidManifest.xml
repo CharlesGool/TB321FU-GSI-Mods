@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lenovo.tb321fu.overlay.powerprofile">
+    <application android:extractNativeLibs="false" android:hasCode="false"/>
+    <!-- 静态 RRO:替换 framework-res 的 power_profile.xml(= vendor FrameworksResTarget_Vendor 的版本 + audio/video 两个新键名)。只在 TB321FU 原厂 vendor 上生效 -->
+    <overlay android:isStatic="true" android:priority="324" android:requiredSystemPropertyName="ro.product.vendor.device" android:requiredSystemPropertyValue="TB321FU" android:targetPackage="android"/>
+</manifest>
