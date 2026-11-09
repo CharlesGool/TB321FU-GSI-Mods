@@ -1,0 +1,2 @@
+# 手电筒档位 App(com.lenovo.tb321fu.torch)可以跑的命令:每行一个 ERE,请求整行完全匹配其中一条。
+torch apply [1-4]

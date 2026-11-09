@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lenovo.tb321fu.torch">
+    <uses-sdk android:minSdkVersion="34" android:targetSdkVersion="35" />
+    <!-- 没有界面、没有入口:常驻(系统分区的 App 才能 persistent),开机后一直监听手电筒的开关和档位 -->
+    <application
+        android:name=".TorchApp"
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:persistent="true"
+        android:hasCode="true" />
+</manifest>
