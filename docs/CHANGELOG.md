@@ -16,9 +16,12 @@ user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 �
 - `required/general/hardware-fix/wifi-only` V1.0:按纯 Wi-Fi 平板处理(去 dsds 双卡、telephony 特性、voice/sms/data capable)。
 - `required/general/hardware-fix/power-profile` V1.0:power_profile 补 `audio` / `video` 键名,电池用量里音视频耗电不再是 0。
 - `required/general/bug-fix/herald-quiet` V1.0:herald 域 dontaudit,dmesg 不再被 herald 的 avc 冲掉。
-- `toolkit/tests/test-herald-apps.sh`;`test-battery-plugins.sh` 加 mksh 和 V1.2 用例。
+- `required/general/hardware-fix/torch-levels` V1.0:手电筒亮度滑块真正生效。vendor 相机 HAL 忽略档位(固定两颗各 75 mA)、亮着改档还会关掉第二颗灯;常驻小 App 监听 TorchCallback,经 herald 按档位重写 PMIC 闪光灯节点(1~3 档单颗 50/100/200 mA,4 档两颗各 300 mA)。
+- `required/general/bug-fix/qti-testscripts-fix` V1.0:补原厂 vendor rc 用到的两个 QTI 调试脚本 SELinux 类型(不给权限),开机 init 子进程不再 SIGABRT 两次。
+- `toolkit/tests/test-herald-apps.sh`、`test-torch-plugin.sh`;`test-battery-plugins.sh` 加 mksh 和 V1.2 用例。
 
 ### 变更
+- `herald-quiet` V1.1:另外静默 init 起 herald 域服务时的 noatsecure / rlimitinh / siginh(只 dontaudit,不放行)。
 - `battery` V1.2:节点读取改用 shell 内建(不再每个节点 fork cat/tr)、不变的值每次开机只读一次、新增 `battery overview`(一次读完 info + 三个 status)、`battery info` 带整机 `soh` / `cycle_count` / `charge_full_uah` / `charge_full_design_uah`。
 
 ### 修复
