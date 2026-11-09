@@ -24,6 +24,10 @@ apply.sh 用 `cil_append` 把 `herald_quiet.cil` 追加到 plat_sepolicy.cil 末
 
 `plat_sepolicy_and_mapping.sha256` 你们已经是全 0（每次开机由 init 在设备上编译），所以不用重算 precompiled。
 
+## V1.1
+
+另外静默 init 起 herald 域服务时的 `noatsecure / rlimitinh / siginh`(每起一个服务 3 条)。只是 dontaudit,不放行,行为不变。
+
 ## 验证
 
 **编译（已在 test-v2.0 上做过）：** 用 init 同款的 secilc 命令，把设备当前的策略加上本文件编一遍，不加载：

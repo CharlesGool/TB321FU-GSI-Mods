@@ -1,0 +1,12 @@
+; ==== qti-testscripts-fix:补两个原厂 vendor rc 用到、但 user 版 vendor 策略里没有的 SELinux 类型 ====
+; init.qti.ufs.rc(on init):     exec u:r:vendor-qti-testscripts:s0 -- /vendor/bin/sh /vendor/bin/init.qti.ufs.debug.sh
+; init.qcom.rc(boot_completed):  service qti-testscripts …  seclabel u:r:qti-testscripts:s0(oneshot)
+; 类型不存在时 init fork 出的子进程 setexeccon() 失败就 LOG(FATAL),每次开机 crash buffer 两条 SIGABRT(init)。
+; 只定义类型、不给任何权限:setexeccon 能成功,接着 execve 被拒,init 记一条 "cannot execv" 后子进程正常退出(127)。
+; 两个脚本在本机本来就不存在;不建 permissive 域,也不放行任何东西。被拒的 transition 只是 dontaudit 掉。
+(type qti-testscripts)
+(roletype r qti-testscripts)
+(type vendor-qti-testscripts)
+(roletype r vendor-qti-testscripts)
+(dontaudit init qti-testscripts (process (transition noatsecure rlimitinh siginh)))
+(dontaudit init vendor-qti-testscripts (process (transition noatsecure rlimitinh siginh)))

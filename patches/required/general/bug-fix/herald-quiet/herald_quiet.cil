@@ -115,3 +115,6 @@
 (dontaudit herald herald_quiet_target (diced (all)))
 (dontaudit herald herald_quiet_target (drmservice (all)))
 (dontaudit herald herald_quiet_target (tee_service (all)))
+; V1.1:init 起 herald 域服务(herald_main、tango_*、tb321fu_vibrator)时每个 3 条 noatsecure / rlimitinh / siginh 被拒。
+;   只静默、不放行:行为照旧(按 secure exec 处理,清环境变量、重置 rlimit)。
+(dontaudit init herald (process (noatsecure rlimitinh siginh)))
