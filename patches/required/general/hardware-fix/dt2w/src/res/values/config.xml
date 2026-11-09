@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 只负责让开关显示;真正开关节点的是 herald 插件 dt2w.sh(高通 Power HAL 不处理 DOUBLE_TAP_TO_WAKE) -->
+    <bool name="config_supportDoubleTapWake">true</bool>
+</resources>

@@ -36,8 +36,13 @@ herald_dt2w_ovl_state() {   # 设 $_ds = on | off | missing,$_dovl = 完整 over
   _dovl=$(echo "$_dl" | sed 's/^.*\] *//')
   case "$_dl" in "") _ds=missing ;; *"[x]"*) _ds=on ;; *) _ds=off ;; esac
 }
+herald_dt2w_cfg() { herald_sys /system/bin/cmd overlay lookup android "$DT2W_RES" | tr -d '\r\n '; }   # 当前生效值 true/false
 herald_dt2w_ovl_ensure() {   # 结果在 $_ds
   herald_dt2w_ovl_state
+  [ "$_ds" = on ] && return 0
+  # 镜像里已有静态 RRO 把它设成 true(推荐做法,见 README)就不用 fabricated overlay:
+  #   fabricated overlay 实测重启后会被系统删掉(2026-11-09 test-v1.8),每次开机重建会让所有进程收到一次资源变更
+  if [ "$(herald_dt2w_cfg)" = true ]; then _ds=static; return 0; fi
   if [ "$_ds" = missing ]; then
     herald_sys /system/bin/cmd overlay fabricate --target android --name "$DT2W_OVL_NAME" "$DT2W_RES" 0x12 0xffffffff >/dev/null
     herald_dt2w_ovl_state
@@ -66,7 +71,8 @@ herald_dt2w_status() {
   echo "setting=$(herald_sys /system/bin/settings get secure double_tap_to_wake | tr -d '\r\n ') (Secure.double_tap_to_wake; null = 默认开)"
   echo "node=$DT2W_NODE value=${_dc:-不存在}"
   herald_dt2w_ovl_state
-  echo "overlay=$_ds ${_dovl:-$DT2W_OVL_NAME} (on = 设置 → 显示 → 点按唤醒 开关可见)"
+  echo "config_supportDoubleTapWake=$(herald_dt2w_cfg) (true = 设置 → 显示 → 点按唤醒 开关可见)"
+  echo "fabricated_overlay=$_ds ${_dovl:-$DT2W_OVL_NAME} (镜像带静态 RRO 时为 missing 是正常的)"
 }
 herald_dt2w() {
   [ -e "$DT2W_NODE" ] || { echo "err dt2w 没有 $DT2W_NODE"; return; }

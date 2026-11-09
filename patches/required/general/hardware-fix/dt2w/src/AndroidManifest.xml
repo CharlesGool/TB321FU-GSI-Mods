@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lenovo.tb321fu.overlay.dt2w">
+    <application android:extractNativeLibs="false" android:hasCode="false"/>
+    <!-- 静态 RRO:让设置 → 显示 → 点按唤醒 开关可见;真正写节点的是 herald 插件 dt2w.sh。只在 TB321FU 原厂 vendor 上生效 -->
+    <overlay android:isStatic="true" android:priority="323" android:requiredSystemPropertyName="ro.product.vendor.device" android:requiredSystemPropertyValue="TB321FU" android:targetPackage="android"/>
+</manifest>
