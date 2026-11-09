@@ -1,0 +1,26 @@
+# TB321FU: A2DP 走高通 ADSP 硬件卸载, vendor 用原厂音频策略(vendor 已声明 ro.bluetooth.a2dp_offload.supported=true 和 cap)
+persist.bluetooth.a2dp_offload.disabled=false
+persist.bluetooth.bluetooth_audio_hal.disabled=false
+# 双模耳机默认仍走经典蓝牙, LE 音频在耳机详情里手动开(和原厂 ZUI 一致)
+ro.bluetooth.leaudio.le_audio_connection_by_default=false
+# 关掉 Pixel 专用、高通 vendor 不支持的特性(vendor 蓝牙音频 provider 是 V3, 没有 V4 的 codec extension)
+persist.bluetooth.opus.enabled=false
+bluetooth.core.le_audio.codec_extension_aidl.enabled=false
+bluetooth.hfp.swb.supported=false
+# LE Audio(LC3)走 ADSP 硬件卸载: tangorpro 自带的 false 就地改成 true(product 晚于 vendor 加载, 会盖住 vendor 的 true)
+bluetooth.profile.bap.unicast.client.enabled=true
+bluetooth.profile.csip.set_coordinator.enabled=true
+bluetooth.profile.vcp.controller.enabled=true
+bluetooth.profile.mcp.server.enabled=true
+bluetooth.profile.ccp.server.enabled=true
+bluetooth.profile.hap.client.enabled=true
+bluetooth.profile.bap.broadcast.assist.enabled=true
+bluetooth.profile.bap.broadcast.source.enabled=true
+ro.bluetooth.leaudio_offload.supported=true
+persist.bluetooth.leaudio_offload.disabled=false
+persist.bluetooth.leaudio.toggle_visible=true
+# 平板当耳机用的角色不开
+bluetooth.profile.bap.unicast.server.enabled=false
+bluetooth.profile.vc.server.enabled=false
+bluetooth.profile.tbs.server.enabled=false
+ro.bluetooth.leaudio_switcher.supported=false
