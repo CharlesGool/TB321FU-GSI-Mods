@@ -80,5 +80,6 @@ adb shell heraldctl rexec grep -i -e probe -e slot -e kirby -e sc202cs -e macro 
 联想相机 target SDK 34,启动时检查 `READ/WRITE_EXTERNAL_STORAGE`,而这两项在 Android 13 以后的设置里没有开关,用户没法授予,于是弹"缺少运行所需的必要权限"
 (V102 真机:相机服务里没有它的连接记录,应用里只有这两项未授权,adb 授权后正常出画面、能存照片)。
 `001.app` 现在多装一份 `etc/default-permissions/default-permissions-com.zui.camera.xml`,开机默认授予相机、麦克风、读写存储和 `READ_MEDIA_IMAGES`;位置不授予。
-默认授权只在系统第一次扫描到这个包、或系统版本升级时生效。保数据刷机且之前已经装过联想相机的设备,授权状态以原来的为准,必要时手动授权:
-`adb shell pm grant com.zui.camera android.permission.READ_EXTERNAL_STORAGE`(WRITE_EXTERNAL_STORAGE 同理)。
+默认授权只在系统第一次扫描到这个包、或系统版本升级时生效。从没有联想相机的版本(如 user-v1.3)保数据刷过来,指纹没变、包又是新装的,默认授权不会跑,
+相机照样弹"缺少运行所需的必要权限"(user-v1.3-zuicamera 真机问题,手动 `adb shell pm grant com.zui.camera android.permission.READ_EXTERNAL_STORAGE` 后正常)。
+所以 `006.storage-permission` 直接改相机应用,让它不再检查这两项(见该部分的 README),清数据也不受影响。

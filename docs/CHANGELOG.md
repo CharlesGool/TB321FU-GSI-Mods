@@ -2,7 +2,7 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
-## DP11 未发布(test-v2.0 … test-v3.1)— 2026-11-09
+## DP11 未发布(test-v2.0 … test-v3.1)— 2026-11-10
 
 user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 起陆续验证),等下一个正式版一起发布。
 
