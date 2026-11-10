@@ -22,7 +22,10 @@ import java.util.Set;
  *
  * This persistent, UI-less, direct-boot-aware app keeps one "latest wanted state" and publishes
  * it atomically (write tmp, rename) to its device-protected files/torch_state:
- * {@code <seq> on <1-4>} or {@code <seq> off}. The torch-levels herald plugin watches the
+ * {@code <seq> on <1-4>}, {@code <seq> off}, or {@code <seq> cam} while an app has the camera open
+ * (TorchCallback reports the torch unavailable). While off, the plugin detaches the HAL's torch
+ * LED triggers and preloads the minimum current, so turning on never flashes the HAL's own
+ * 2 x 75 mA first; "cam" restores the stock triggers so the camera's own torch / pre-flash work. The torch-levels herald plugin watches the
  * directory with inotify, re-reads the file on every event and applies only the newest line, so
  * nothing queues up and a stale state can never run (test-v2.8: the request/reply channel took
  * 0.35-0.57 s per round trip and stale requests switched a freshly lit torch off).
@@ -40,6 +43,8 @@ public final class TorchApp extends Application {
     private CameraManager cm;
     private Handler h;
     private final Set<String> lit = new HashSet<>();
+    /** Camera ids held by an app (TorchCallback.onTorchModeUnavailable) until their torch mode turns off. */
+    private final Set<String> busy = new HashSet<>();
     /** FLASH_INFO_STRENGTH_MAXIMUM_LEVEL per camera id (fixed; read once). */
     private final Map<String, Integer> maxLevel = new HashMap<>();
     /** Camera id of the latest change (whose level we read). Handler thread only, like the rest. */
@@ -97,6 +102,7 @@ public final class TorchApp extends Application {
         @Override
         public void onTorchModeChanged(String id, boolean on) {
             if (on) {
+                busy.remove(id);
                 lit.add(id);
                 cur = id;
                 int l = read(id);
@@ -104,10 +110,23 @@ public final class TorchApp extends Application {
                 publish("on");                  // new seq on every turn-on, even at the same level
                 h.removeCallbacks(poll);
                 h.postDelayed(poll, POLL_MS);
-            } else if (lit.remove(id) && lit.isEmpty()) {
-                h.removeCallbacks(poll);
-                publish("off");
+            } else {
+                // Closing the camera also reports mode false: that ends "cam" too.
+                boolean wasLit = lit.remove(id), wasBusy = busy.remove(id);
+                if ((wasLit || wasBusy) && lit.isEmpty()) {
+                    h.removeCallbacks(poll);
+                    publish(wasBusy ? "camera closed" : "off");
+                }
             }
+        }
+
+        @Override
+        public void onTorchModeUnavailable(String id) {
+            // An app opened the camera (also reported right away at registration if it already is).
+            if (!busy.add(id)) return;
+            lit.remove(id);
+            if (lit.isEmpty()) h.removeCallbacks(poll);
+            publish("unavailable");
         }
 
         @Override
@@ -137,7 +156,8 @@ public final class TorchApp extends Application {
 
     /** Handler thread only. */
     private void publish(String why) {
-        String line = (++seq) + (lit.isEmpty() ? " off" : " on " + Math.max(1, Math.min(4, level))) + "\n";
+        String line = (++seq) + (!busy.isEmpty() ? " cam"
+                : lit.isEmpty() ? " off" : " on " + Math.max(1, Math.min(4, level))) + "\n";
         try {
             try (FileOutputStream o = new FileOutputStream(tmp)) {
                 o.write(line.getBytes(StandardCharsets.US_ASCII));
