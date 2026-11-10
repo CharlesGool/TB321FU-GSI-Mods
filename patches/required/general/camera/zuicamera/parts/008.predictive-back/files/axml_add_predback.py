@@ -157,5 +157,29 @@ head=struct.pack("<HHI",0x0003,8,0)  # size 占位
 newf=bytearray(head+sp_chunk+rm_chunk+bytes(xml))
 struct.pack_into("<I",newf,4,len(newf))
 open(out,"wb").write(newf)
-print("OK: strings %d->%d, resmap %d->%d, size %d->%d, android_ns_idx=%d->%d, new attr idx=%d"%(
-    sc,sc2,nres,len(resmap2),total,len(newf),android_idx,ns_new,P))
+
+# 自校验:重新解析写出的文件,确认字符串池里有该属性名、resmap 对应项是 RESID。不依赖外部工具(aapt2 版本行为不一)。
+def verify(fn):
+    b=open(fn,"rb").read()
+    assert struct.unpack_from("<H",b,0)[0]==0x0003 and struct.unpack_from("<I",b,4)[0]==len(b), "头/大小不对"
+    o=8; t,hs,sz=struct.unpack_from("<HHI",b,o); assert t==0x0001
+    c,stc2,fl2,ssx,_=struct.unpack_from("<IIIII",b,o+8)
+    ot=o+28; db=o+ssx; strs=[]
+    for i in range(c):
+        q=db+struct.unpack_from("<I",b,ot+4*i)[0]
+        if fl2&0x100:
+            def v8(q):
+                x=b[q]; return (((x&0x7f)<<8)|b[q+1],q+2) if x&0x80 else (x,q+1)
+            cl,q=v8(q); bl,q=v8(q); strs.append(bytes(b[q:q+bl]).decode("utf-8"))
+        else:
+            cl=struct.unpack_from("<H",b,q)[0]; q+=2
+            if cl&0x8000: cl=((cl&0x7fff)<<16)|struct.unpack_from("<H",b,q)[0]; q+=2
+            strs.append(bytes(b[q:q+cl*2]).decode("utf-16-le"))
+    assert ATTR in strs, "输出里没有属性名字符串"
+    ai=strs.index(ATTR)
+    o+=sz; t,hs,sz=struct.unpack_from("<HHI",b,o); assert t==0x0180
+    rm=[struct.unpack_from("<I",b,o+8+4*i)[0] for i in range((sz-8)//4)]
+    assert ai<len(rm) and rm[ai]==RESID, "resmap 里该属性不是 0x%08x"%RESID
+verify(out)
+print("OK(verified): strings %d->%d, resmap %d->%d, size %d->%d, attr idx=%d resid=0x%08x"%(
+    sc,sc2,nres,len(resmap2),total,len(newf),P,RESID))

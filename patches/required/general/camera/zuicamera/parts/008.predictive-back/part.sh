@@ -48,12 +48,8 @@ PY
 zipalign -f -p 4 "$T/repacked.apk" "$T/aligned.apk"
 apksigner sign --key "$KEYDIR/overlay.pk8" --cert "$KEYDIR/overlay.x509.pem" --out "$T/out.apk" "$T/aligned.apk"
 apksigner verify "$T/out.apk" >/dev/null || die "签名校验失败"
-# 核对属性确实加上了(只验名字在:不同版本 aapt2 对布尔值的打印不一样,
-#   有的是 =true、有的是 (type 0x12)0xffffffff,所以别卡 =true)。
-command -v aapt2 >/dev/null && {
-    aapt2 dump xmltree "$T/out.apk" --file AndroidManifest.xml 2>/dev/null | grep -q "enableOnBackInvokedCallback" \
-        || die "回包里没有 enableOnBackInvokedCallback 属性"
-}
+# 属性是否真写进去,由 axml_add_predback.py 自己重新解析输出校验(上面它退非 0 就已 die),
+#   不依赖 aapt2(构建环境里 aapt2 版本/行为不一)。
 
 put "$T/out.apk" "$APK" 0644 0:0 u:object_r:system_file:s0
 rm -rf "$T"
