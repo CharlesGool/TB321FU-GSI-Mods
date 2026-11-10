@@ -42,6 +42,10 @@
     刚开始失败先快速重试几次(60 秒,最多 5 分钟),失败够多次退到 1 小时,一直失败退到 1 天——避免对着
     一个大概率修不好的状态一直按固定间隔硬敲。
 
+## 已知坑
+
+- **部署载荷二进制必须原子替换,不能原地 `cp -f`**(V1.4):keystore2 把 `$CFG/bin/inject` mmap 为注入载荷。herald 重启时若原地 `cp -f` 覆盖它(O_TRUNC 重写、inode 不变),内核截断会丢掉 keystore2 里载荷已重定位的 COW 私有页(GOT/RELRO),指针退回链接时地址 → keystore2 SIGSEGV、keystore 锁定(分享 WLAN 等需认证操作失败,要重新解锁)。平时 inject 守护在执行该文件、原地写 ETXTBSY 让 cp 换 inode,但 herald 重启时守护先被杀。`install_herald_bin` 用 cmp 跳过 + 临时文件 rename(换 inode)避免。test-v2.9/v3.0 真机 kprobe 定位(用户),v3.1 修。
+
 ## 改动清单
 
 - `etc/herald_payload/`:`bin/{keymint,inject}`、`seed/*`、`plugins/00-attestation.sh`。

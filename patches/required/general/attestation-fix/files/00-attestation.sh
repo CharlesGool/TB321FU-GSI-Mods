@@ -65,9 +65,23 @@ chmod 0600 "$CFG"/keybox.xml "$CFG"/config.toml "$CFG"/injector.toml 2>/dev/null
 # herald_exec 标签(keystore 已放行 read/execute/map herald_exec),fd handoff 即可成(绕 namespace)。
 RBIN=$CFG/bin
 mkdir -p "$RBIN"                       # type_transition: herald 在 keystore_data_file 下建 "bin" → herald_exec
-cp -f "$BIN/keymint" "$RBIN/keymint" 2>/dev/null   # 在 herald_exec 目录内创建 → 文件自动 herald_exec
-cp -f "$BIN/inject"  "$RBIN/inject"  2>/dev/null
-chmod 0755 "$RBIN" "$RBIN/keymint" "$RBIN/inject" 2>/dev/null   # 0755:keystore(1017,other)能 traverse+读
+chmod 0755 "$RBIN" 2>/dev/null         # 0755:keystore(1017,other)能 traverse+读
+# 原子替换正被 keystore2 mmap 的载荷二进制:内容相同就跳过,不同就同目录临时文件 + rename(换 inode)。
+# ★绝不能原地 cp -f:O_TRUNC 会让内核(unmap_mapping_range even_cows)丢掉 keystore2 里载荷已重定位的
+#   COW 私有页(GOT / RELRO / .data 退回文件原始字节),函数指针退回未加基址的链接时地址 → keystore2 SIGSEGV、
+#   keystore 随之锁定(分享 WLAN 等需认证操作失败,要重新解锁;test-v2.9/v3.0 真机 kprobe 定位)。平时 inject
+#   守护在执行该文件、原地写会 ETXTBSY 让 cp 退化成换 inode,但 herald 重启时守护先被杀,原地写就真写进去。
+#   rename 后 keystore2 继续用旧 inode 的旧页,不受影响;.new 建在 $RBIN 内,继承 herald_exec 标签。
+install_herald_bin() {   # <src> <dst>
+    _ihs=$1; _ihd=$2; _iht="$_ihd.new.$$"
+    cmp -s "$_ihs" "$_ihd" 2>/dev/null && return 0      # 内容相同(同版本重启):不碰,inode 不变
+    if cp "$_ihs" "$_iht" 2>/dev/null && chmod 0755 "$_iht" 2>/dev/null && mv -f "$_iht" "$_ihd" 2>/dev/null; then
+        return 0
+    fi
+    rm -f "$_iht" 2>/dev/null; log "install_herald_bin $_ihd 失败"
+}
+install_herald_bin "$BIN/keymint" "$RBIN/keymint"   # 在 herald_exec 目录内创建 → 文件自动 herald_exec
+install_herald_bin "$BIN/inject"  "$RBIN/inject"
 log "运行目录 $RBIN(herald_exec,0755);keymint/inject 已就位"
 
 # ★Bug A 修复:data 目录及其中所有文件必须始终 keystore:keystore。keymint 启动后 drop 到 keystore(1017),
