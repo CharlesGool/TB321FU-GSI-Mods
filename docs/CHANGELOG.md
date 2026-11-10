@@ -2,9 +2,9 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
-## DP11 未发布(test-v2.0 … test-v3.1)— 2026-11-10
+## DP11 user-v2.0(V23)— 2026-11-10
 
-user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 起陆续验证),等下一个正式版一起发布。
+DP11 线正式版(标准 `user-v2.0_optional` + 自用 `user-v2.0-cust_bebug`),上一个正式版是 user-v1.9。中间的 test-v2.0 … test-v3.1 是测试版,以下改动都在 DP11 线上机跑过。tag `dp11-user-v2.0`。增量:标准从 user-v1.9,自用从 test-v3.1。
 
 ### 新增
 - `required/general/herald-apps` V1.0:内置功能 App 的专用通道。每个功能做成一个装在系统分区的小 App,入口注入设置;不用配对,鉴权 = 包装在系统分区 + uid 一致,每个 App 只能跑 `apps/<包名>.allow` 白名单里的命令;支持附带数据(spoof set / keybox import)。回包 O_EXCL 新建后 `chown -h` + `chcon -h`(App 数据文件带 MLS 类别,不改上下文 App 打不开)。
