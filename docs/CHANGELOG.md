@@ -2,7 +2,7 @@
 
 [English](en/CHANGELOG.md) · [Español](es/CHANGELOG.md) · 简体中文
 
-## DP11 未发布(test-v2.0 … test-v3.0)— 2026-11-09
+## DP11 未发布(test-v2.0 … test-v3.1)— 2026-11-09
 
 user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 起陆续验证),等下一个正式版一起发布。
 
@@ -17,6 +17,7 @@ user-v1.9 之后的测试版,以下改动都在 DP11 线上机跑过(test-v2.0 �
 - `required/general/hardware-fix/power-profile` V1.0:power_profile 补 `audio` / `video` 键名,电池用量里音视频耗电不再是 0。
 - `required/general/bug-fix/herald-quiet` V1.0:herald 域 dontaudit,dmesg 不再被 herald 的 avc 冲掉。
 - `required/general/hardware-fix/torch-levels` V1.1:手电筒亮度滑块真正生效。vendor 相机 HAL 忽略档位(固定两颗各 75 mA)、亮着改档还会关掉第二颗灯;常驻小 App 监听 TorchCallback,经 herald 按档位重写 PMIC 闪光灯节点(1~3 档单颗 50/100/200 mA,4 档两颗各 300 mA)。V1.1 修 test-v2.6 实测的三处:关灯后已在路上的写入把灯重新点亮(请求按序排队 + 关灯发 `torch off`)、单颗电流只有一半(补写 `torch_0=2X`)、改档约 1 秒才生效(防抖 80 ms,herald-apps 轮询 0.2 秒)。V1.2 修 test-v2.7 实测的:经 sysfs 写 0 会摘掉相机 HAL 的 LED trigger,手电筒坏到重启(写 0 后挂回 trigger,每条命令和开机时自愈;关灯只在灯还亮时补写);重启后首次解锁前档位不生效(App `directBootAware`,通道放 DE 存储);改档等待再缩短(开灯立刻发、改档防抖 40 ms)。V1.3 按 test-v2.8 上的原型验证结果改通道:App 只写一份最新状态到 DE 的 `torch_state`(原子 rename),herald 常驻 watcher 用 inotify 读到就执行最新一行(0 次 fork,原型实测 21~51 ms 收敛),不再走 herald-apps 请求通道(一次往返 0.35~0.57 秒、排队后过时的 off 会关掉新开的灯),白名单去掉;灯亮时 App 每 150 ms 读一次档位,兜底丢失的 LEVEL 回调;直接点开跟随 HAL 报的档位(当前 4 档)。V1.4 修 test-v2.9 反馈的"从关闭打开 1 / 2 档先闪一下亮光"(HAL 每次开灯先用自己的 75+75 mA 点亮约 25 ms):关灯后摘掉 torch0 / torch3 的 trigger 并给 `torch_0` 预载 25(12.5+12.5 mA),HAL 开灯只能由暗变亮;相机被打开时 App 发布 `cam`,trigger 全部挂回,相机补光 / 预闪走原厂流程。
+- 三个带界面的内置 App(电池 V1.1 / 机型伪装 V1.1 / 导航栏 V1.1)开启预测性返回(`android:enableOnBackInvokedCallback="true"`):返回有预测性动画。单屏 App 返回=finish()、对话框用框架 Dialog(自注册返回回调),无需改代码。
 - `attestation-fix` V1.4:部署载荷二进制改用原子替换(`install_herald_bin`:cmp 相同就跳过,不同就临时文件 + rename 换 inode),不再原地 `cp -f`。根因(test-v2.9/v3.0 真机 kprobe 定位,用户):keystore2 把 `$CFG/bin/inject` mmap 为载荷,herald 重启时原地 `cp -f` 覆盖它会 O_TRUNC 截断、内核丢掉载荷已重定位的 COW 私有页(GOT/RELRO 退回文件原值),指针退回未加基址的链接时地址 → keystore2 SIGSEGV、keystore 锁定(分享 WLAN 等需认证操作失败,要重新解锁;test-v2.9 问题 #2、v3.0 问题 #2)。平时 inject 守护在执行该文件、原地写 ETXTBSY 让 cp 换 inode,只有 herald 重启(守护先被杀)才真原地写。附带 herald-core c80b798:注入 keystore2 的载荷不再起常驻配置监听线程(减少一个崩溃线程,非此问题的修复,保留作加固)。
 - `required/general/bug-fix/qti-testscripts-fix` V1.0:补原厂 vendor rc 用到的两个 QTI 调试脚本 SELinux 类型(不给权限),开机 init 子进程不再 SIGABRT 两次。
 - `toolkit/tests/test-herald-apps.sh`、`test-torch-plugin.sh`;`test-battery-plugins.sh` 加 mksh 和 V1.2 用例。

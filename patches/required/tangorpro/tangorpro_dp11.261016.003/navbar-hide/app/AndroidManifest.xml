@@ -4,6 +4,7 @@
     <uses-sdk android:minSdkVersion="34" android:targetSdkVersion="35" />
     <application
         android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:supportsRtl="true"
